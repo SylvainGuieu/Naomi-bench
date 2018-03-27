@@ -18,12 +18,21 @@ classdef BaseData
             obj.data = data;
             obj.header = header;
         end
-        
-        function outputArg = method1(obj,inputArg)
-            %METHOD1 Summary of this method goes here
-            %   Detailed explanation goes here
-            outputArg = obj.Property1 + inputArg;
+        function key = getKey(obj, key, default)
+            if nargin<3; 
+                key = []; 
+            else
+                key = default;
+            end;
+
+            for iKey=1:length(obj.header)
+                if strcomp(obj.header{iKey}{1}, key)
+                    key = obj.header{iKey}{2};
+                    break;
+                end
+            end
         end
+        
     end
 end
 

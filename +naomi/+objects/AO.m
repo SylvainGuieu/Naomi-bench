@@ -47,7 +47,7 @@ classdef AO < naomi.objects.BaseObject
            obj.dm.biasVector = 0.0;
            obj.dm.Reset();
            IFC = naomi.measureIF(obj.dm, obj.wfs, config.dmCenterAct, Npp, Amp);
-           config.IFC = naomi.Data(IFC, "IFC", bench);
+           config.IFC = naomi.Data(IFC, 'IFC', bench);
        end
        function [xCenter,yCenter] = computeCenter(obj, config)
             % Get IF of center actuator the result is returned and 

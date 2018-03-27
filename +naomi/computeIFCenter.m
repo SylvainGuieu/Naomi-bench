@@ -21,7 +21,7 @@ IFc = IFc - min(IFc(~isnan(IFc)));
 
 % Compute barycenter
 [Y,X] = meshgrid(1:Nsub,1:Nsub);
-C = naomi.nansum(IFc(:));
+C  = naomi.nansum(IFc(:));
 xC = naomi.nansum(IFc(:) .* X(:)) / C;
 yC = naomi.nansum(IFc(:) .* Y(:)) / C;
 

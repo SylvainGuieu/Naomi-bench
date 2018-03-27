@@ -18,8 +18,8 @@ classdef Gimbal < naomi.objects.BaseObject
            %% gain computed for X and Y axis are 
            %% 3.3 arcsec per mumeter for X and 5.0 arcsec per memeter for Y
            %% arcsec mecanic
-           rY = naomi.objects.GimbalAxis(daisyChain.ConnectDaisyChainDevice(1), 5000, 8.5);
-           rX = naomi.objects.GimbalAxis(daisyChain.ConnectDaisyChainDevice(2), 3300, 8.5);
+           rY = naomi.objects.GimbalAxis(daisyChain.ConnectDaisyChainDevice(1), 'rY', 5000, 8.5);
+           rX = naomi.objects.GimbalAxis(daisyChain.ConnectDaisyChainDevice(2), 'rX', 3300, 8.5);
            
            obj.rX = rX;
            obj.rY = rY;
@@ -55,14 +55,10 @@ classdef Gimbal < naomi.objects.BaseObject
                 obj.rY.device.CloseConnection();
                 obj.daisyChain.CloseDaisyChain();
           end
-          function writeFitsHeader(obj, f)
+          function populateHeader(obj, h)
                 % populate fits header
-                naomi.addToHeader(f, 'RXZERO', obj.rX.zero, 'Zero position of rX motor [mm]');
-                naomi.addToHeader(f, 'RYZERO', obj.rY.zero, 'Zero position of rY motor [mm]');
-                naomi.addToHeader(f, 'RXGAIN', obj.rX.gain, 'Gain of rX motor [arcsec/mm]');
-                naomi.addToHeader(f, 'RYGAIN', obj.rY.gain, 'Gain of rY motor [arcsec/mm]');
-                naomi.addToHeader(f, 'RXPOS',  obj.rX.getPos, 'position of rX when header writing [mm]');
-                naomi.addToHeader(f, 'RYPOS',  obj.rY.getPos, 'position of rY when header writing [mm]');
+                obj.rX.populateHeader(h);
+                obj.rY.populateHeader(h);
           end
     end
 end

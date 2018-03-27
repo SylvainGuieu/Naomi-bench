@@ -15,10 +15,11 @@ function [xS,yS] = getScale(dm, wfs, Npp, Amp)
         dm.cmdVector(~mod(i,2))  = Amp;
         dm.cmdVector(~~mod(i,2)) = -Amp;
         dm.DrawMonitoring();
+
         phase = phase + wfs.GetPhase() / Npp;
 
-        dm.cmdVector(~mod(i,2))  = -Amp;
-        dm.cmdVector(~~mod(i,2)) = Amp;
+        dm.cmdVector( ~mod(i,2)) = -Amp;
+        dm.cmdVector(~~mod(i,2)) =  Amp;
         dm.DrawMonitoring();
         phase = phase - wfs.GetPhase() / Npp;
         dm.Reset;
@@ -35,7 +36,7 @@ function [xS,yS] = getScale(dm, wfs, Npp, Amp)
     phase = zeros(wfs.Nsub,wfs.Nsub);
     for p = 1:Npp;
         dm.Reset;
-        dm.cmdVector(~mod(j,2))  = Amp;
+        dm.cmdVector(~mod(j,2))  =  Amp;
         dm.cmdVector(~~mod(j,2)) = -Amp;
         dm.DrawMonitoring();
         phase = phase + wfs.GetPhase() / Npp;
