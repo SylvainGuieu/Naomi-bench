@@ -10,18 +10,21 @@ classdef GimbalAxis < naomi.objects.BaseObject
         fast;
         slow;
         axis;
+        axisName;
         gain;
         
     end
     
     methods
-        function  obj = GimbalAxis(device, gain, zero)
+        function  obj = GimbalAxis(device, axisName, gain, zero)
             if nargin<2; gain = 5000;end;
             if nargin<3; zero = 8.5 ;end;
             
                 
             obj.device = device;
             obj.axis = '1';
+            obj.axisName = axisName;
+
             fprintf('Enable closed-loop operation\n');
             obj.device.SVO(obj.axis, 1);
             fprintf('Set speed\n');
@@ -121,7 +124,13 @@ classdef GimbalAxis < naomi.objects.BaseObject
          function [vel] = getVelocity(obj)
              vel = obj.device.qVEL(obj.axis);
           
-         end
+        end
+        function populateHeader(obj, h)
+                % populate fits header
+                naomi.addToHeader(h, strcat(obj.axisName,'ZERO'), obj.zero,   strcat('Zero position of ',obj.axisName,'motor [mm]'));
+                naomi.addToHeader(h, strcat(obj.axisName,'GAIN'), obj.gain,   strcat('Gain of ', obj.axisName,' motor [arcsec/mm]'));
+                naomi.addToHeader(h, strcat(obj.axisName,'POS'),  obj.getPos, strcat('position of ', obj.axisName,' when header writing [mm]'));
+          end
     end
 end         
          
