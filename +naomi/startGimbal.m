@@ -14,4 +14,6 @@ function startGimbal(config)
     gimbal.rY.zero = config.gimbalRyZero;
     gimbal.rX.gain = config.gimbalRxGain;
     gimbal.rY.gain = config.gimbalRyGain;
+    gimbal.serialNumber = config.gimbalNumber;
+    
 end

@@ -7,6 +7,7 @@ classdef Gimbal < naomi.objects.BaseObject
         rX;
         rY;
         N;
+        serialNumber = -99;
             
         
     end 
@@ -57,6 +58,7 @@ classdef Gimbal < naomi.objects.BaseObject
           end
           function populateHeader(obj, h)
                 % populate fits header
+                naomi.addToHeader(h, obj.serialNumber, 'GSNUM', 'gimbal serial number');
                 obj.rX.populateHeader(h);
                 obj.rY.populateHeader(h);
           end

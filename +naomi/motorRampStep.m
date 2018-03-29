@@ -56,7 +56,7 @@ function [rx,ry,alpha,beta,dalpha,dbeta] = motorRampStep(config, direction)
         if length(rx)>1
             px = polyfit(rx,alpha,1);
             py = polyfit(ry,beta,1);
-
+            
             switch direction 
             case {'rX','rx','RX', 'rXY', 'rxy'}      
                 figure(3); hold on; 

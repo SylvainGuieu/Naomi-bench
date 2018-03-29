@@ -171,6 +171,15 @@ classdef Wfs < naomi.objects.BaseObject
            
         end  
         function populateHeader(obj, h)
+            if max(abs(obj.ref(:))) == 0;
+              naomi.addToHeader(f, 'PHASEREF', 'NO', 'YES/NO subtracted reference');
+            else
+              naomi.addToHeader(f, 'PHASEREF', 'YES', 'YES/NO subtracted reference');
+            end
+            if obj.filterTilt; FT = 'YES'; else FT= 'NO'; end
+            naomi.addToHeader(f, 'TTFILT', FT, 'YES/NO is TipTilt filtered');
+            
+
             naomi.addToHeader(f, 'WFSMODEL', obj.model, 'Wave front sensor model');
             naomi.addToHeader(f, 'WFSNSUB',  obj.Nsub, 'Wave front number of sub apperture');
         end;

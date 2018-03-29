@@ -104,6 +104,7 @@ classdef Config < handle
         propDef = {
                      {'location',       'ORIGIN',  'Where data has been taken IPAG/ESO-HQ/BENCH'},
                      {'mjd',            'MJD-OBS', 'Modified Julian Date of writing header'},
+                     {'dateobs',        'DATE-OBS','Date of writing header'},
                      {'dmID',           'DM-ID' ,  'DM identification'},
                      {'pupillDiameter', 'PUPDIAM', 'Pupill Diamter [m]'},
                      {'xPixelScale',    'XPCALE',  'X pixel scale in m/pixel'},
@@ -225,12 +226,15 @@ classdef Config < handle
             % modified julian date
             mjd = juliandate(datetime('now'),'modifiedjuliandate');
         end
-        function writeFitsHeader(obj, f)
+        function dateobs = dateobs(obj)
+            dateobs = datestr(now,'yyyy-mm-ddThh:MM:SS');
+        end
+        function populateHeader(obj, f)
             % populate a generic fits header for all files a maximum of
             % information is populated here
             
             for i=1:length(obj.propDef)
-                def = obj.propDef(i);
+                def = obj.propDef{i};
                 naomi.addToHeader(f, def{2}, obj.(def{1}), def{3});
             end
         end

@@ -31,12 +31,12 @@ classdef AutocolMeasurement < naomi.data.BaseData
         end
         function plotAlpha(obj, varargin)
             plot(obj.alpha, varargin{:})
-            title(sprintf('RX = %.3f', obj.getKey('RXPOS',nan)));
+            title(sprintf('%s RX = %.3f', obj.getKey('DATE-OBS',''), obj.getKey('RXPOS',nan)));
             ylabel('alpha [arcsec]');
         end
         function plotBeta(obj, varargin)
             plot(obj.beta, varargin{:})
-            title(sprintf('RY = %.3f', obj.getKey('RYPOS',nan)));
+            title(sprintf('%s RY = %.3f', obj.getKey('DATE-OBS',''), obj.getKey('RYPOS',nan)));
             ylabel('beta [arcsec]');
         end
         
