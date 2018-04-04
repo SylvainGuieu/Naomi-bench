@@ -1,10 +1,10 @@
-function IFM_t = ComputeIFM(IFM,Amp,Width)
-% ComputeIFM  Compute theoretical IFM. Position of actuators
-%             are read from the input IFM.
+function IFM_t = theoriticalIFM(IFM,Amp,Width)
+% theoriticalIFM  Compute theoretical IFM. Position of actuators
+%             are red from the input IFM.
 %
-%   IFM_t = ComputeIFM (IFM, Amp, Width)
+%   IFM_t = theoriticalIFM (IFM, Amp, Width)
 %
-%   The position of eactuator is read form the input IFM
+%   The position of actuator is red form the input IFM
 %   The gain is similar for all actuators, but the sign is
 %   matched to the sign from input IFM. Size is also the same
 %   for all actuators. The output synthetic IFM are filled with

@@ -1,4 +1,4 @@
-classdef WfsHASO128 < naomi.Wfs
+classdef WfsHASO128 < naomi.objects.Wfs
     properties
         model = 'HASO128';
         Nsub = 128;
@@ -41,7 +41,7 @@ classdef WfsHASO128 < naomi.Wfs
             obj.haso.Online;
             obj.haso.sReconstructor.type = 'zonal';
             obj.haso.sReconstructor.validModes(:) = 1;
-            Online@naomi.Wfs(obj);
+            Online@naomi.objects.Wfs(obj);
         end
         
         function Reset(obj)

@@ -60,30 +60,12 @@ function [IFM, IFMcleaned, NtC] = IFM(bench, Npp, Nloop, Amp, IFPause, Neig, Nze
 	     {'IF_PAUSE',IFPause,'pause between actioneu'}};
 
 	IFM = naomi.data.IFM(IFMarray, h , {bench});
-
-
-	% Typical sizes in pixels
-	size28 = bench.sizePix(28.0e-3);
-	size38 = bench.sizePix(36.5e-3);
-	size45 = bench.sizePix(45.0e-3);
-
-
-	Percentil = config.ifmCleanPercentil;
-	Nexclude = int32(size38/4.);
-	IFMcleanArray = naomi.compute.cleanIFM(IFMarray, Nexclude, Percentil);
-	h = {h; {{'IF_NEXC',Nexclude,'number of exclude pixel'},
-	         {'IF_PERC',Percentil,'percentil to compute piston'} 
-	         }};
-
-	IFMClean = naomi.data.IFM(IFMCleanArray, h, {bench});
-
-	NtCArray = naomi.coompute.NtC(IFMCleanArray,config.naomiPupillDiameter, config.dmCentralAct, Neig, Nzern);
-
-	h = { h ; {{'NEIG',Neig, 'accepted Eigenvalues'}, {'NZER',Nzer, 'number of Zerniques'}}};
-	NtC = naomi.data.NtC(NtCArray, h, {bench});
-
+	
 	if config.autoConfig
 		bench.IFM = IFM;
+		naomi.make.cleanIFM(bench);
+		naomi.make.Ztc(bench);
+
 		bench.IFMClean = IFMClean;
 		bench.NtC = NtC;
 	end

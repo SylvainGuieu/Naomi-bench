@@ -22,7 +22,7 @@ phic = phic - (X-Nsub/2) * median(xdelta(~isnan(xdelta)));
 ydelta = diff(phic');
 phic = phic - (Y-Nsub/2) * median(ydelta(~isnan(ydelta)));
 
-Rms = naomi.nanstd(phic(:));
+Rms = naomi.compute.nanstd(phic(:));
 % Ptv = max(phic(:)) - min(phic(:));
 end
 

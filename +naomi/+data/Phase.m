@@ -16,12 +16,12 @@ classdef Phase < naomi.data.BaseData
             clf; imagesc(phase);
 
             
-            if strcomp(obj.getKey('PHASEREF','NO'), 'NO'); tit = 'Phase screen';
+            if strcmp(obj.getKey('PHASEREF','NO'), 'NO'); tit = 'Phase screen';
             else tit = 'Phase screen - reference'; end;
             	
             title({tit,...
                    sprintf('rms=%.3fum ptv=%.3fum',...
-                   naomi.nanstd(phase(:)),...
+                   naomi.compute.nanstd(phase(:)),...
                    max(phase(:)) - min(phase(:)))});
             xlabel('Y   =>+');
             ylabel('+<=   X');

@@ -32,7 +32,7 @@ function ZtC = ZtC(bench, diameter_or_mode)
 		naomi.make.cleanIFM(bench);
 	end
 	IFM = bench.IFMClean; 	
-	ZtCArray = naomi.compute.ZtC(IFM.data,  diameter, config.dmCenterAct, Neig, Nzer);
+	ZtCArray = naomi.compute.ZtC(IFM.data,  diameter, config.dmCentralActuator, Neig, Nzer);
 
 	h = {{'MJD-OBS', IFM.getKey('MJD-OBS',0.0), 'modified julian when IFM measured'},
 	     {'IF_AMP' , IFM.getKey('AMP',   -9.99),  '[Cmax] amplitude of push-pull'},

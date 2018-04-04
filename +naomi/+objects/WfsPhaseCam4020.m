@@ -1,4 +1,4 @@
-classdef WfsPhaseCam4020 < naomi.Wfs
+classdef WfsPhaseCam4020 < naomi.objects.Wfs
     properties
         model = 'PhaseCam4020';
         Nsub = 992/4;
@@ -58,7 +58,7 @@ classdef WfsPhaseCam4020 < naomi.Wfs
             else
                 fprintf('Already connected\n');
             end
-            Online@Wfs(obj);
+            Online@naomi.objects.Wfs(obj);
          end
          
          function checkFlux(obj)

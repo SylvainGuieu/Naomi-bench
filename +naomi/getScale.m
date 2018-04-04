@@ -25,7 +25,7 @@ function [xS,yS] = getScale(dm, wfs, Npp, Amp)
         dm.Reset;
     end;
 
-    X = squeeze(naomi.nansum(phase,2));
+    X = squeeze(naomi.compute.nansum(phase,2));
     Xf = abs(fft(X(~isnan(X)),N));
     [~,xf] = max(Xf(1:N/2));
     xS = 5. / (N./xf);
@@ -48,7 +48,7 @@ function [xS,yS] = getScale(dm, wfs, Npp, Amp)
         dm.Reset;
     end;
 
-    Y = squeeze(naomi.nansum(phase,1));
+    Y = squeeze(naomi.compute.nansum(phase,1));
     Yf = abs(fft(Y(~isnan(Y)),N));
     [~,yf] = max(Yf(1:N/2));
     yS = 5. / (N./yf);

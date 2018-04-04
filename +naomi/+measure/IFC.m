@@ -19,9 +19,9 @@ function [xCenter,yCenter,IFC] = IFC(bench, Npp, Amp)
 	if nargin<2; Npp = config.ifNpp; end
 	if nargin<3; Amp = config.ifAMplitude; end
 
-	IFC = naomi.measure.IF(bench, bench.config.dmCentralAct);
+	IFC = naomi.measure.IF(bench, bench.config.dmCentralActuator);
 	[xCenter,yCenter] = naomi.compute.IFCenter(IFC.data);
-	if config.autoSave;
+	if config.autoConfig;
 		bench.xCenter = xCenter;
 		bench.yCenter = yCenter;
 		bench.IFC = IFC;

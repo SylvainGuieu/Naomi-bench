@@ -22,9 +22,9 @@ function [dX,dY,dTip,dTilt,dFoc] = alignManual(bench)
 		naomi.getFigure('Alignment');
 		PHASE.plot();
 		title({'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',
-               sprintf('Adjust x,y and tip,tilt to be <%.2fpix and <%.2fum',pupThreshold,tiltThreshold),
-               sprintf('Current:           x=%.2f  y=%.2f  tip=%.2f  tilt=%.2f',...
-                       dX, dY, dTip, dTilt),
+               sprintf('Adjust x,y and tip,tilt to be <%.2fmm and <%.2fum',pupThreshold*1e3,tiltThreshold),
+               sprintf('Current:           x=%.3fmm  y=%.3fmm  tip=%.2f  tilt=%.2f',...
+                       dX*1e3, dY*1e3, dTip, dTilt),
                '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'});
 
     end

@@ -41,7 +41,7 @@ for z=1:Nzer
 end
 
 % Comptue the Phase to Zernike
-PtZ = reshape(pinv(reshape(naomi.nanzero(ZtP),Nzer,[])),Nsub,Nsub,[]);
+PtZ = reshape(pinv(reshape(naomi.compute.nanzero(ZtP),Nzer,[])),Nsub,Nsub,[]);
 
 end
 

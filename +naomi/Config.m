@@ -61,7 +61,7 @@ classdef Config < handle
         
         
         % center actuator id number
-        dmCentralAct = 121;       
+        dmCentralActuator = 121;       
         
         % Bench Phase reference file
         % leave '' to ask user when using getPhaseReferenceFile
@@ -185,7 +185,7 @@ classdef Config < handle
                      {'dateobs',        'DATE-OBS','Date of writing header'},
                      {'dmID',           'DM-ID' ,  'DM identification'},
                      {'pupillDiameter', 'PUPDIAM', 'Pupill Diamter [m]'},                    
-                     {'dmCenterAct',    'CENTACT', 'DM center actuator number'},                     
+                     {'dmCentralActuator',    'CENTACT', 'DM center actuator number'},                     
                      {'centerNpp',      'CTNPP',   'Number of push/pull for IFC computation'},
                      {'centerAmplitude','CTAMP',   'push/pull amplitude for IFC computation'}, 
                      {'scaleNpp',       'SCNPP',   'Number of push/pull for scale computation'}, 
@@ -217,13 +217,14 @@ classdef Config < handle
         function log(obj, str, level)
             if nargin<3
                 level = obj.verbose;
+            end
             naomi.log(str, level, obj.verbose);
         end
         function set.location(obj, location)
             found = false
             for iLoc=1:length(obj.locationRoots)
-                if strcmp(location, obj.locationRoots{i}{1})
-                    obj.rootDirectory = obj.locationRoots{i}{2};
+                if strcmp(location, obj.locationRoots{iLoc}{1})
+                    obj.rootDirectory = obj.locationRoots{iLoc}{2};
                     found = true;
                 end
             end
@@ -236,9 +237,9 @@ classdef Config < handle
             obj.location = location;
         end
 
-        function locations locationChoices(obj)
+        function locations = locationChoices(obj)
             locations = {}
-            for iLoc:length(obj.locationRoots)
+            for iLoc=1:length(obj.locationRoots)
                 locations{iLoc} = obj.locationRoots{iLoc}{1};
             end
         end
@@ -488,7 +489,7 @@ classdef Config < handle
         		case 'YPCALE'
         			obj.yPixelScale = value;
         		case 'CENTACT'
-        			obj.dmCenterAct = value;
+        			obj.dmCentralActuator = value;
         		case 'XCENTER'
         			obj.xCenter = value;
         		case 'YCENTER'

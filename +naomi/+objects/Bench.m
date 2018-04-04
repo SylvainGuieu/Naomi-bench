@@ -10,7 +10,7 @@ classdef Bench < naomi.objects.BaseObject
     gimbal; % gimabal object 
     autocol; % autocolimatrice object (only at IPAG calibration bench) 
     ACEStatus = false; % true/false if ASE has been started
-    subsystems = ['config', 'wfs', 'dm', 'environment', 'gimbal', 'autocol'];
+    subsystems = {'config', 'wfs', 'dm', 'environment', 'gimbal', 'autocol'};
 
 
     % computed x,y pixel scale as returned by naomi.measure.pixelScale
@@ -79,7 +79,8 @@ classdef Bench < naomi.objects.BaseObject
         			obj.startAutocol();
         		otherwise
         			error(strcat('unknown subsystem ', varargin{iArg}));
-        		end
+                end
+            end
         end
 
         function  sizePix = sizePix(obj, sz)
@@ -115,7 +116,7 @@ classdef Bench < naomi.objects.BaseObject
 			end
         end
 
-        function startACE(obj):
+        function startACE(obj)
         	if ~obj.ACEStatus
         		obj.ACEStatus = naomi.startACE(obj.config);
         	end
@@ -142,10 +143,10 @@ classdef Bench < naomi.objects.BaseObject
             % populate a generic fits header for all files a maximum of
             % information is populated here
            	
-           	for iSys:length(obj.subsystems)
-           		s = obj.subsystems(iSys);
-           		if obj.has(s); obj.(s).populateHeader(h)l ; end
-           	end;
+           	for iSys=1:length(obj.subsystems)
+           		s = obj.subsystems{iSys};
+           		if obj.has(s); obj.(s).populateHeader(h); end
+            end
         end
     end
 end

@@ -51,7 +51,7 @@ end
 
 % Find NaNs in x and nanmean(x)
 nans = isnan(x);
-avg = naomi.nanmean(x,dim);
+avg = naomi.compute.nanmean(x,dim);
 
 % create array indicating number of element 
 % of x in dimension DIM (needed for subtraction of mean)

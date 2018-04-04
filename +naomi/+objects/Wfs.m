@@ -41,9 +41,8 @@ classdef Wfs < naomi.objects.BaseObject
        end  
 
        function [X,Y] = meshgrid(obj)
-          [X,Y] = meshgrid(1:obj.Nsub, 1:obj.Nsub)
+          [X,Y] = meshgrid(1:obj.Nsub, 1:obj.Nsub);
        end
-
        function [tip,tilt] = getTipTilt(obj)
         % return the measured tip/tilt 
         phi = obj.getPhase();
@@ -55,7 +54,8 @@ classdef Wfs < naomi.objects.BaseObject
 
        function [tip,tilt] = removeTipTilt(obj,tip, tilt)
           %obj.resetTipTiltReference(); % shoudl not be necesary 
-          if nargin==2; error('removeTipTilt takes non or 2 arguments');
+          if nargin==2; error('removeTipTilt takes non or 2 arguments');end
+          
           if nargin<2            
             phi = obj.getPhase();
             [Y,X] = meshgrid(1:obj.Nsub,1:obj.Nsub);

@@ -40,13 +40,13 @@ classdef AO < naomi.objects.BaseObject
             config.yScale = yS;
        end
        function IFC = measureIFC(obj, config, bench)
-           fprintf('Measure IFC with center actuator %i\n',config.dmCenterAct);
+           fprintf('Measure IFC with center actuator %i\n',config.dmCentralActuator);
            Npp = config.centerNpp;
            Amp = config.centerAmp;
            % put bias vector to 0.0 and reset the DM
            obj.dm.biasVector = 0.0;
            obj.dm.Reset();
-           IFC = naomi.measureIF(obj.dm, obj.wfs, config.dmCenterAct, Npp, Amp);
+           IFC = naomi.measureIF(obj.dm, obj.wfs, config.dmCentralActuator, Npp, Amp);
            config.IFC = naomi.Data(IFC, 'IFC', bench);
        end
        function [xCenter,yCenter] = computeCenter(obj, config)

@@ -7,8 +7,11 @@ function [dX,dY,dTip,dTilt,dFoc] = missalignment(bench, phi)
 	% - dTip : in um rms
 	% - dTilt  : in um rms  
 	% - dFoc  : un um rms 
-
+    
+    
 	pscale = bench.config.pixelScale;
+    diam = bench.config.pupillDiameter; 
+    
 	wfs = bench.wfs;
 
 	x0 = wfs.Nsub/2;
@@ -25,11 +28,11 @@ function [dX,dY,dTip,dTilt,dFoc] = missalignment(bench, phi)
 	yTarget = sum(sum(alight.*Y))./norm;
 
 
-	[~,PtZ] = naomi.compute.theoriticalZtP(wfs.Nsub,xTarget,yTarget,diam/pscale,3);
-	zer = naomi.nanzero(phi(:)') * reshape(PtZ,[],3);
+	[~,PtZ] = naomi.compute.theoriticalZtP(wfs.Nsub,xTarget,yTarget,diam/pscale,4);
+	zer = naomi.compute.nanzero(phi(:)') * reshape(PtZ,[],4);
 	
-	dx = (xTarget-x0)*pscale;
-	dy = (yTarget-x0)*pscale;
+	dX = (xTarget-x0)*pscale;
+	dY = (yTarget-x0)*pscale;
 	dTip  = zer(2);
 	dTilt = zer(3);
 	dFoc  = zer(4);	
