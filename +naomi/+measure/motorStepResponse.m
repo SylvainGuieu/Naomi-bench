@@ -1,6 +1,10 @@
-function movementArray = motorStepResponse(gimbal, autocol, direction, config)
+function movementArray = motorStepResponse(bench, direction)
 	
-
+    config = bench.config;
+    gimbal = bench.gimbal;
+    autocol = bench.autocol;
+    
+    
 	startX = config.gimbalRxZero; 
     startY = config.gimbalRyZero; 
     step   = config.gimbalRampStep;

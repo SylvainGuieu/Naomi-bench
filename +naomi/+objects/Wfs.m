@@ -11,7 +11,10 @@ classdef Wfs < naomi.objects.BaseObject
     properties
         % properties of phase output
         mask;
+        % bench phase reference 
         ref;
+        % TipTilt phase reference 
+        refTT;
         
         
         filterTilt;
@@ -29,38 +32,48 @@ classdef Wfs < naomi.objects.BaseObject
        function obj = Wfs()
            %obj.connect(host, port);
            obj.mask = ones(obj.Nsub,obj.Nsub);
-           obj.ref = zeros(obj.Nsub,obj.Nsub);
+           obj.ref   = zeros(obj.Nsub,obj.Nsub);
+           obj.refTT = zeros(obj.Nsub,obj.Nsub);
            obj.filterTilt = 0;
        end
        function delete(obj)
             obj.Off;
        end  
-       
-       function loadReference(obj, filename, removeTipTilt)
-           % Load a phase screen reference in the wfs
-           fprintf('Load REF_DUMMY reference:\n');
-           fprintf('%s\n',strrep(char(filename(1)),'\','\\'));
-           obj.ref = fitsread(char(answer(1)));
-           % Read a phase make sure it is all working
-           obj.GetPhase();
-           
-           if removeTipTilt
-               fprintf('Take mean Tip/Tilt in reference\n');
-               [Y,X] = meshgrid(1:obj.Nsub,1:obj.Nsub);
-               obj.filterTilt = 0;
-               phi = obj.GetPhase();
-               xdelta = diff(phi);
-               ydelta = diff(phi');
-               obj.ref = obj.ref + (X-obj.Nsub/2) * median(xdelta(~isnan(xdelta)));
-               obj.ref = obj.ref + (Y-obj.Nsub/2) * median(ydelta(~isnan(ydelta)));
-           end
+
+       function [X,Y] = meshgrid(obj)
+          [X,Y] = meshgrid(1:obj.Nsub, 1:obj.Nsub)
        end
+
+       function [tip,tilt] = getTipTilt(obj)
+        % return the measured tip/tilt 
+        phi = obj.getPhase();
+        xdelta = diff(phi);
+        ydelta = diff(phi');
+        tip  = median(xdelta(~isnan(xdelta)));
+        tilt = median(ydelta(~isnan(ydelta)));    
+       end
+
+       function [tip,tilt] = removeTipTilt(obj,tip, tilt)
+          %obj.resetTipTiltReference(); % shoudl not be necesary 
+          if nargin==2; error('removeTipTilt takes non or 2 arguments');
+          if nargin<2            
+            phi = obj.getPhase();
+            [Y,X] = meshgrid(1:obj.Nsub,1:obj.Nsub);
+            [tip, tilt] = obj.getTipTilt();
+          end          
+          obj.refTT = obj.refTT + (X-obj.Nsub/2) * tip;
+          obj.refTT = obj.refTT + (Y-obj.Nsub/2) * tilt;
+          obj.filterTilt = 1;
+       end
+         
        
        function resetReference(obj)
            obj.ref = zeros(obj.Nsub,obj.Nsub);
        end
        
-         
+       function resetTipTiltReference(obj)
+           obj.refTT = zeros(obj.Nsub,obj.Nsub);
+       end
       
        function phase = getPhase(obj)
             % Read the phase screen from the WFS
@@ -69,7 +82,7 @@ classdef Wfs < naomi.objects.BaseObject
             % Remove reference phase
             % Filter tip/filt if required
             % Filter piston
-            % Plot phase in figure 'Last Phase'
+            
             
             phase = obj.getRawPhase();
             
@@ -86,34 +99,12 @@ classdef Wfs < naomi.objects.BaseObject
             phase = phase - obj.ref;
             
             % Check filtering of tip/tilt
-            phase = phase - mean(phase(~isnan(phase)));
-            if (obj.filterTilt)
-                [Y,X] = meshgrid(1:obj.Nsub,1:obj.Nsub);
-                xdelta = diff(phase);
-                phase = phase - (X-obj.Nsub/2) * median(xdelta(~isnan(xdelta)));
-                ydelta = diff(phase');
-                phase = phase - (Y-obj.Nsub/2) * median(ydelta(~isnan(ydelta)));
-            end
+            phase = phase - obj.refTT;
             
             % Remove mean
             phase = phase - mean(phase(~isnan(phase)));
         end
         
-        function phase = plotPhase(obj)
-            % Plot
-            phase = obj.getPhase();
-            naomi.GetFigure('Last Phase');
-            clf; imagesc(phase);
-            if max(abs(obj.ref(:))) == 0; tit = 'Last received phase screen';
-            else tit = 'Last received phase screen - reference'; end;
-            title({tit,...
-                   sprintf('rms=%.3fum ptv=%.3fum',...
-                   naomi.nanstd(phase(:)),...
-                   max(phase(:)) - min(phase(:)))});
-            xlabel('Y   =>+');
-            ylabel('+<=   X');
-            colorbar;    
-        end
         function phase = getAvgPhase(obj, Np)
             %    Phase = wfs.GetAvgPhase(Np)
             %
@@ -164,7 +155,7 @@ classdef Wfs < naomi.objects.BaseObject
                
         
         function Online(obj)
-           obj.filterTilt = 0;
+           
         end
         
         function Reset(obj)
@@ -176,10 +167,9 @@ classdef Wfs < naomi.objects.BaseObject
             else
               naomi.addToHeader(f, 'PHASEREF', 'YES', 'YES/NO subtracted reference');
             end
-            if obj.filterTilt; FT = 'YES'; else FT= 'NO'; end
+            if max(abs(obj.refTT(:))) == 0; FT = 'NO'; else FT= 'YES'; end
             naomi.addToHeader(f, 'TTFILT', FT, 'YES/NO is TipTilt filtered');
-            
-
+              
             naomi.addToHeader(f, 'WFSMODEL', obj.model, 'Wave front sensor model');
             naomi.addToHeader(f, 'WFSNSUB',  obj.Nsub, 'Wave front number of sub apperture');
         end;

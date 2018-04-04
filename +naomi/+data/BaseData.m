@@ -145,6 +145,7 @@ classdef BaseData < handle
             fitswrite(obj.data,fileName);
             %matlab.io.fits.writeImg(.file, obj.getData());
         end
+        
         function saveFits(obj, fileName)
            obj.fitsWriteData(fileName);
            fpr = matlab.io.fits.openFile(fileName, 'READWRITE');

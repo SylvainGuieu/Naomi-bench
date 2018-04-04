@@ -1,0 +1,5 @@
++make contain function which define a link between the +measurement and +compute capabilities. 
+
+All function should take the bench object as first argument and must compute derived data from the measurement. 
+For instance from IFM the ZtC and NtC can be computed.
+

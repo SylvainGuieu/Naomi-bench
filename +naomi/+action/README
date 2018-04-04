@@ -1,0 +1,4 @@
+The action directory contain function which are not a measurement by itself but some complex movements or actions of the bench, like closeModal for instance.
+
+closeModal :  close a modal loop  (wfs and dm should be started)
+closeZonal :  close a zonal loop  (wfs and dm should be started)
