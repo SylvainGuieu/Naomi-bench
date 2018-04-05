@@ -7,7 +7,7 @@ classdef IFM < naomi.data.PhaseCube
             obj = obj@naomi.data.BaseData(varargin{:});
         end
         function sh = staticHeader(obj)
-        	sh = {{'DPR_TYPE', 'IFM', ''}}
+        	sh = {{'DPR_TYPE', 'IFM', ''}};
         end
      
     end

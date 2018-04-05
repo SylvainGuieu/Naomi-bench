@@ -8,7 +8,7 @@ classdef Phase < naomi.data.BaseData
             obj = obj@naomi.data.BaseData(varargin{:});
         end
         function sh = staticHeader(obj)
-        	sh = {{'DPR_TYPE', 'PHASE', ''}}
+        	sh = {{'DPR_TYPE', 'PHASE', ''}};
         end
 
         function plot(obj)

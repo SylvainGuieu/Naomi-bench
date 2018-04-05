@@ -8,7 +8,7 @@ classdef IF < naomi.data.Phase
             obj = obj@naomi.data.Phase(varargin{:});
         end
         function sh = staticHeader(obj)
-        	sh = {{'DPR_TYPE', 'IF', ''}}
+        	sh = {{'DPR_TYPE', 'IF', ''}};
         end
 
     function plot(obj)

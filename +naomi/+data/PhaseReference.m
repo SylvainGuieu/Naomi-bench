@@ -7,7 +7,7 @@ classdef PhaseReference < naomi.data.BaseData
             obj = obj@naomi.data.BaseData(varargin{:});
         end
         function sh = staticHeader(obj)
-        	sh = {{'DPR_TYPE', 'REF_DUMMY', ''}}
+        	sh = {{'DPR_TYPE', 'REF_DUMMY', ''}};
         end
     end
 end

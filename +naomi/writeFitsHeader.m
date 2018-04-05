@@ -4,7 +4,7 @@
  {'pupillDiameter', 'PUPDIAM', 'Pupill Diamter [m]'},
  {'xPixelScale',    'XPCALE',  'X pixel scale in m/pixel'},
  {'yPixelScale',    'YPCALE',  'Y pixel scale in m/pixel'},
- {'dmCenterAct',    'CENTACT', 'DM center actuator number'},
+ {'dmCentralActuator',    'CENTACT', 'DM center actuator number'},
  {'xCenter',        'XCENTER', 'DM X center [pixel]'}, 
  {'yCenter',        'YCENTER', 'DM Y center [pixel]'}, 
  {'centerNpp',      'CTNPP',   'Number of push/pull for IFC computation'},

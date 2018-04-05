@@ -8,7 +8,7 @@ classdef ZtC < naomi.data.Phase
             obj = obj@naomi.data.Phase(varargin{:});
         end
         function sh = staticHeader(obj)
-        	sh = {{'DPR_TYPE', 'ZTC_MATRIX', ''}}
+        	sh = {{'DPR_TYPE', 'ZTC_MATRIX', ''}};
         end        
     	function plot(obj)
             IF = obj.data;
