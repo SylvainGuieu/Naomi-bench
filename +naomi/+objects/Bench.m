@@ -106,6 +106,7 @@ classdef Bench < naomi.objects.BaseObject
             if obj.has('dm')
             	obj.dm.zernike2Command = ZtCData.data;
             end
+            obj.ZtCData = ZtCData;
         end
 
         function set.phaseRefData(obj, PR)
@@ -120,13 +121,15 @@ classdef Bench < naomi.objects.BaseObject
                 end;
 	        	%check if it is working 				   	
 				obj.config.log('OK\n', 1);
-			end
+            end
+            obj.phaseRefData = PR;
         end
 
         function set.maskData(obj, maskData)
             if obj.has('wfs') 
                 obj.wfs.mask = maskData.data;
             end
+            obj.maskData = maskData;
         end
 
         function startACE(obj)

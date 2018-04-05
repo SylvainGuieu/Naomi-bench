@@ -8,7 +8,7 @@ naomi.startACE(bench.config);
 % wfs = naomi.objects.WfsHASO128();
 % wfs.connect(cFile,'M660FA');
 % wfs.Online();
-bench.startWfs();
+%bench.startWfs();
 
-naomi.measure.phase(bench).plot;
-naomi.action.alignManual(bench); 
+%naomi.measure.phase(bench).plot;
+%naomi.action.alignManual(bench); 

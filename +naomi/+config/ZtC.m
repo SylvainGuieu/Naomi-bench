@@ -1,4 +1,4 @@
-function ZtC(bench, ZtCData_Or_file)
+function ZtC(bench, data_or_file)
 	% configure the Zernique to Command Matrix 
 	% if not given a gui ask for a fits file 
 	% execption, if the argument is 
@@ -12,7 +12,7 @@ function ZtC(bench, ZtCData_Or_file)
 		[file, path] = naomi.askFitsFile('Select a Mask file');
 		if isequal(file, 0); return; end;
 		maskFile = fullfile(path, file);
-		bench.ZtCData = naomi.data.Mask(maskFile);		
+		bench.ZtCData = naomi.data.ZtC(maskFile);		
 	else
 		if ischar(data_or_file)	
 			if strcmp(data_or_file, '')
@@ -37,5 +37,9 @@ function ZtC(bench, ZtCData_Or_file)
 		else
 			bench.ZtCData = data_or_file;
 		end
-	end	
+    end
+    if bench.config.plotVerbose
+        naomi.getFigure('Zernique to Command');
+        bench.ZtCData.plot();
+    end
 end
