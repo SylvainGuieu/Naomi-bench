@@ -59,14 +59,11 @@ function [IFM, IFMcleaned, NtC] = IFM(bench, Npp, Nloop, Amp, IFPause, Neig, Nze
 	     {'IF_LOOP' ,Nloop,'number of push-pull'},
 	     {'IF_PAUSE',IFPause,'pause between actioneu'}};
 
-	IFM = naomi.data.IFM(IFMarray, h , {bench});
-	
+	IFMData = naomi.data.IFM(IFMarray, h , {bench});
+	IFMCleanData = naomi.make.cleanIFM(bench, IFMData);
 	if config.autoConfig
-		bench.IFM = IFM;
-		naomi.make.cleanIFM(bench);
-		naomi.make.Ztc(bench);
-
-		bench.IFMClean = IFMClean;
-		bench.NtC = NtC;
+		bench.IFMData = IFMData;
+		bench.IFMCleanData = IFMCleanData;
+		bench.ZtCData = naomi.make.ZtC(bench);
 	end
 end

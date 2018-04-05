@@ -39,17 +39,20 @@ classdef Config < handle
         % some typical mode to compute the ZtC 
         %           |- config mode for Zernique2Command computation
         %           |               |- diameter used for ZtC
-        %           |               |        |- Neig value 
-        %           |               |        |   |- Nzern number of Zernique to keep 
+        %           |               |        |- central obscurtion used in [m]
+        %           |               |        |    |- Neig value 
+        %           |               |        |    |   |- Nzern number of Zernique to keep 
         ztcDef = {
-                  {'naomi',        28.0e-3, 140, 100},
-                  {'naomi-sparta', 28.0e-3, 140, 21 }, 
-                  {'bench',        36.5e-3, 220, 100}
+                  {'naomi',        28.0e-3, 0.0, 140, 100},
+                  {'naomi-sparta', 28.0e-3, 0.0, 140, 21 }, 
+                  {'bench',        36.5e-3, 0.0, 220, 100}
                 };
         % current ztcMode 
         ztcMode = 'naomi';
         % ZtC pupill size used for computation in m 
         ztcPupillDiameter = 28.0e-3;
+        % The central obstruction used for ZtC computation 
+        ztcCentralObscurtionDiameter = 0.0; 
         % number of Neig for Zernique to command matrix 
         ztcNeig = 140;
         % number of Zernique to command matrix 
@@ -88,6 +91,12 @@ classdef Config < handle
         referenceNp = 1;
         
 
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %
+        %  IFM measurement  
+        %
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
         % define usable IF/IFM parameters 
         ifDef = {
                        % |- ifNpp
@@ -116,6 +125,16 @@ classdef Config < handle
         % IFM cleaning parameter 
         ifmCleanPercentil = 50;
         
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %
+        %  Zernique to Phase measurement 
+        %
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        ztpNpp = 1;
+        ztpAmplitude = 0.3;
+        % put negative to take the total number of zerniques in dm.zernike2Command
+        ztpNzern = 21;
+
         
         %%%%%%%%%%%%%%%%%%%%%
         % startup alignment  
@@ -307,8 +326,9 @@ classdef Config < handle
                 def = obj.ztcDef{i};
                 if strcomp(mode,def{1})
                     obj.ztcPupillDiameter = def{2};
-                    obj.ztcNeig = def{3};
-                    obj.ztcNzer = def{4};
+                    obj.ztcCentralObscurtionDiameter = def{3};
+                    obj.ztcNeig = def{4};
+                    obj.ztcNzer = def{5};
                     found = true;
                 end
             end

@@ -4,14 +4,11 @@ function phaseData = phaseReference(bench, Np)
 	h = {{'NP', Np, 'Number of averaged pull'}};
 
 	ref = bench.wfs.ref; % save the ref 
-	bench.wfs.ref.resetReference();
+	bench.wfs.resetReference();
 
-	PHASE_REF = naomi.data.PhaseReference(bench.wfs.getAvgPhase(Np), h, {bench});
+
+	phaseRefData = naomi.data.PhaseReference(bench.wfs.getAvgPhase(Np), h, {bench});
 	if bench.config.autoConfig
-		bench.PHASE_REF = PHASE_REF;
-	end
-	if bench.config.plotVerbose
-		naomi.getFigure('Phase reference');
-		PHASE_REF.plot();
+		naomi.config.phaseReference(phaseRefData);	
 	end
 end

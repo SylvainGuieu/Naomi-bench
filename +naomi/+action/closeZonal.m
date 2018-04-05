@@ -15,7 +15,7 @@ wfs = bench.wfs;
 dm = bench.dm;
 config = bench.config;
 
-config.log(fprints('Close zonal loop (%i step):\n',Nstep), 1);
+config.log(sprintf('Close zonal loop (%i step):\n',Nstep), 1);
 
 [~,~,Nact] = size(PtC);
 if nargin < 6; trgPhi = 0.0; end;
@@ -32,7 +32,7 @@ for step=1:Nstep
     % Print
     if config.plotVerbose; dm.DrawMonitoring(); end
     cmd = dm.cmdVector + dm.biasVector;
-    config.log(fprints(['%2i rms = %.3f rmsc = %.3f ptv = %.3f '...
+    config.log(sprintf(['%2i rms = %.3f rmsc = %.3f ptv = %.3f '...
              'cmax = %.3f cmean = %.3f\n'],...
             step, naomi.compute.nanstd(phir(:)), ...
             naomi.compute.rms_tt(phir),max(phir(:)) - min(phir(:)),...

@@ -33,20 +33,23 @@ classdef Bench < naomi.objects.BaseObject
     xCenter;
     yCenter;
 
-    % PHASE_REF
+    % The mask data as created by naomi.make.pupillMask 
+    maskData; 
+
+    % phaseRefData
     % the phase Reference data, this should be a naomi.data.PhaseReference object 
     % and represent the bench static aberation (taken with a dummy) and should not
     % contain Tip and Tilt or Piston  
-    PHASE_REF;
+    phaseRefData;
 
     % The IF computed for the center actuator as returned by naomi.measure.IFC
     % this should be a naomi.data.IF object
-    IFC;
+    IFCData;
 
-    % The IFM and IFMClean as returned by naomi.measure.IFM
-    IFM;
-    IFMClean;
-    ZtC; % changing the ZtC will change the dm.zernike2Command
+    % The IFMData and IFMCleanData as returned by naomi.measure.IFM
+    IFMData;
+    IFMCleanData;
+    ZtCData; % changing the ZtCData will change the dm.zernike2Command
 
     end
     methods
@@ -98,22 +101,32 @@ classdef Bench < naomi.objects.BaseObject
         	sizePix = sz/scale;
         end
 
-        function set.ZtC(obj, ZtC)
+        function set.ZtCData(obj, ZtCData)
         	obj.config.log('Setting a new Zernique to Command Matrix\n', 1);
-        	obj.dm.zernike2Command = ZtC.data;
+            if obj.has('dm')
+            	obj.dm.zernike2Command = ZtCData.data;
+            end
         end
 
-        function set.PHASE_REF(obj, PR)
+        function set.phaseRefData(obj, PR)
         	if isempty(PR)
         		obj.config.log('Removing the phase reference ...', 1);
-        		obj.wfs.resetReference();
+                if obj.has('wfs'); obj.wfs.resetReference(); end;
         	else
 	        	obj.config.log('Setting a new Phase Reference ...', 1);
-	        	obj.wfs.ref = PR.data;  
-	        	%check if it is working 
-				obj.wfs.getPhase();      	
+	        	if obj.has('wfs'); 
+                    obj.wfs.ref = PR.data;  
+                    obj.wfs.getPhase();   
+                end;
+	        	%check if it is working 				   	
 				obj.config.log('OK\n', 1);
 			end
+        end
+
+        function set.maskData(obj, maskData)
+            if obj.has('wfs') 
+                obj.wfs.mask = maskData.data;
+            end
         end
 
         function startACE(obj)

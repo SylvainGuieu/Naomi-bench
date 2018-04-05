@@ -1,11 +1,11 @@
-classdef ZtC < naomi.data.Phase
+classdef ZtC < naomi.data.BaseData
 	properties
 	
 
 	end	
 	methods
         function obj = ZtC(varargin)
-            obj = obj@naomi.data.Phase(varargin{:});
+            obj = obj@naomi.data.BaseData(varargin{:});
         end
         function sh = staticHeader(obj)
         	sh = {{'DPR_TYPE', 'ZTC_MATRIX', ''}};

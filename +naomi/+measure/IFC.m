@@ -1,4 +1,4 @@
-function [xCenter,yCenter,IFC] = IFC(bench, Npp, Amp)
+function [xCenter,yCenter,IFCData] = IFC(bench, Npp, Amp)
 %   IFC  measure the Influence Function of the central actuator 
 % 
 %   IFC = measure.IFC(bench, act, Npp, Amp)
@@ -19,12 +19,10 @@ function [xCenter,yCenter,IFC] = IFC(bench, Npp, Amp)
 	if nargin<2; Npp = config.ifNpp; end
 	if nargin<3; Amp = config.ifAMplitude; end
 
-	IFC = naomi.measure.IF(bench, bench.config.dmCentralActuator);
-	[xCenter,yCenter] = naomi.compute.IFCenter(IFC.data);
-	if config.autoConfig;
-		bench.xCenter = xCenter;
-		bench.yCenter = yCenter;
-		bench.IFC = IFC;
-	end
+	IFCData = naomi.measure.IF(bench, bench.config.dmCentralActuator);
+	[xCenter,yCenter] = naomi.compute.IFCenter(IFCData.data);
 
+	if config.autoConfig;
+		naomi.config.IFC(IFCData);		
+	end		
 end

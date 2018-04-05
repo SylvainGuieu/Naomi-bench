@@ -122,6 +122,11 @@ classdef Wfs < naomi.objects.BaseObject
                     phase = phase + obj.getPhase() / Np;
                 end
         end
+
+        function removeMask(obj)
+          % remove the current wfs mask 
+          obj.mask(:,:) = 1;
+        end
         
         function setMask(obj,diam,x0,y0,obs)
             % Set the mask of the phase returned by the WFS

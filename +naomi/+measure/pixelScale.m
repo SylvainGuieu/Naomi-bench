@@ -1,4 +1,4 @@
-function [xS,yS, phaseCube] = scale(bench,  Npp, Amp)
+function [xScale,yScale, phaseCubeData] = scale(bench,  Npp, Amp)
     % getScale   Measure the scale of the WFS
     %
     %    [xS,yS] = getScale(dm, wfs, Amp)
@@ -39,26 +39,24 @@ function [xS,yS, phaseCube] = scale(bench,  Npp, Amp)
     [~,xf] = max(Xf(1:N/2));
     xS = 5. / (N./xf);
 
-    fprintf('Measure xscale = %.4fmm/pix\n',xS);
+    bench.config.log(sprintf('Measure xscale = %.4fmm/pix\n',xS));
 
     % Push-pull with Y-waffle
     phase = zeros(wfs.Nsub,wfs.Nsub);
-    
-
     for p = 1:Npp;
         dm.Reset;
         dm.cmdVector(~mod(j,2))  =  Amp;
         dm.cmdVector(~~mod(j,2)) = -Amp;
-        dm.DrawMonitoring();
-        p = wfs.GetPhase();
+        if dm.config.plotVerbose; dm.DrawMonitoring();end;
+        p = wfs.getPhase();
         phase = phase + p / Npp;
         phaseCube = [phaseCube; p];
 
 
         dm.cmdVector(~mod(j,2))  = -Amp;
         dm.cmdVector(~~mod(j,2)) = Amp;
-        dm.DrawMonitoring();
-        p = wfs.GetPhase();
+        if dm.config.plotVerbose; dm.DrawMonitoring(); end;
+        p = wfs.getPhase();
         phase = phase - p / Npp;
         phaseCube = [phaseCube; p];
         dm.Reset;
@@ -69,9 +67,13 @@ function [xS,yS, phaseCube] = scale(bench,  Npp, Amp)
     [~,yf] = max(Yf(1:N/2));
     yS = 5. / (N./yf);
 
-    fprintf('Measure yscale = %.4fmm/pix\n',yS);
-
+    bench.config.log(sprintf('Measure yscale = %.4fmm/pix\n',yS), 1);    
     dm.Reset;
-    phaseCube = naomi.data.PhaseCube(phaseCube, {}, {bench});
-    
+    phaseCubeData = naomi.data.PhaseCube(phaseCube, {}, {bench});
+
+    xScale = xS*1e-3;% stored in m/pix 
+    yScale = yS*1e-3;
+    if bench.config.autoConfig
+        naomi.config.pixelScale(xScale, yScale); 
+    end
 end

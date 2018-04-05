@@ -1,4 +1,4 @@
-function [PtC,NtC,ZtP] = cmdMat(IFM, x0, y0, diamPix, Neig, Nzer, zeroMean)
+function [PtC,NtC,ZtP] = cmdMat(IFM, x0, y0, diamPix, centralObscurtionPix, Neig, Nzer, zeroMean)
 % ComputeCmdMat  Compute the zonal and modal Command matrix
 %
 %   [NtC,PtC,ZtP] = ComputeCommandMatrix(IFM, x0, y0, rad, Neig)
@@ -21,8 +21,7 @@ function [PtC,NtC,ZtP] = cmdMat(IFM, x0, y0, diamPix, Neig, Nzer, zeroMean)
 [Nact,Nsub,~] = size(IFM);
 
 % Mask to define the phase pupil
-[Y,X] = meshgrid(1:Nsub,1:Nsub);
-mask = (X-x0).^2 + (Y-y0).^2 < (diamPix*diamPix/4);
+mask = naomi.compute.pupillMask(Nsub, diamPix, centralObscurtionPix, x0, y0);
 
 % CtP defined only over the
 % requested circle, 0 outside.
