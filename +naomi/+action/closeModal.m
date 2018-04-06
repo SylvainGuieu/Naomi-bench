@@ -1,11 +1,11 @@
-function [phir,rmsc] = closeModal(bench,PtN,gain,Nstep,minMode,maxMode,trgPhi)
+function [phir,rmsc] = closeModal(bench,PtZArray,gain,Nstep,minMode,maxMode,trgPhi)
 % closeModal Close a modal loop
 %
-%   phi = closeModal(dm,wfs,PtN,gain,Nstep,minMode,maxMode)
-%   phi = closeModal(dm,wfs,PtN,gain,Nstep,minMode,maxMode,targetPhi)
+%   phi = closeModal(dm,wfs,PtZArray,gain,Nstep,minMode,maxMode)
+%   phi = closeModal(dm,wfs,PtZArray,gain,Nstep,minMode,maxMode,targetPhi)
 %
 %   dm, wfs: DM and WFS from ACE
-%   PtN(Nsub,Nsub,Nzer): Phase to Mode matrix
+%   PtZArray(Nsub,Nsub,Nzer): Phase to Mode matrix
 %   gain: loop gain, same for all modes
 %   Nstep: number of step before function return
 %   minMode,maxMode: first and last controled modes
@@ -21,7 +21,7 @@ config = bench.config;
 
 fprintf('Close modal loop (%i step):\n',Nstep);
 
-[~,~,Nzer] = size(PtN);
+[~,~,Nzer] = size(PtZArray);
 if nargin < 8; trgPhi = 0.0; end;
 
 for step=1:Nstep
@@ -30,7 +30,7 @@ for step=1:Nstep
     phir = phi - trgPhi;
 
     % Control
-    res = reshape(naomi.compute.nanzero(phir),1,[]) * reshape(PtN,[],Nzer);
+    res = reshape(naomi.compute.nanzero(phir),1,[]) * reshape(PtZArray,[],Nzer);
     dm.zernikeVector(minMode:maxMode) = dm.zernikeVector(minMode:maxMode) - gain * res(minMode:maxMode);
     
     % Print

@@ -141,11 +141,26 @@ classdef BaseData < handle
         function data = fitsReadData(obj, file)
             data = matlab.io.fits.readImg(file);
         end
+
         function fitsWriteData(obj, fileName)
             fitswrite(obj.data,fileName);
             %matlab.io.fits.writeImg(.file, obj.getData());
         end
-        
+        function saveFromDate(obj, directory, dte)
+            baseFileName = strcat(obj.getKey('DPR_TYPE', 'UNKNOWN'), '_', datestr(dte, 'yyyy-mm-ddThh:MM:SS'));
+            
+            if exist(fullfile(directory, strcat(baseFileName, '.fits')), 'file')
+                counter = 1
+                while exist(fullfile(directory, strcat(baseFileName,sprintf('_%03d',counter), '.fits')), 'file')
+                    counter = counter + 1;
+                end
+                fileName = fullfile(directory, strcat(baseFileName,sprintf('_%03d',counter), '.fits'));                
+            else
+                fileName = fullfile(directory, strcat(baseFileName, '.fits'));
+            end
+            obj.saveFits(fileName);
+        end
+
         function saveFits(obj, fileName)
            obj.fitsWriteData(fileName);
            fpr = matlab.io.fits.openFile(fileName, 'READWRITE');

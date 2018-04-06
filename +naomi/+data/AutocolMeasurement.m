@@ -15,14 +15,6 @@ classdef AutocolMeasurement < naomi.data.BaseData
             %obj = obj@naomi.data.BaseData(varargin{:});
         %end
         
-        function initPlot(obj)      
-            fa = naomi.getFigure('autocol alpha');          
-            if isempty(fa.Children); obj.alphaPlotAxes = axes(fa);
-            else; obj.alphaPlotAxes = fa.Children(1);end
-            fb = naomi.getFigure('autocol beta');
-            if isempty(fb.Children);  obj.betaPlotAxes = axes(fb);
-            else; obj.betaPlotAxes = fb.Children(1);end
-        end
         function a = alpha(obj);
             a = obj.data(:,obj.ALPHA_INDEX);
         end
@@ -42,17 +34,10 @@ classdef AutocolMeasurement < naomi.data.BaseData
         
 		function plot(obj)
 			if isempty(obj.data); return ;end
-
-			if ~isempty(obj.alphaPlotAxes)
-				plot(obj.alphaPlotAxes, obj.data(:,obj.ALPHA_INDEX), 'bo-');
-                title(obj.alphaPlotAxes, sprintf('RX = %.3f', obj.getKey('RXPOS',nan)));
-                ylabel('alpha [arcsec]');
-            end
-			if ~isempty(obj.betaPlotAxes)
-				plot(obj.betaPlotAxes, obj.data(:,obj.BETA_INDEX),  'bo-');
-                title(obj.betaPlotAxes, sprintf('RY = %.3f', obj.getKey('RYPOS',nan)));
-                ylabel('beta [arcsec]');
-            end
+            subplot(3,1,1);
+            obj.plotAlpha();
+            subplot(3,1,2);
+            obj.plotBeta();			
 		end
 	end
 end

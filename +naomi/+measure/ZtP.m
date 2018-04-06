@@ -1,4 +1,7 @@
 function [ZtP,PtZ] = ZtP(bench, Npp, amplitude, Nzern)
+	global stopZtPMeasurement
+	stopZtPMeasurement = false;
+
 	config = bench.config;
 	wfs = bench.wfs;
 	dm = bench.dm;
@@ -17,22 +20,36 @@ function [ZtP,PtZ] = ZtP(bench, Npp, amplitude, Nzern)
 	config.log('Measure phase for NAOMI modes\n', 1);
 
 	h = {{'MJD-OBS', config.mjd, 'MJD when measure script started'},
-	     {'ZTP_NPP', Npp, 'Number of push-pull'}, 
-		 {'ZTP_AMP', ,amplitude,  '[Cmax] amplitude of push-pull'}};
+	     {'ZTP_NPP',  Npp, 'Number of push-pull'}, 
+		 {'ZTP_AMP', amplitude,  '[Cmax] amplitude of push-pull'}, 
+		 {'ZTP_NZER', amplitude,  'number of zerniques'},
+		 };
 		 
 	ZtP = naomi.data.ZtP(ZtPArray, h, {bench});
 
+	% setup dm and wfs 
+	dm.Reset();
+	wfs.Reset();
+	
+
 	for z=1:Nzer
-	    amp = Amp ./ max(abs(squeeze(dm.zernike2Command(z,:))));
+		if stopZtPMeasurement
+			Ztp = [];
+			PtZ = [];
+			return ;
+		end
+
+	    amp = amplitude ./ max(abs(squeeze(dm.zernike2Command(z,:))));
 	    config.log(sprintf(' %i',z), 1);  
 	    for p=1:Npp
 	    	% take the zerniqueVector reference
 	        ref = dm.zernikeVector(z);
 	        dm.zernikeVector(z) = ref + amp;
-	        dm.DrawMonitoring;
+	        if config.plotVerbose; dm.DrawMonitoring; end;
 	        push = naomi.measure.phase(bench,1).data;
+	        
 	        dm.zernikeVector(z) = ref - amp;
-	        dm.DrawMonitoring;
+	        if config.plotVerbose; dm.DrawMonitoring; end;
 	        pull = naomi.measure.phase(bench,1).data;
 	        ZtPArray(z,:,:) = ZtPArray(z,:,:) + reshape((push - pull)/(2*amp*Npp),1,Nsub,Nsub);
 	        % put back the zernique vector as it was
@@ -45,10 +62,9 @@ function [ZtP,PtZ] = ZtP(bench, Npp, amplitude, Nzern)
 	        ZtPArray(1,:,:) = ZtPArray(1,:,:) + 1.0;
 	    end
 	    
-
 	    % Plot
 	    if config.plotVerbose
-		    naomi.getFigure('Mode');
+		    bench.config.figure('Mode');
 		    ZtP.plotOneMode(z);	   
 		end
 	end
@@ -62,6 +78,5 @@ function [ZtP,PtZ] = ZtP(bench, Npp, amplitude, Nzern)
     PtZArray = reshape(Tmp,Nsub,Nsub,Nzer);
 	
 	PtZ = naomi.data.PtZ(PtZArray, h, {bench}); 
-	
 
 end

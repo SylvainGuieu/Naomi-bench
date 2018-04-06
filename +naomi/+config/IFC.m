@@ -1,29 +1,52 @@
-function IFC(bench, data_or_file)
-	% configure the phase IF for central actuator
-	% if not given a gui will ask for a file
+function isConfigured = IFC(bench, data_or_file)
+	% isConfigured = config.IFC(bench) do nothing return true if configured
+	% config.IFC(bench, filePath) load a IF file as IFC 
+	% config.IFC(bench, 'fetch')   a gui ask the user to fetch a file
+	% config.IFC(bench, 'measure') the IFC is measured and configured
+	% config.IFC(bench, IFCData)   the IFC data object is configured
+	% config.IFC(bench, [])  remove the configured IFC if any
+	%
+	% The IFC will also update the xCenter, yCenter of the bench
+	% 
+		
 	if nargin<2
-		[file, path] = naomi.askFitsFile('Select a central actuator phase IFC_*');
-		if isequal(file, 0); return; end;
-		IFCFile = fullfile(path, file);
-		bench.IFCData= naomi.data.PhaseReference(IFCFile);		
-	else
-		if ischar(data_or_file)	
-			if strcmp(data_or_file, '')				
-				bench.IFCData = [];
-			else
-				bench.IFCData = naomi.data.IF(data_or_file);				
-			end		
-		else			
-			bench.IFCData = data_or_file;
-		end
+		isConfigured = ~isempty(bench.IFCData);
+		return 
 	end
-	bench.config.log('IFC configured, new xCenter, yCenter computed\n', 1);
-	[xCenter,yCenter] = naomi.compute.IFCenter(bench.IFCData.data);
+
+	if ischar(data_or_file)
+		switch data_or_file
+		case 'fetch'
+			[file, path] = naomi.askFitsFile('Select a central actuator phase IFC_*');
+			if isequal(file, 0); return; end;
+			fullPath = fullfile(path, file);
+			data = naomi.data.IF(fullPath);
+		case 'measure'
+			data = naomi.measure.IF(bench);
+		otherwise % this is a file path
+			data =  naomi.data.IF(data_or_file);
+		end
+
+	else
+		if isempty(data_or_file)
+			bench.IFC = [];
+			bench.xCenter = [];
+			bench,yCenter = [];
+			isConfigured = false;
+			return 
+		else
+			data = data_or_file;
+	end
+
+	bench.IFCData = data;
+	[xCenter,yCenter] = naomi.compute.IFCenter(data);
 	bench.xCenter = xCenter;
 	bench.yCenter = yCenter;
-	
+	isConfigured = true;
+
 	if bench.config.plotVerbose
-		naomi.getFigure('IF central actuator');
+		bench.config.figure('IF Central Actuator');% do not modify name for good placement 
 		bench.IFCData.plot();
-	end
+	end	
+	bench.config.log(sprintf('IFCenter and xCenter=%.2f, yCenter=%.2f has been configured ', xCenter, yCenter),2);
 end

@@ -1,31 +1,31 @@
-classdef Phase < naomi.data.BaseData
+classdef Flat < naomi.data.Phase
 	properties
 	
-
 	end	
 	methods
-        function obj = Phase(varargin)
-            obj = obj@naomi.data.BaseData(varargin{:});
+        function obj = Flatvarargin)
+            obj = obj@naomi.data.Phase(varargin{:});
         end
         function sh = staticHeader(obj)
-        	sh = {{'DPR_TYPE', 'PHASE', ''}};
+        	sh = {{'DPR_TYPE', 'FLATO', ''}};
         end
-
         function plot(obj)
         	phase = obj.data;
             clf; imagesc(phase);
 
-            
-            if strcmp(obj.getKey('PHASEREF','NO'), 'NO'); tit = 'Phase screen';
-            else tit = 'Phase screen - reference'; end;
+            if strcmp(obj.getKey('LOOP', 'OPEN', 'OPEN'))
+            	ttl = 'Open Loop Flat';
+            else
+            	ttl = 'Close Loop Flat';
+            end	
             	
-            title({tit,...
+            title({ttl,...
                    sprintf('rms=%.3fum ptv=%.3fum',...
                    naomi.compute.nanstd(phase(:)),...
                    max(phase(:)) - min(phase(:)))});
             xlabel('Y   =>+');
             ylabel('+<=   X');
             colorbar;    
-        end
+        end     	   
     end
 end

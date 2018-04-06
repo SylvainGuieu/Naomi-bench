@@ -19,6 +19,9 @@ classdef Config < handle
             {'ESO-HQ', 'C:\Users\NAOMI-IPAG-2\Documents\DM_Testing\'}
         }
 
+        % tplName as writen in data header products 'TPL_NAME'
+        tplName = 'TEST';
+
         % these will be filled when location is set 
         rootDirectory;
         dataDirectory;
@@ -66,9 +69,6 @@ classdef Config < handle
         % center actuator id number
         dmCentralActuator = 121;       
         
-        % Bench Phase reference file
-        % leave '' to ask user when using getPhaseReferenceFile
-        phaseReferenceFile = '';
 
         % 1/0 put -1 force to ask user with getRemoveReferenceTipTilt
         removeReferenceTipTilt = -1;
@@ -131,11 +131,38 @@ classdef Config < handle
         %
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         ztpNpp = 1;
-        ztpAmplitude = 0.3;
+        ztpAmplitude = 0.25;
         % put negative to take the total number of zerniques in dm.zernike2Command
         ztpNzern = 21;
-
         
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %
+        %   Flat measurement 
+        %
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
+        % flat measurement, number of pull 
+        flatNp = 5; 
+        
+        % gain used to measure the flat in close loop 
+        flatCloseGain = 0.5;
+        % number of Zernique to close the loop on flat 
+        flatCloseNz  = 15;
+        % number of iteration to close loop on flat 
+        flatCloseNstep  = 10;
+
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %
+        %   Stroke  measurement 
+        %
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   
+        % the minimum and maximum fraction of zernique to command amplitude 
+        strokeMinAmpFrac = 0.05;
+        strokeMaxAmpFrac = 0.97;
+        % number of measured points 
+        strokeNstep = 10; 
+                
+
+
         %%%%%%%%%%%%%%%%%%%%%
         % startup alignment  
         %%%%%%%%%%%%%%%%%%%%%
@@ -189,7 +216,24 @@ classdef Config < handle
         % Configuration specified for IPAG bench 
         % Auto colimatrice port communication 
         autocolCom = 'com1';
+            
+        %%%%%%%%%%%%%%
+        %
+        % Graphical configuration 
+        % see the figure function for figure placement
+        %%%%%%%%%%%%%%
+        % rescale the area where the standart figure will be ploted 
+        screenHorizontalScale = 1;
+        screenVerticalScale   = 1;
+        % ofsset of this area 
+        screenHorizontalOffset = 0;
+        screenVerticalOffset = 0;
         
+
+
+
+
+
         % some constant
         IPAG = 'IPAG';
         ESOHQ = 'ESO-HQ';
@@ -199,6 +243,7 @@ classdef Config < handle
         
         % define the properties / FITS key / fits comment used by writeFits Header
         propDef = {
+                     {'tplName' ,       'TPL_NAME','kind of the measurement'},
                      {'location',       'ORIGIN',  'Where data has been taken IPAG/ESO-HQ/BENCH'},
                      {'mjd',            'MJD-OBS', 'Modified Julian Date of writing header'},
                      {'dateobs',        'DATE-OBS','Date of writing header'},
@@ -415,32 +460,6 @@ classdef Config < handle
         end
 
         
-
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %
-        %   phaseReferenceFile 
-        %
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        function askPhaseReferenceFile(obj)
-           prompt = {'Load a recent REF_DUMMY reference of the bench (or let empty)'};
-           answer = inputdlg(prompt,'Bench reference',[1 80],{obj.phaseReferenceFile});
-           if ~isempty(answer) && ~strcmp(answer(1),'')
-               obj.phaseReferenceFile = char(answer);
-           elseif isempty(answer)
-               % nothing to do 
-           else 
-               obj.phaseReferenceFile = '';
-           end
-        end
-
-        function phaseReferenceFile = getPhaseReferenceFile(obj)
-            if strcmp(obj.phaseReferenceFile, '')
-                obj.askPhaseReferenceFile;
-            end
-            phaseReferenceFile = obj.phaseReferenceFile;
-        end
-
-
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %
         %   remove reference tiptill 
@@ -459,6 +478,42 @@ classdef Config < handle
                 obj.askRemoveReferenceTipTilt
             end
             removeReferenceTipTilt = obj.removeReferenceTipTilt;
+        end
+
+
+        function fig = figure(obj, name)
+            fig = findobj('type','figure','name',name);
+
+            if isempty(fig); 
+                fig = figure('name',name);
+                sH = obj.screenHorizontalScale;
+                sV = obj.screenVerticalScale;
+                dH = obj.screenHorizontalOffset;
+                dV = obj.screenVerticalOffset;
+                switch name         
+                    %% figure related to configuration 
+                    case 'Phase Reference'
+                        set(fig, 'Position', [0*sH+dH,   2000*sV+dV, 300*sH, 300*sV]); 
+                    case 'Phase Mask'
+                        set(fig, 'Position', [300*sH+dH, 2000*sV+dV, 300*sH, 300*sV]);                                 
+                    case 'Zernique to Command' 
+                        set(fig, 'Position', [0*sH+dH,   1700*sV+dV, 600*sH, 600*sV]); 
+
+                    case 'Influence Function'
+                    %% figure related to measurement 
+                    case 'Last Phase'
+                        set(fig, 'Position', [1000*sH+dH, 2000*sV+dV, 300*sH, 300*sV]);                     
+                    case 'Best Flat' 
+                        set(fig, 'Position', [1000*sH+dH, 1700*sV+dV, 300*sH, 300*sV]);
+                    case 'IF Central Actuator'
+                        set(fig, 'Position', [1000*sH+dH, 1400*sV+dV, 300*sH, 300*sV]);
+                    case 'Modal Stroke'
+                        set(fig, 'Position', [2000*sH+dH, 2000*sV+dV, 300*sH, 600*sV]);
+                    case 'Mode'
+                    %% figures related to actions 
+                    case 'Alignment'
+                end
+            else set(0, 'CurrentFigure', fig); end;
         end
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

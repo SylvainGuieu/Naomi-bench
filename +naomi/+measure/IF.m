@@ -50,7 +50,7 @@ function IF = IF(bench,  act, Npp, Amp)
 
     IF = naomi.data.IF(IF, h, {bench});
     if bench.config.plotVerbose 
-    	naomi.getFigure('Influence Function');  
+    	bench.config.figure('Influence Function');  
     	IF.plot();    	
     end
 end

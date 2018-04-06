@@ -1,4 +1,4 @@
-function ZtC = ZtC(bench, IFMData)
+function ZtCData = ZtC(bench, IFMData)
 	% Compute the ZtC Matrix 
 	% The only required parameter is bench all others are taken from 
 	% measurement stored inside bench or inside config.  
@@ -37,7 +37,7 @@ function ZtC = ZtC(bench, IFMData)
 	    };
 	
 	if strcomp(config.ztcMode, 'naomi')
-		h{length(h)} = {'DPR_TYPE', 'NTC_MATRIX', ''};
+		h{length(h)} = {'DPR_TYPE', 'ZTC_MATRIX', ''};
 	end
-	ZtC = naomi.data.ZtC(ZtCArray, h, {bench});			
+	ZtCData = naomi.data.ZtC(ZtCArray, h, {bench});			
 end

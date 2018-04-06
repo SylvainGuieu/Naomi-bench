@@ -45,22 +45,17 @@ classdef Wfs < naomi.objects.BaseObject
        end
        function [tip,tilt] = getTipTilt(obj)
         % return the measured tip/tilt 
-        phi = obj.getPhase();
-        xdelta = diff(phi);
-        ydelta = diff(phi');
-        tip  = median(xdelta(~isnan(xdelta)));
-        tilt = median(ydelta(~isnan(ydelta)));    
+        [tip,tilt] = naomi.compute.tipTilt(obj.getPhase());
        end
 
        function [tip,tilt] = removeTipTilt(obj,tip, tilt)
           %obj.resetTipTiltReference(); % shoudl not be necesary 
-          if nargin==2; error('removeTipTilt takes non or 2 arguments');end
+          if nargin==2; error('removeTipTilt takes none or 2 arguments');end
           
-          if nargin<2            
-            phi = obj.getPhase();
-            [Y,X] = meshgrid(1:obj.Nsub,1:obj.Nsub);
+          if nargin<2
             [tip, tilt] = obj.getTipTilt();
-          end          
+          end
+          [Y,X] = obj.meshgrid();          
           obj.refTT = obj.refTT + (X-obj.Nsub/2) * tip;
           obj.refTT = obj.refTT + (Y-obj.Nsub/2) * tilt;
           obj.filterTilt = 1;

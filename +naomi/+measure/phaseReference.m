@@ -7,8 +7,5 @@ function phaseData = phaseReference(bench, Np)
 	bench.wfs.resetReference();
 
 
-	phaseRefData = naomi.data.PhaseReference(bench.wfs.getAvgPhase(Np), h, {bench});
-	if bench.config.autoConfig
-		naomi.config.phaseReference(phaseRefData);	
-	end
+	phaseData = naomi.data.PhaseReference(bench.wfs.getAvgPhase(Np), h, {bench});	
 end

@@ -1,4 +1,4 @@
-function [IFM, IFMcleaned, NtC] = IFM(bench, Npp, Nloop, Amp, IFPause, Neig, Nzern)
+function [IFMData, IFMcleaned] = IFM(bench, Npp, Nloop, Amp, IFPause, Neig, Nzern)
 %   measure.IFM  Get the Influence Function of all actuators 
 % 
 %   IFM = measure.IFM(bench, Npp, Nloop, Amp, IFPause)
@@ -16,11 +16,9 @@ function [IFM, IFMcleaned, NtC] = IFM(bench, Npp, Nloop, Amp, IFPause, Neig, Nze
 %   Neig : numberof  Eigen values for NtC computation
 %   Nzern: number of zernics for NtC computation 
 % 
-%   IFM : the influence functions 
-%   IFMClean : the cleaned influence functions
-%   NtC : NAOMI to Command Matrix
-
-% Size
+%   IFMData : the influence functions data object
+%   IFMCleanData : the cleaned influence functions object   
+% 
 
 	config = bench.config;
 	mjd =  config.mjd;

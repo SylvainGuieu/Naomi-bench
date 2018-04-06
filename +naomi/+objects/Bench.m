@@ -36,11 +36,11 @@ classdef Bench < naomi.objects.BaseObject
     % The mask data as created by naomi.make.pupillMask 
     maskData; 
 
-    % phaseRefData
+    % phaseReferenceData
     % the phase Reference data, this should be a naomi.data.PhaseReference object 
     % and represent the bench static aberation (taken with a dummy) and should not
     % contain Tip and Tilt or Piston  
-    phaseRefData;
+    phaseReferenceData;
 
     % The IF computed for the center actuator as returned by naomi.measure.IFC
     % this should be a naomi.data.IF object
@@ -109,7 +109,7 @@ classdef Bench < naomi.objects.BaseObject
             obj.ZtCData = ZtCData;
         end
 
-        function set.phaseRefData(obj, PR)
+        function set.phaseReferenceData(obj, PR)
         	if isempty(PR)
         		obj.config.log('Removing the phase reference ...', 1);
                 if obj.has('wfs'); obj.wfs.resetReference(); end;
@@ -122,12 +122,15 @@ classdef Bench < naomi.objects.BaseObject
 	        	%check if it is working 				   	
 				obj.config.log('OK\n', 1);
             end
-            obj.phaseRefData = PR;
+            obj.phaseReferenceData = PR;
         end
 
         function set.maskData(obj, maskData)
             if obj.has('wfs') 
-                obj.wfs.mask = maskData.data;
+            	if isempty(maskData)
+            		obj.wfs.removeMask();
+            	else:
+	                obj.wfs.mask = maskData.data;	                
             end
             obj.maskData = maskData;
         end

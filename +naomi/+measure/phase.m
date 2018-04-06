@@ -5,7 +5,7 @@ function phaseData = phase(bench, Np)
 	phaseData = naomi.data.Phase(bench.wfs.getAvgPhase(Np), h, {bench});
 	
 	if bench.config.plotVerbose
-		naomi.getFigure('Last Phase');
+		bench.config.figure('Last Phase');
 		phaseData.plot();
 	end
 end
