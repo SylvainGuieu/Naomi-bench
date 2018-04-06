@@ -117,9 +117,10 @@ classdef Bench < naomi.objects.BaseObject
 	        	obj.config.log('Setting a new Phase Reference ...', 1);
 	        	if obj.has('wfs'); 
                     obj.wfs.ref = PR.data;  
+                    %check if it is working 
                     obj.wfs.getPhase();   
                 end;
-	        	%check if it is working 				   	
+	        					   	
 				obj.config.log('OK\n', 1);
             end
             obj.phaseReferenceData = PR;

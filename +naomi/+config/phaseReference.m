@@ -34,7 +34,7 @@ function isConfigured = phaseReference(bench, data_or_file)
 			data = data_or_file;
 	end
 
-	bench.phaseReferenceData= data;	
+	bench.phaseReferenceData = data;	
 	isConfigured = true;
 		
 	if bench.config.plotVerbose
