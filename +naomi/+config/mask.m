@@ -35,9 +35,8 @@ function isConfigured = mask(bench, data_or_file)
 	isConfigured = true;
 		
 	if bench.config.plotVerbose
-		naomi.getFigure('Phase Mask');
+		bench.config.figure('Phase Mask');
 		bench.maskData.plot();
 	end	
 	bench.config.log('a mask has been configured',2);
-
 end
