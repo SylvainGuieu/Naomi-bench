@@ -38,7 +38,7 @@ function isConfigured = phaseReference(bench, data_or_file)
 	isConfigured = true;
 		
 	if bench.config.plotVerbose
-		naomi.getFigure('Phase Reference');
+		bench.config.figure('Phase Reference');
 		bench.phaseReferenceData.plot();
 	end	
 	bench.config.log('a Phase reference has been configured',2);

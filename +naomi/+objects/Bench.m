@@ -129,8 +129,9 @@ classdef Bench < naomi.objects.BaseObject
             if obj.has('wfs') 
             	if isempty(maskData)
             		obj.wfs.removeMask();
-            	else:
+            	else
 	                obj.wfs.mask = maskData.data;	                
+	            end
             end
             obj.maskData = maskData;
         end
