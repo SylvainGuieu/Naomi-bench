@@ -1,7 +1,7 @@
 classdef WfsHASO128 < naomi.objects.Wfs
     properties
         model = 'HASO128';
-        Nsub = 128;
+        nSubAperture = 128;
         pause = 0.5;
         haso;
     end
@@ -15,21 +15,12 @@ classdef WfsHASO128 < naomi.objects.Wfs
         end
         function phase = getRawPhase(obj)
             % Read the phase screen from HASO
-            obj.haso.SetMask(ones(obj.Nsub,obj.Nsub));
+            obj.haso.SetMask(ones(obj.nSubAperture,obj.nSubAperture));
             pause(obj.pause);
             phase = obj.haso.GetPhase();
             phase = double(flip(phase,1));
         end
         
-        function check = checkPhase(obj, phase)
-            % Check the integrity of a phase screen
-            check = 0;
-            if  ~all(obj.mask(:) == 1)
-                if any(isnan(phase(obj.mask==1)))
-                    check = 1;
-                end
-            end
-        end
         
         function Off(obj)
             % Disable HASO
@@ -79,7 +70,7 @@ classdef WfsHASO128 < naomi.objects.Wfs
         function populateHeader(obj, f)
                 % populate fits header
                 naomi.addToHeader(f, 'WFMODEL', obj.model, 'Wave front model');
-                naomi.addToHeader(f, 'WFNSUB', obj.Nsub, 'Wave front number of sub apperture');
+                naomi.addToHeader(f, 'WFNSUB', obj.nSubAperture, 'Wave front number of sub apperture');
                
           end
     end

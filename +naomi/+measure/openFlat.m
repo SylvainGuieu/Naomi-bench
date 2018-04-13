@@ -1,14 +1,15 @@
-function flatData = openFlat(bench, Np)
+function flatData = openFlat(bench, nPhase)
 	config = bench.config;
-	if nargin<2; Np = config.flatNp; end;
+	if nargin<2; nPhase = config.flatNphase; end;
 
-	bench.dm.Reset();
-	naomi.config.pupillMask(bench);		
-	bench.wfs.Reset();
+	naomi.action.resetDM(bench);
+	naomi.config.pupillMask(bench);
+	naomi.action.resetWfs(bench);		
 	
-	flatArray = naomi.measure.phase(Np);
+	
+	flatArray = naomi.measure.phase(bench,nPhase);
 
-	h = {{'DPR_TYPR', 'FLAT_OPEN', ''}, {'NP', Np, 'number of pull'}, 
+	h = {{'DPR_TYPR', 'FLAT_OPEN', ''}, {'NP', nPhase, 'number of phase averaged'}, 
 		 {'LOOP', 'OPEN', ''}};
 
 	flatData = naomi.data.Phase(flatArray, h, {bench});

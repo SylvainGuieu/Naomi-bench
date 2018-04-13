@@ -1,32 +1,28 @@
-function strokeData = stroke(bench,zerniqueMode,amplitudeVector)
+function strokeData = stroke(bench,zernikeMode,amplitudeVector)
 	config = bench.config;
-	wfs = bench.wfs;
-	dm = bench.dm;
-
+	
 	if nargin<3
-		maxAmp = 1./max(abs(dm.zernike2Command(zerniqueMode,:)));
+		maxAmp = 1./max(abs(bench.ZtCArray(zernikeMode,:)));
 		amplitudeVector = linspace(config.strokeMinAmpFrac*maxAMp, config.strokeMaxAmpFrac*maxAMp, config.strokeNstep);
 	end
 
 	[Nstep,~] = size(amplitudeVector(:));
 	outputArray =  zeros(Nstep, 4);
 	outputArray(:,1) = amplitudeVector;
-	allPhiArray = zeros(Nsub,Nsub,Nstep);
+	allPhiArray = zeros(nSubAperture,nSubAperture,Nstep);
 
-	dm.Reset();
-	
-	wfs.Reset();
+	naomi.action.resetDm(bench);
+	naomi.action.resetWfs(bench);
 
 	phiRefArray = naomi.measure.phase(bench);
 	h = {
 		  {'MJD-OBS', config.mjd, 'MJD at script startup'}, 
-		  {'MODE', zerniqueMode, 'Zernique mode used'}
+		  {'MODE', zernikeMode, 'Zernike mode used'}
 		};
 	for s=1:Nstep
 	    % Set DM
-	    dm.zernikeVector(zerniqueMode) = amplitudeVector(s) * (1).^(s-1);
-	    if config.plotVerbose; dm.DrawMonitoring();end;
-	    outputArray(s,2) = max(abs(dm.biasVector + dm.cmdVector));
+	    naomi.action.cmdModal(bench, zernikeMode, amplitudeVector(s) * (1).^(s-1));
+	    outputArray(s,2) = max(abs(bench.biasVector + bench.cmdVector));
 
 
 	    phiArray = naomi.measure.phase(bench) - phiRefArray;

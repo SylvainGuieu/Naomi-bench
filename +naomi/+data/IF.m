@@ -4,7 +4,7 @@ classdef IF < naomi.data.Phase
 
 	end	
 	methods
-        function obj = Phase(varargin)
+        function obj = IF(varargin)
             obj = obj@naomi.data.Phase(varargin{:});
         end
         function sh = staticHeader(obj)

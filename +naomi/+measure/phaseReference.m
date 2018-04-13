@@ -1,11 +1,9 @@
-function phaseData = phaseReference(bench, Np)
-	if nargin<2; Np = bench.config.phaseRefNp; end
+function phaseData = phaseReference(bench, nPhase)
+	if nargin<2; nPhase = bench.config.phaseRefNphase; end
 	
-	h = {{'NP', Np, 'Number of averaged pull'}};
-
-	ref = bench.wfs.ref; % save the ref 
-	bench.wfs.resetReference();
-
-
-	phaseData = naomi.data.PhaseReference(bench.wfs.getAvgPhase(Np), h, {bench});	
+	h = {{'NP', nPhase, 'Number of phase averaged'}};
+		
+	% 0,0 -> no tiptilt removal, no reference substraction 
+	phaseArray = naomi.measure.phase(bench,nPhase,0,0);
+	phaseData = naomi.data.PhaseReference(phaseArray, h, {bench});	
 end

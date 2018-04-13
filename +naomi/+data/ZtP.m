@@ -10,6 +10,9 @@ classdef ZtP < naomi.data.PhaseCube
         function sh = staticHeader(obj)
         	sh = {{'DPR_TYPE', 'ZTP_MATRIX', ''}};
         end
+        function ZtPSpartaData = toSparta(obj)
+            ZtPSpartaData = naomi.data.ZtPSpartaData(obj.data, obj.header, obj.context);
+        end
         
         function plotOneMode(obj, z)
         	clf; 
@@ -19,26 +22,32 @@ classdef ZtP < naomi.data.PhaseCube
 		    xlabel('Y  =>'); ylabel('<=  X');
         end
         
-    	function plotModes(obj, ZtPRefArray, NzerMax)
-    		if nargin<3; NzerMax=21;end;
+    	function plotModes(obj, maxZernike)
+    		if nargin<2; maxZernike=21;end;
     		ZtPArray = obj.data;
+    		[~, nSubAperture, ~] = size(ZtPArray);
+    		ZtPRefArray = naomi.compute.theoriticalZtP(
+    						 nSubAperture, obj.getKey('XCENTER', 0),  obj.getKey('YCENTER', 0),
+    						       ATOTOTOTOTOT FIFNFIFNINQIASNIFNAISFIASNFIN
+    						       ) 
 
-    		[Nzer,Nsub,~] = size(ZtPArray);
-			Nzer = min(Nzer,NzerMax);			
+    			);
+
+    		[nZernike,nSubAperture,~] = size(ZtPArray);
+			nZernike = min(nZernike,maxZernike);			
 			
-
 			clf;
-			[Gain, Res] = naomi.compute.compareZtP(ZtPArray, ZtPRefArray);
-
-    		for z=1:Nzer
-			    subplot(7,6,z*2-1);
-			    imagesc(squeeze(ZtPArray(z,:,:)));
+			[residualVector, gainVector] = naomi.compute.ztpDifference(ZtPArray, ZtPRefArray, maxZernike);
+			
+    		for iZernike=1:nZernike
+			    subplot(7,6,iZernike*2-1);
+			    imagesc(squeeze(ZtPArray(iZernike,:,:)));
 			    set(gca,'XTickLabel','','YTickLabel','');
-			    title(sprintf('Mode %i',z));
-			    subplot(7,6,z*2);
-			    imagesc(squeeze(ZtPArray(z,:,:) - ZtPRefArray(z,:,:)));
+			    title(sprintf('Mode %i',iZernike));
+			    subplot(7,6,iZernike*2);
+			    imagesc(squeeze(ZtPArray(iZernike,:,:) - ZtPRefArray(iZernike,:,:)));
 			    set(gca,'XTickLabel','','YTickLabel','');
-			    title(sprintf('%.3fum',Res(z)));
+			    title(sprintf('%.3fum',residualVector(iZernike)));
 			end	
      	end
  	end

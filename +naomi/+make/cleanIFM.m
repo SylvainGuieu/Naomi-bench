@@ -1,7 +1,8 @@
 function IFMCleanData = cleanIFM(bench, IFMData)
 	config = bench.config;
 	Percentil = config.ifmCleanPercentil;
-	Nexclude = int32(bench.sizePix(config.pupillDiameter) / 4.);
+	% :TODO: check if it is the full pupill or the naomi pupill
+	Nexclude = int32(bench.sizePix(config.fullPupillDiameter) / 4.);
 
 	if nargin<2
 		if isempty(bench.IFMData)
@@ -10,8 +11,10 @@ function IFMCleanData = cleanIFM(bench, IFMData)
 			IFMData = bench.IFMData;
 		end
 	end
-		
-	IFMcleanArray = naomi.compute.cleanIFM(IFMDate.data, Nexclude, Percentil);
+	if IFMData.getKey('IF_NEXC', -99)>-99
+		bench.config.log('Warning (IFMCleanData) the given IFMData has allready been cleaned');
+	end		
+	IFCleanMatrix = naomi.compute.cleanIFM(IFMData.data, Nexclude, Percentil);
 	h = {{'MJD-OBS', IFM.getKey('MJD-OBS',0.0), 'modified julian when IFM measured'},
 	     {'IF_AMP' , IFM.getKey('AMP', -9.99),  '[Cmax] amplitude of push-pull'},
 	     {'IF_NPP'  ,IFM.getKey('IF_NPP',-9), 'number of push-pull'},
@@ -19,5 +22,5 @@ function IFMCleanData = cleanIFM(bench, IFMData)
 	     {'IF_PAUSE',IFM.getKey('IF_PAUSE', -9.99),'pause between actioneu'}, 
 	     {'IF_NEXC',Nexclude,'number of exclude pixel'},
 	     {'IF_PERC',Percentil,'percentil to compute piston'}};
-	IFMCleanData = naomi.data.IFM(IFMCleanArray, h, {bench});	
+	IFMCleanData = naomi.data.IFMatrix(IFCleanMatrix, h, {bench});	
 end

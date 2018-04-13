@@ -1,4 +1,4 @@
-function [dX,dY,dTip,dTilt,dFoc] = missalignment(bench, phi)
+function [dX,dY,dTip,dTilt,dFoc] = missalignment(bench, phaseArray)
 	% measure the miss alignment of the mirror
 	% measure it from a given phase screen or take a phase screen if not given.  
 	% Return 
@@ -8,28 +8,31 @@ function [dX,dY,dTip,dTilt,dFoc] = missalignment(bench, phi)
 	% - dTilt  : in um rms  
 	% - dFoc  : un um rms 
     
+    if nargin<2    	
+    	naomi.configure.mask([]);
+    	phaseArray = naomi.measure.phase(bench);
+    end
     
 	pscale = bench.config.pixelScale;
-    diam = bench.config.pupillDiameter; 
+    diam = bench.config.fullPupillDiameter;
     
 	wfs = bench.wfs;
 
-	x0 = wfs.Nsub/2;
-    y0 = wfs.Nsub/2;
-    if nargin < 2
-		phi =  wfs.getPhase();
-	end
+	nSubAperture = bench.nSubAperture;
+	x0 = nSubAperture/2;
+    y0 = nSubAperture/2;
+    
 	% Filter pixel with light 
-	alight = ~isnan(phi);
+	alight = ~isnan(phaseArray);
 
-	[X,Y] = wfs.meshgrid();
+	[xArray,yArray] = wfs.meshgrid();
 	norm = sum(sum(alight));
-	xTarget = sum(sum(alight.*X))./norm;
-	yTarget = sum(sum(alight.*Y))./norm;
+	xTarget = sum(sum(alight.*xArray))./norm;
+	yTarget = sum(sum(alight.*yArray))./norm;
 
 
-	[~,PtZ] = naomi.compute.theoriticalZtP(wfs.Nsub,xTarget,yTarget,diam/pscale,4);
-	zer = naomi.compute.nanzero(phi(:)') * reshape(PtZ,[],4);
+	[~,PtZ] = naomi.compute.theoriticalZtP(nSubAperture,xTarget,yTarget,diam/pscale,4);
+	zer = naomi.compute.nanzero(phaseArray(:)') * reshape(PtZ,[],4);
 	
 	dX = (xTarget-x0)*pscale;
 	dY = (yTarget-x0)*pscale;

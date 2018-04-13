@@ -5,8 +5,8 @@ function [dX,dY,dTip,dTilt,dFoc] = alignManual(bench)
 	pupThreshold = bench.config.pupillCenteringThreshold;
 	
 
-	phaseData = naomi.measure.phase(bench);
-	[dX,dY,dTip,dTilt,dFoc] = naomi.measure.missalignment(bench, phaseData.data);
+	phaseArray = naomi.measure.phase(bench);
+	[dX,dY,dTip,dTilt,dFoc] = naomi.measure.missalignment(bench, phaseArray);
 
 	if ~checkAlign(dX,dY,dTip,dTilt, pupThreshold, tiltThreshold)
 		choice = questdlg({'Alignement is recommended','Do you want to align?'}, ...
@@ -17,10 +17,11 @@ function [dX,dY,dTip,dTilt,dFoc] = alignManual(bench)
 
 	while ~checkAlign(dX,dY,dTip,dTilt, pupThreshold, tiltThreshold)
 		
-		phaseData = naomi.measure.phase(bench);
-		[dX,dY,dTip,dTilt,dFoc] = naomi.measure.missalignment(bench, phaseData.data);
+		phaseArray = naomi.measure.phase(bench);
+		[dX,dY,dTip,dTilt,dFoc] = naomi.measure.missalignment(bench, phaseArray);
 		bench.config.figure('Alignment');
-		phaseData.plot();
+		
+		naomi.plot.lastPhase(bench);
 		title({'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',
                sprintf('Adjust x,y and tip,tilt to be <%.2fmm and <%.2fum',pupThreshold*1e3,tiltThreshold),
                sprintf('Current:           x=%.3fmm  y=%.3fmm  tip=%.2f  tilt=%.2f',...

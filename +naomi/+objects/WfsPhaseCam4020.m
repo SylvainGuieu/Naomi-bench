@@ -1,7 +1,7 @@
 classdef WfsPhaseCam4020 < naomi.objects.Wfs
     properties
         model = 'PhaseCam4020';
-        Nsub = 992/4;
+        nSubAperture = 992/4;
         pause = 0.01;
         tcp;
     end
@@ -20,21 +20,17 @@ classdef WfsPhaseCam4020 < naomi.objects.Wfs
             end
             obj.tcp.write(uint8('P'));
             % Get phase screen
-            phase = obj.tcp.read(obj.Nsub.^2,'single');
+            phase = obj.tcp.read(obj.nSubAperture.^2,'single');
             if obj.tcp.BytesAvailable ~= 0;
                 warning('TCP connection is not clean!');
             end;
             % Rotate, deal with NaN
-            phase = -rot90(reshape(phase,obj.Nsub,obj.Nsub));
+            phase = -rot90(reshape(phase,obj.nSubAperture,obj.nSubAperture));
             phase(phase==99) = NaN;
             % From meca-wave to [um]-optical
             phase = double(2.0 * phase * 0.6328);
         end
-         function check = checkPhase(obj, phase)
-            % Check the integrity of a phase screen
-            check = 0;
-         end
-        
+         
          function Off(obj)
              if ~isempty(obj.tcp)
                     fprintf('Close connection\n');

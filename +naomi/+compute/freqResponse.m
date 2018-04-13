@@ -1,5 +1,6 @@
 function FR = freqResponse(f,omega,amp,zeta)
-
+% :TODO: Clean freqResponse function 
+%
 % FR = freqResponse(f,omega,amp,zeta)
 %
 % Compute the Transfer Function of the sum 

@@ -2,3 +2,4 @@ The action directory contain function which are not a measurement by itself but 
 
 closeModal :  close a modal loop  (wfs and dm should be started)
 closeZonal :  close a zonal loop  (wfs and dm should be started)
+alignManual: Bring plot and dialog for manual alignment (tip-tilt and X-Y), wfs should be started

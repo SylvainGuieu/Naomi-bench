@@ -7,20 +7,20 @@ function Rms = rms_tt(phi)
 %   properly. The toutput is 0.0 for a constant phase screen.
 %   The function actully call nanstd.
 %
-%   phi(Nsub,Nsub): input phase screen, can contain NaN
+%   phi(nSubAperture,nSubAperture): input phase screen, can contain NaN
 %   
 %   Rms: output rms
 
 % Get size
-[Nsub,~] = size(phi);
-[Y,X] = meshgrid(1:Nsub,1:Nsub);
+[nSubAperture,~] = size(phi);
+[Y,X] = meshgrid(1:nSubAperture,1:nSubAperture);
 
 % Clean tip-tilt
 phic = phi;
 xdelta = diff(phic);
-phic = phic - (X-Nsub/2) * median(xdelta(~isnan(xdelta)));
+phic = phic - (X-nSubAperture/2) * median(xdelta(~isnan(xdelta)));
 ydelta = diff(phic');
-phic = phic - (Y-Nsub/2) * median(ydelta(~isnan(ydelta)));
+phic = phic - (Y-nSubAperture/2) * median(ydelta(~isnan(ydelta)));
 
 Rms = naomi.compute.nanstd(phic(:));
 % Ptv = max(phic(:)) - min(phic(:));

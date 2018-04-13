@@ -1,8 +1,8 @@
 function IFM_clean = cleanIFM (IFM, rad, prc)
-% cleanIFM  Remove piston and tip-tilt from
-%           Influence Function matrix.
-%
-%   IFM_clean = cleanIFM (IFM, rad, prc)
+% compute.cleanIFM  Remove piston and tip-tilt from
+%                   Influence Function matrix.
+%   
+%   IFM_clean = compute.cleanIFM (IFM, rad, prc)
 %
 %   For each Influence Function, a radius of rad pixel around
 %   its maximum is discarded, supposedly containing most of
@@ -11,17 +11,15 @@ function IFM_clean = cleanIFM (IFM, rad, prc)
 %   These tip/tilt/piston are then removed from the full
 %   influence function.
 % 
-%   IFM(Nact,Nsub,Nsub): input Influence Functions
+%   IFM(nActuator,nSubAperture,nSubAperture): input Influence Functions
 %   rad: radius to be discarded around each actuator
 %   prc: percentile to define the piston in the floor
 %
-%   IFM_clean(Nact,Nsub,Nsub): output Influence Functions
+%   IFM_clean(nActuator,nSubAperture,nSubAperture): output Influence Functions
 
-size_IFM = size(IFM);
-Nsub = size_IFM(2);
-Nact = size_IFM(1);
+[nActuator, nSubAperture] = size(IFM);
 
-if rad > 0.5*Nsub
+if rad > 0.5*nSubAperture
     error('Radius is too large');
 end
 
@@ -29,14 +27,14 @@ end
 fprintf('Clean IFM with rad=%ipix and prc=%.1f%%\n',rad,prc);
 
 % Pixel grid
-[Y,X] = meshgrid(1:Nsub,1:Nsub);
+[Y,X] = meshgrid(1:nSubAperture,1:nSubAperture);
 
 % Clean output
-IFM_clean = zeros(Nact,Nsub,Nsub);
+IFM_clean = zeros(nActuator,nSubAperture,nSubAperture);
 
 % Loop on actuators
-for a=1:Nact
-    ctp = squeeze(IFM(a,:,:));
+for iActuator=1:nActuator
+    ctp = squeeze(IFM(iActuator,:,:));
     
     % Remove median piston
     ctp = ctp - median(ctp(~isnan(ctp)));
@@ -52,9 +50,9 @@ for a=1:Nact
         
     % Clean tip-tilt
     xdelta = diff(ctp_f);
-    ctp = ctp - (X-Nsub/2) * median(xdelta(~isnan(xdelta)));
+    ctp = ctp - (X-nSubAperture/2) * median(xdelta(~isnan(xdelta)));
     ydelta = diff(transpose(ctp_f));
-    ctp = ctp - (Y-Nsub/2) * median(ydelta(~isnan(ydelta)));
+    ctp = ctp - (Y-nSubAperture/2) * median(ydelta(~isnan(ydelta)));
     
     % Clean piston with percentil
     ctp_f = ctp;
@@ -65,7 +63,7 @@ for a=1:Nact
     ctp = ctp - piston;
     
     % Set Back
-    IFM_clean(a,:,:) = ctp;
+    IFM_clean(iActuator,:,:) = ctp;
 end
 
 end

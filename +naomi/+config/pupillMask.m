@@ -1,4 +1,4 @@
-function pupillMask(bench, varargin)
+function success = pupillMask(bench, varargin)
 	% Configure the Mask for the WFS
 	%
 	% configure.pupillMask(bench)
@@ -15,4 +15,5 @@ function pupillMask(bench, varargin)
 	% - centralObscurtion : central obscurtion in [m] if not given 
 	%						takes the bench.config.ztcCentralObscurtionDiameter	
 	naomi.config.mask(naomi.make.pupillMask(bench,  varargin{:}));
+	success = true;
 end

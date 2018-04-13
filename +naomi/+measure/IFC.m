@@ -1,7 +1,7 @@
-function [xCenter,yCenter,IFCData] = IFC(bench, Npp, Amp)
+function [IFCData,xCenter,yCenter] = IFC(bench, nPushPull, amplitude)
 %   IFC  measure the Influence Function of the central actuator 
 % 
-%   IFC = measure.IFC(bench, act, Npp, Amp)
+%   IFC = measure.IFC(bench, act, nPushPull, amplitude)
 %
 %   The requested actuator is push-pulled and the difference
 %   is returned as its influence function.
@@ -9,20 +9,18 @@ function [xCenter,yCenter,IFCData] = IFC(bench, Npp, Amp)
 %   
 %   
 %   bench: naomi bench structure including wfs and dm object  
-%   Npp: number of push-pull default in bench.config.ifNpp
-%   Amp: amplitude of the push-pull default in bench.config.ifAmplitude 
+%   nPushPull: number of push-pull default in bench.config.ifnPushPull
+%   amplitude: amplitude of the push-pull default in bench.config.ifamplitudelitude 
 %   
+%   IFCData is a data.IF the influence function of the central actuator
 %   xCenter  computed x/y center in pixel 
 %   yCenter
-%   IF is a data.IF   the influence function of the central actuator
+%   
 	config = bench.config;
-	if nargin<2; Npp = config.ifNpp; end
-	if nargin<3; Amp = config.ifAMplitude; end
+	if nargin<2; nPushPull = config.ifNpushPull; end
+	if nargin<3; amplitude = config.ifAmplitude; end
 
-	IFCData = naomi.measure.IF(bench, bench.config.dmCentralActuator);
+	IFCData = naomi.measure.IF(bench, bench.config.dmCentralActuator, nPushPull);
 	[xCenter,yCenter] = naomi.compute.IFCenter(IFCData.data);
 
-	if config.autoConfig;
-		naomi.config.IFC(IFCData);		
-	end		
 end

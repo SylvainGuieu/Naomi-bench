@@ -1,7 +1,7 @@
-function [xi,yj,mask] = actPos()
+function [xi,yj,mask] = actuatorPosition()
 % actPos  Compute the 2d indices of DM241 actuators
 %
-%   [xi,yj,mask] = actPos()
+%   [xi,yj,mask] = actuatorPosition()
 %
 %   Compute the positions and the mask representing the 241
 %   actuators of the DM241. Following the definition of X,Y,

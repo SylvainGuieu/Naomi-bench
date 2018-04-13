@@ -1,17 +1,17 @@
-function ZtC = ZtC(IFM, diameter, centralObscurtionDiameter, dmCenterAct, Neig, Nzer)
+function ZtC = ZtC(IFM, diameter, centralObscurtionDiameter, dmCenterAct, nEigenValue, nZernike)
 	% compute.ZtC  Compute the Zernique to command Matrix  
 	%
-	% ZtC = compute.ZtC(IFM, diameter, dmCenterAct, Neig, Nzer)
+	% ZtC = compute.ZtC(IFM, diameter, dmCenterAct, nEigenValue, nZernike)
 	%
-	%  The compute.cmdMat function is used but before, the IF center and 
+	%  The compute.commandMatrix function is used but before, the IF center and 
 	% the pixel scale is computed.
 	% 
-	% IFM(Nact,Nsub,Nsub): input Influence Functions
+	% IFM(nActuator,nSubAperture,nSubAperture): input Influence Functions
 	% dimaeter: pupill diameter in m (should be 28e-3 for NAOMI)
 	% centralObscurtion: pupill central obscurtion diameter in (m) (probably 0)
 	% dmCenterAct: index of the center actuator
-	% Neig: number of accepted Eigenvalues
-	% Nzern : number of zerniques
+	% nEigenValue: number of accepted Eigenvalues
+	% nZerniken : number of zernikes
 	IFC = squeeze(IFM(dmCenterAct,:,:));
 	[xCenter,yCenter] = naomi.compute.IFCenter(IFC);
 
@@ -19,5 +19,5 @@ function ZtC = ZtC(IFM, diameter, centralObscurtionDiameter, dmCenterAct, Neig, 
     scale = 0.5 * (xS + yS);
     diamPix = diameter / scale;
     centralObscurtionPix = centralObscurtionDiameter / scale;
-	[~,ZtC,~] = naomi.compute.cmdMat(IFM,xCenter,yCenter,diamPix, centralObscurtionPix, Neig,Nzer,1);
+	[~,ZtC,~] = naomi.compute.commandMatrix(IFM,xCenter,yCenter,diamPix, centralObscurtionPix, nEigenValue, nZernike,1);
 end

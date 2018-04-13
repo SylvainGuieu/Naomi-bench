@@ -21,7 +21,7 @@ function mask = pupillMask(bench, puppillDiameter, xCenter, yCenter, centralObsc
 	diamPix = bench.sizePix(pupillDiameter);
 	obsPix  = bench.sizePix(centralObscurtionDiameter);
 	
-	maskArray = naomi.compute(wfs.Nsub, diamPix, obsPix, xCenter, yCenter);
+	maskArray = naomi.compute(bench.nSubAperture, diamPix, obsPix, xCenter, yCenter);
 
     h = {{'PUPDIAM', pupillDiameter, 'Mask pupill diameter in [m]'}, 
     	 {'XCENTER', xCenter, 'Mask X Center [pixel]'},

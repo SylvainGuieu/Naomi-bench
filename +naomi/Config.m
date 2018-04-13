@@ -5,11 +5,12 @@ classdef Config < handle
     properties
         verbose = 2; % verbose level for NAOMI measurement/action/config ... 
         plotVerbose = true; % standalone plot are ploted or not when doing measurement 
-
-        %% some measure.* function will write the result on the 
-        %% the bench object, but only if autoConfig is true
-        %% ashould be always true unless for debug purpose
-        autoConfig = true;
+        % turn on of the simulator 
+        simulated = false;
+        % software version. This is writen in the fits files to eventualy check one
+        % day for uncompatibilities 
+        naomiVersion = '01-04-2018';
+        
         % location where the script has been started
         location = 'IPAG';
         % possible loction and their root directory associated
@@ -36,19 +37,19 @@ classdef Config < handle
         % Bench pupill diameter size in m
         % this is the physical pupill of the DM on the bench 
         % not the one used for ZtC (see bellow)  
-        pupillDiameter = 36.5e-3;
+        fullPupillDiameter = 36.5e-3;
          
         
         % some typical mode to compute the ZtC 
         %           |- config mode for Zernique2Command computation
         %           |               |- diameter used for ZtC
         %           |               |        |- central obscurtion used in [m]
-        %           |               |        |    |- Neig value 
-        %           |               |        |    |   |- Nzern number of Zernique to keep 
+        %           |               |        |    |- n Eigen Value value 
+        %           |               |        |    |   |- nZernike number of Zernique to keep 
         ztcDef = {
                   {'naomi',        28.0e-3, 0.0, 140, 100},
                   {'naomi-sparta', 28.0e-3, 0.0, 140, 21 }, 
-                  {'bench',        36.5e-3, 0.0, 220, 100}
+                  {'full',         36.5e-3, 0.0, 220, 100}
                 };
         % current ztcMode 
         ztcMode = 'naomi';
@@ -56,10 +57,10 @@ classdef Config < handle
         ztcPupillDiameter = 28.0e-3;
         % The central obstruction used for ZtC computation 
         ztcCentralObscurtionDiameter = 0.0; 
-        % number of Neig for Zernique to command matrix 
-        ztcNeig = 140;
+        % number of eigen value for Zernique to command matrix 
+        ztcNeigenValue = 140;
         % number of Zernique to command matrix 
-        ztcNzer = 100;
+        ztcNzernike = 100;
 
 
         % Assumed aproximative pixel scale for start-up alignment
@@ -69,27 +70,27 @@ classdef Config < handle
         % center actuator id number
         dmCentralActuator = 121;       
         
+        % separation between actuators in [m]
+        dmActuatorSeparation = 2.5e-3;
 
         % 1/0 put -1 force to ask user with getRemoveReferenceTipTilt
         removeReferenceTipTilt = -1;
         
         %default number of phase average 
-        defaultNp = 1;
+        defaultNphase = 1;
 
         % number of Np for phase refernence
-        phaseRefNp = 2;
+        phaseRefNphase = 2;
 
 
         % number of push pull for DM center computation
-        centerNpp = 2;
+        centerNpushPull = 2;
         % push pull ampliture for DM center computation
         centerAmplitude = 0.15;
         % number of pushPull for wfs pixel scale computation 
-        scaleNpp = 1;
+        scaleNpushPull = 1;
         scaleAmplitude = 0.1;
-        % number of Pull for phase reference computation
-        referenceNp = 1;
-        
+       
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %
@@ -99,7 +100,7 @@ classdef Config < handle
 
         % define usable IF/IFM parameters 
         ifDef = {
-                       % |- ifNpp
+                       % |- ifNpushPull
                        % |  |- ifAMplitude 
                        % |  |     |- ifmNloop
                        % |  |     |  |- ifmPause 
@@ -107,13 +108,14 @@ classdef Config < handle
             {'accurate', 2, 0.35, 2, 1.0}
             
         };
-        ifMode = 'quick';
+        % quick or accurate leave it '' to ask user 
+        ifMode = '';
 
         %%
         % The 4 following parameters will be modified 
         % when ifMode is changed
-        % default Npp for IF and IFM computation 
-        ifNpp = 1;
+        % default nPushPull for IF and IFM computation 
+        ifNpushPull = 1;
         % default Amplitude for IF and IFM computation 
         ifAmplitude = 0.3;
         % default number of llop for IFM computation 
@@ -130,23 +132,23 @@ classdef Config < handle
         %  Zernique to Phase measurement 
         %
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        ztpNpp = 1;
+        ztpNpushPull = 1;
         ztpAmplitude = 0.25;
-        % put negative to take the total number of zerniques in dm.zernike2Command
-        ztpNzern = 21;
+        % put negative to take the total number of zernike in dm.zernike2Command
+        ztpNZernike = 21;
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %
         %   Flat measurement 
         %
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
-        % flat measurement, number of pull 
-        flatNp = 5; 
+        % flat measurement, number of phase 
+        flatNphase = 5; 
         
         % gain used to measure the flat in close loop 
         flatCloseGain = 0.5;
         % number of Zernique to close the loop on flat 
-        flatCloseNz  = 15;
+        flatCloseNzernike  = 15;
         % number of iteration to close loop on flat 
         flatCloseNstep  = 10;
 
@@ -155,7 +157,7 @@ classdef Config < handle
         %   Stroke  measurement 
         %
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   
-        % the minimum and maximum fraction of zernique to command amplitude 
+        % the minimum and maximum fraction of zernike to command amplitude 
         strokeMinAmpFrac = 0.05;
         strokeMaxAmpFrac = 0.97;
         % number of measured points 
@@ -181,6 +183,8 @@ classdef Config < handle
         % gimbal movement specification 
         %%%%%%%%%%%%%%%%%%%%%
 
+        % Specify if the gimbal is used on the bench and motorized
+        useGimbal = true;
         % Which order correspond to rX and rY motor movement 
         rXOrder = 2; %tip
         rYOrder = 3; %tilt
@@ -248,17 +252,18 @@ classdef Config < handle
                      {'mjd',            'MJD-OBS', 'Modified Julian Date of writing header'},
                      {'dateobs',        'DATE-OBS','Date of writing header'},
                      {'dmID',           'DM-ID' ,  'DM identification'},
-                     {'pupillDiameter', 'PUPDIAM', 'Pupill Diamter [m]'},                    
+                     {'fullPupillDiameter', 'FPUPDIAM', 'Full DM Pupill Diamter [m]'},                    
                      {'dmCentralActuator',    'CENTACT', 'DM center actuator number'},                     
-                     {'centerNpp',      'CTNPP',   'Number of push/pull for IFC computation'},
+                     {'centerNpushPull',      'CTNPP',   'Number of push/pull for IFC computation'},
                      {'centerAmplitude','CTAMP',   'push/pull amplitude for IFC computation'}, 
-                     {'scaleNpp',       'SCNPP',   'Number of push/pull for scale computation'}, 
+                     {'scaleNpushPull',       'SCNPP',   'Number of push/pull for scale computation'}, 
                      {'scaleAmplitude', 'SCAMP',   'push/pull amplitude for scale computation'}, 
                      {'referenceNp',    'RFNP',    'Number of push for flat/reference measurement'},
                      {'rXOrder',        'RXORDER', 'Zernike order or rx motor movement'},
                      {'rYOrder',        'RYORDER', 'Zernike order or ry motor movement'},
                      {'rXSign',         'RXSIGN',  'Zernike sign or rx positive motor movement'},
-                     {'rYSign',         'RYSIGN',  'Zernike sign or ry positive motor movement'}
+                     {'rYSign',         'RYSIGN',  'Zernike sign or ry positive motor movement'}, 
+                     {'naomiVecrion',   'VERSION', 'naomi calibartion bench software version'}
             };
     end
     
@@ -330,7 +335,7 @@ classdef Config < handle
             for i=1:length(obj.ifDef)
                 def = obj.ifDef{i};
                 if strcomp(mode,def{1})
-                    obj.ifNpp = def{2};
+                    obj.ifNpushPull = def{2};
                     obj.ifAmplitude = def{3};
                     obj.ifmNloop = def{4};
                     obj.ifmPause = def{5};
@@ -372,8 +377,8 @@ classdef Config < handle
                 if strcomp(mode,def{1})
                     obj.ztcPupillDiameter = def{2};
                     obj.ztcCentralObscurtionDiameter = def{3};
-                    obj.ztcNeig = def{4};
-                    obj.ztcNzer = def{5};
+                    obj.ztcNeigenValue = def{4};
+                    obj.ztcNzernike = def{5};
                     found = true;
                 end
             end
@@ -542,54 +547,6 @@ classdef Config < handle
             end
         end
 
-        function loadFitsHeader(obj,f)
-            % not used to be remove at some point. 
-            % the idea was to modify the config from a fits file header
-            % but they are to many cases and variable to make it work 
-            % corectly.
-        	keyCells = f.keywords; % to be defined
-        	for i=1:length(keyCells)
-        		c = keyCells{i};
-        		key = c{1};
-        		value = c{2};
-        		switch key
-        		case 'ORIGIN'
-        			obj.location = value;
-        		case 'DM-ID'
-        			obj.dmId = value;
-        		case 'PUPDIAM'
-        			obj.pupillDiameter = value;
-        		case 'XPCALE'
-        			obj.xPixelScale = value;
-        		case 'YPCALE'
-        			obj.yPixelScale = value;
-        		case 'CENTACT'
-        			obj.dmCentralActuator = value;
-        		case 'XCENTER'
-        			obj.xCenter = value;
-        		case 'YCENTER'
-        			obj.yCenter = value;
-        		case 'CTNPP'
-					obj.centerNpp = value;
-				case 'CTAMP'
-					obj.centerAmplitude = value;
-				case 'SCNPP'
-					obj.scaleNpp = value;
-				case 'SCAMP'
-					obj.scaleAmplitude = value;
-				case 'RFNP'
-					obj.referenceNp = value;
-				case 'RXORDER'
-					obj.rXOrder = value;
-				case 'RYORDER'
-					obj.rYOrder = value;
-				case 'RXSIGN'
-					obj.rXSign = value;
-				case 'RYSIGN'
-					obj.rYSign = value;
-                end
-            end
-        end
     end
 end
 

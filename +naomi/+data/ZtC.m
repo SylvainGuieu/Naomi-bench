@@ -19,5 +19,9 @@ classdef ZtC < naomi.data.BaseData
             ylabel('commands');
             colorbar;    
      	end
+
+        function ZtCSpartaData = toSparta(obj)
+            ZtCSpartaData = naomi.data.ZtCSpartaData(obj.data, obj.header, obj.context);
+        end
  	end
 end
