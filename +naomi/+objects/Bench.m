@@ -1,6 +1,6 @@
 classdef Bench < naomi.objects.BaseObject
     %  Bench object contain all the subsystem of naomi calibration bench 
-    %  this is the unique interface for all the measurement function.
+    %  this is the uniue interface for all the measurement function.
 
     properties
     config; % configuration object all the configuration goes here 
@@ -51,7 +51,7 @@ classdef Bench < naomi.objects.BaseObject
     % and represent the bench static aberation (taken with a dummy) and should not
     % contain Tip and Tilt or Piston  
     phaseReferenceData;
-
+    
     % The IF computed for the center actuator as returned by naomi.measure.IFC
     % this should be a naomi.data.IF object
     IFCData;
@@ -143,6 +143,7 @@ classdef Bench < naomi.objects.BaseObject
                 zernikeVector = obj.simulator.zernikeVector;
             else
                 zernikeVector = obj.dm.zernikeVector;
+            end
         end
 
         function cmdVector = cmdVector(obj)
@@ -150,6 +151,7 @@ classdef Bench < naomi.objects.BaseObject
                 cmdVector = obj.simulator.cmdVector;
             else
                 cmdVector = obj.dm.cmdVector;
+            end
         end
         function set.ZtCData(obj, ZtCData)
         	obj.config.log('Setting a new Zernique to Command Matrix\n', 1);
@@ -195,7 +197,7 @@ classdef Bench < naomi.objects.BaseObject
         function set.phaseReferenceData(obj, PR)
         	if isempty(PR)
         		obj.config.log('Removing the phase reference ...', 1);
-                if obj.has('wfs'); obj.phaseReferenceData = [] end;
+                if obj.has('wfs'); obj.phaseReferenceData = []; end;
         	else
 	        	obj.config.log('Setting a new Phase Reference ...', 1);
                 obj.phaseReferenceData = PR;
@@ -211,14 +213,10 @@ classdef Bench < naomi.objects.BaseObject
         function phaseReferenceArray = phaseReferenceArray(obj)
             if isempty(obj.phaseReferenceData)
                 nSubAperture = obj.nSubAperture;
-                phaseReferenceData = zeros(nSubAperture, nSubAperture);                
+                phaseReferenceArray = zeros(nSubAperture, nSubAperture);                
             else
                 phaseReferenceArray = obj.phaseReferenceData.data;
-        end
-
-        function set.phaseReferenceArray(obj, phaseReferenceArray)
-            % setting directly an array will create a phaseReferenceData on the fly 
-            obj.phaseReferenceData = naomi.data.PhaseReference(phaseReferenceArray, {}, {obj});
+            end
         end
 
         function nSubAperture = nSubAperture(obj)
@@ -247,13 +245,6 @@ classdef Bench < naomi.objects.BaseObject
         end
 
         function set.maskData(obj, maskData)
-            if obj.has('wfs') 
-            	if isempty(maskData)
-            		obj.wfs.removeMask();
-            	else
-	                obj.wfs.mask = maskData.data;	                
-	            end
-            end
             obj.maskData = maskData;
         end
 
@@ -285,7 +276,7 @@ classdef Bench < naomi.objects.BaseObject
         function check = checkPhase(obj, phase)
             % Check the integrity of a phase screen
             check = 1;
-            maskArray = bench.maskArray;
+            maskArray = obj.maskArray;
             if ~all(maskArray(:) == 1)
                 if any(isnan(phase(maskArray==1)))
                     check = 0;

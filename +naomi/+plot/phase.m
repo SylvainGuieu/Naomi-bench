@@ -1,7 +1,7 @@
 function phase(bench)
 		% plot the last phase received  
 		
-	    phase = obj.lastPhaseArray;
+	    phase = bench.lastPhaseArray;
 		if isempty(phase)
 			clf;
 			title('No phase screen received yet');

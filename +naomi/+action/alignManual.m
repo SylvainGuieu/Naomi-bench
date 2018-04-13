@@ -21,7 +21,7 @@ function [dX,dY,dTip,dTilt,dFoc] = alignManual(bench)
 		[dX,dY,dTip,dTilt,dFoc] = naomi.measure.missalignment(bench, phaseArray);
 		bench.config.figure('Alignment');
 		
-		naomi.plot.lastPhase(bench);
+		naomi.plot.phase(bench);
 		title({'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',
                sprintf('Adjust x,y and tip,tilt to be <%.2fmm and <%.2fum',pupThreshold*1e3,tiltThreshold),
                sprintf('Current:           x=%.3fmm  y=%.3fmm  tip=%.2f  tilt=%.2f',...

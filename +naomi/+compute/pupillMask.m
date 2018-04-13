@@ -7,6 +7,6 @@ function maskArray = pupillMask(nSubAperture,diameterPix,centralObscurtionPix, x
 	[Y,X] = meshgrid(1:nSubAperture,1:nSubAperture);
     Z = (X-xCenterPix).^2 + (Y-yCenterPix).^2 < (diameterPix*diameterPix/4);
     Z = Z .* ((X-xCenterPix).^2 + (Y-yCenterPix).^2 >= (diameterPix*diameterPix*centralObscurtionPix*centralObscurtionPix/4));
-    maskArray = ones(nSubAperture,nSubAperture);
-    maskArray(~Z) = NaN;
+    maskArray = ones(nSubAperture,nSubAperture, 'logical');
+    maskArray(~Z) = 0;
 end

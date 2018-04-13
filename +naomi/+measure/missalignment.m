@@ -9,7 +9,7 @@ function [dX,dY,dTip,dTilt,dFoc] = missalignment(bench, phaseArray)
 	% - dFoc  : un um rms 
     
     if nargin<2    	
-    	naomi.configure.mask([]);
+    	naomi.config.mask(bench,[]);
     	phaseArray = naomi.measure.phase(bench);
     end
     
@@ -25,17 +25,15 @@ function [dX,dY,dTip,dTilt,dFoc] = missalignment(bench, phaseArray)
 	% Filter pixel with light 
 	alight = ~isnan(phaseArray);
 
-	[xArray,yArray] = wfs.meshgrid();
+	[yArray,xArray] = meshgrid(1:nSubAperture, 1:nSubAperture);
 	norm = sum(sum(alight));
 	xTarget = sum(sum(alight.*xArray))./norm;
 	yTarget = sum(sum(alight.*yArray))./norm;
-
-
+    
 	[~,PtZ] = naomi.compute.theoriticalZtP(nSubAperture,xTarget,yTarget,diam/pscale,4);
 	zer = naomi.compute.nanzero(phaseArray(:)') * reshape(PtZ,[],4);
-	
 	dX = (xTarget-x0)*pscale;
-	dY = (yTarget-x0)*pscale;
+	dY = (yTarget-y0)*pscale;
 	dTip  = zer(2);
 	dTilt = zer(3);
 	dFoc  = zer(4);	

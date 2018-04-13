@@ -17,7 +17,7 @@ function phaseArray = phase(bench, nPhase, filterTipTilt, substractReference)
 	if nargin<4 || isempty(substractReference); substractReference = bench.substractReference; end;
 
 	nSubAperture = bench.nSubAperture;
-	phase = zeros(nSubAperture, nSubAperture)*0.0;
+	phaseArray = zeros(nSubAperture, nSubAperture)*0.0;
 	
 
 	maskArray = bench.maskArray;
@@ -33,7 +33,7 @@ function phaseArray = phase(bench, nPhase, filterTipTilt, substractReference)
 		% Apply the mask 
 		rawPhaseArray(maskArray~=1) = NaN;
 		if bench.checkPhase(rawPhaseArray)
-            bench.config.log('Warning Invalid sup-appertures inside the mask !!');
+            bench.config.log('Warning Invalid sup-appertures inside the mask !!\n');
         end
 
         % Remove mean
@@ -61,7 +61,7 @@ function phaseArray = phase(bench, nPhase, filterTipTilt, substractReference)
 
 	bench.lastPhaseArray = phaseArray;
 	if bench.config.plotVerbose
-		naomi.config.figure('Last Phase');
+		bench.config.figure('Last Phase');
 		naomi.plot.phase(bench);
 	end
 end

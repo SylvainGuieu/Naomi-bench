@@ -227,13 +227,20 @@ classdef Config < handle
         % see the figure function for figure placement
         %%%%%%%%%%%%%%
         % rescale the area where the standart figure will be ploted 
-        screenHorizontalScale = 1;
-        screenVerticalScale   = 1;
+        screenHorizontalScale = 0.5;
+        screenVerticalScale   = 0.5;
         % ofsset of this area 
         screenHorizontalOffset = 0;
         screenVerticalOffset = 0;
         
-
+        % grid define the position of area where the plot will be ploted
+        %              |- horizontal screen size in pixel
+        %              |     |- vertical screen size in pixel
+        %              |     |    |- horizontal offset in pixel
+        %              |     |    |  |- vertical offset in pixel
+        %              |     |    |  |  |- h grid resolution
+        %              |     |    |  |  |    |- v grid resolution
+        screenGrid = {1900, 1000, 0, 0, 100, 100};
 
 
 
@@ -485,38 +492,42 @@ classdef Config < handle
             removeReferenceTipTilt = obj.removeReferenceTipTilt;
         end
 
-
+        function posVector = grid2screen(obj, hPos, vPos, hSize, vSize)
+            G = obj.screenGrid;
+            if hPos<0.0; hPos = G{5}+hPos; end;
+            if vPos<0.0; vPos = G{6}+vPos; end;
+            posVector = [ G{3} + G{1}*(hPos/G{5}), ...
+                          G{4} + G{2}*(vPos/G{6}), ...
+                          G{1}*(hSize/G{5}), ...
+                          G{2}*(vSize/G{6}) ];
+            
+        end
         function fig = figure(obj, name)
             fig = findobj('type','figure','name',name);
 
             if isempty(fig); 
                 fig = figure('name',name);
-                sH = obj.screenHorizontalScale;
-                sV = obj.screenVerticalScale;
-                dH = obj.screenHorizontalOffset;
-                dV = obj.screenVerticalOffset;
                 switch name         
                     %% figure related to configuration 
                     case 'Phase Reference'
-                        set(fig, 'Position', [0*sH+dH,   2000*sV+dV, 300*sH, 300*sV]); 
+                        set(fig, 'Position', obj.grid2screen(0,-10,13,10)); 
                     case 'Phase Mask'
-                        set(fig, 'Position', [300*sH+dH, 2000*sV+dV, 300*sH, 300*sV]);                                 
+                        set(fig, 'Position', obj.grid2screen(13,-10,13,10));                                 
                     case 'Zernique to Command' 
-                        set(fig, 'Position', [0*sH+dH,   1700*sV+dV, 600*sH, 600*sV]); 
-
-                    case 'Influence Function'
-                    %% figure related to measurement 
-                    case 'Last Phase'
-                        set(fig, 'Position', [1000*sH+dH, 2000*sV+dV, 300*sH, 300*sV]);                     
-                    case 'Best Flat' 
-                        set(fig, 'Position', [1000*sH+dH, 1700*sV+dV, 300*sH, 300*sV]);
-                    case 'IF Central Actuator'
-                        set(fig, 'Position', [1000*sH+dH, 1400*sV+dV, 300*sH, 300*sV]);
-                    case 'Modal Stroke'
-                        set(fig, 'Position', [2000*sH+dH, 2000*sV+dV, 300*sH, 600*sV]);
-                    case 'Mode'
-                    %% figures related to actions 
-                    case 'Alignment'
+                        set(fig, 'Position', obj.grid2screen(0,-20,26,10)); 
+%                     case 'Influence Function'
+%                     %% figure related to measurement 
+%                     case 'Last Phase'
+%                         set(fig, 'Position', [sX*sH+dH-300*sH, sY*sV+dV-300*sV, 300*sH, 300*sV]);                     
+%                     case 'Best Flat' 
+%                         set(fig, 'Position', [sX*sH+dH-300*sH, sY*sV+dV-900*sV, 300*sH, 300*sV]);
+%                     case 'IF Central Actuator'
+%                         set(fig, 'Position', [1000*sH+dH, 1400*sV+dV, 300*sH, 300*sV]);
+%                     case 'Modal Stroke'
+%                         set(fig, 'Position', [2000*sH+dH, 2000*sV+dV, 300*sH, 600*sV]);
+%                     case 'Mode'
+%                     %% figures related to actions 
+%                     case 'Alignment'
                 end
             else set(0, 'CurrentFigure', fig); end;
         end

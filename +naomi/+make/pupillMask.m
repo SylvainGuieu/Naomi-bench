@@ -1,4 +1,4 @@
-function mask = pupillMask(bench, puppillDiameter, xCenter, yCenter, centralObscurtionDiameter)
+function maskData = pupillMask(bench, puppillDiameter, xCenter, yCenter, centralObscurtionDiameter)
 	% Make a mask for the WFS
 	% - bench : the bench object 
 	% - pupillDiameter : the Pupill diamter for the mask in [m]
@@ -8,7 +8,7 @@ function mask = pupillMask(bench, puppillDiameter, xCenter, yCenter, centralObsc
 	%                      normaly measure at startup
 	% - centralObscurtionDiameter : central obscurtion in [m]
 	if nargin<2; pupillDiameter = bench.config.ztcPupillDiameter; end;
-	if nargin==3; error('config.mask should take 2 or 4 argument not 3');
+	if nargin==3; error('config.mask should take 2 or 4 argument not 3');end
 	if nargin<3
 		xCenter = bench.xCenter;
 		yCenter = bench.yCenter;
@@ -28,5 +28,5 @@ function mask = pupillMask(bench, puppillDiameter, xCenter, yCenter, centralObsc
     	 {'YCENTER', xCenter, 'Mask Y Center [pixel]'},
     	 {'OBSCU', centralObscurtionDiameter, 'Mask central obscurtion diameter [m]'}
     	};
-    mask = naomi.data.Mask(maskArray, h, {bench});
+    maskData = naomi.data.Mask(maskArray, h, {bench});
 end
