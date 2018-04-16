@@ -16,11 +16,20 @@ function [ZtP,PtZ] = ZtP(bench, nPushPull, amplitude, nZernike)
 	ZtPArray = zeros(nZernike,nSubAperture,nSubAperture);
 
 	config.log('Measure phase for NAOMI modes\n', 1);
-
+    if ~isempty(bench.ZtCData)
+        pupillDiameter = bench.ZtCData.getKey('DIAM', 0);
+        if pupillDiameter ==0 % assume this is the configured pupill diameter
+            pupillDiameter = bench.config.ztcPupillDiameter;
+        end
+    else % assume this is the configured pupill diameter
+        pupillDiameter = bench.config.ztcPupillDiameter;
+    end
 	h = {{'MJD-OBS', config.mjd, 'MJD when measure script started'},
-	     {'ZTP_NPP',  nPushPull, 'Number of push-pull'}, 
-		 {'ZTP_AMP', amplitude,  '[Cmax] amplitude of push-pull'}, 
-		 {'ZTP_NZER', nZernike,  'number of zernikes'},		 
+	     {'ZTPNPP',  nPushPull, 'Number of push-pull'}, 
+		 {'ZTPAMP', amplitude,  '[Cmax] amplitude of push-pull'}, 
+		 {'ZTPNZER', nZernike,  'number of zernikes'},
+         {'ZTPDIAM', pupillDiameter,'Pupill diameter in[m]'}, 
+         {'ZTPDIAMP',bench.sizePix(pupillDiameter) ,'Pupill diameter in  wfs pixel'}      
 		 };
 		 
 	ZtP = naomi.data.ZtP(ZtPArray, h, {bench});
@@ -30,39 +39,42 @@ function [ZtP,PtZ] = ZtP(bench, nPushPull, amplitude, nZernike)
 	naomi.action.resetWfs(bench);
 		
 
-	for z=1:nZernike
+	for iZernike=1:nZernike
 		if stopZtPMeasurement
 			Ztp = [];
 			PtZ = [];
 			return ;
 		end
 
-	    amp = amplitude ./ max(abs(squeeze(benc.ZtPArray()(z,:))));
+	    amp = amplitude ./ max(abs(squeeze(bench.ZtPArray()(iZernike,:))));
 	    config.log(sprintf(' %i',z), 1);  
 	    for p=1:nPushPull
 	    	% take the zernikeVector reference
-	        ref = bench.zernikeVector()(z);
-	        naomi.action.cmdModal(bench, z, ref + amp);	        
+	        ref = bench.zernikeVector()(iZernike);
+	        naomi.action.cmdModal(bench, iZernike, ref + amp);	        
  	        push = naomi.measure.phase(bench,1);
 	        
-	        naomi.action.cmdModal(bench, z, ref - amp);	 	        
+	        naomi.action.cmdModal(bench, iZernike, ref - amp);	 	        
 	        pull = naomi.measure.phase(bench,1);
-	        ZtPArray(z,:,:) = ZtPArray(z,:,:) + reshape((push - pull)/(2*amp*nPushPull),1,nSubAperture,nSubAperture);
+	        ZtPArray(iZernike,:,:) = ZtPArray(iZernike,:,:) + reshape((push - pull)/(2*amp*nPushPull),1,nSubAperture,nSubAperture);
 	        % put back the zernike vector as it was
 
-	        naomi.action.cmdModal(bench, z, ref);
+	        naomi.action.cmdModal(bench, iZernike, ref);
 	    end   
 	    
 	    % Cleanup piston
-	    ZtPArray(z,:,:) = ztPArray(z,:,:) - naomi.compute.nanmean(reshape(ZtPArray(z,:,:),[],1));
-	    if z==1
+	    ZtPArray(iZernike,:,:) = ...
+            ztPArray(iZernike,:,:) - ...
+            naomi.compute.nanmean(reshape(ZtPArray(iZernike,:,:),[],1));
+        
+	    if iZernike==1
 	        ZtPArray(1,:,:) = ZtPArray(1,:,:) + 1.0;
 	    end
 	    
 	    % Plot
 	    if config.plotVerbose
 		    bench.config.figure('Mode');
-		    ZtP.plotOneMode(z);	   
+		    ZtP.plotOneMode(iZernike);	   
 		end
 	end
 	config.log('\n', 1); 

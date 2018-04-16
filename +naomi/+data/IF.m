@@ -11,19 +11,21 @@ classdef IF < naomi.data.Phase
         	sh = {{'DPR_TYPE', 'IF', ''}};
         end
 
-    function plot(obj)
+    function plot(obj, axes)
+        if nargin<2; axes = gca; end;
+        
             IF = obj.data;
-            clf; imagesc(IF);
+            cla(axes); imagesc(axes, IF);
 
             ttl = 'Influence Function';
             Max = max(abs(IF(~isnan(IF))));
-            title({ttl,...
+            title(axes, {ttl,...
             	   sprintf('IF %i   max = %.2fum',obj.getKey('ACTNUM', -99),Max)}
 
             	);            
-            xlabel('Y   =>+');
-            ylabel('+<=   X');
-            colorbar;    
+            xlabel(axes, 'Y   =>+');
+            ylabel(axes, '+<=   X');
+            colorbar(axes);
      end
  	end
 end

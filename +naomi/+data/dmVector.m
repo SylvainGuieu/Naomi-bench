@@ -11,7 +11,8 @@ classdef IF < naomi.data.dmVector
         	sh = {{'DPR_TYPE', 'DM_VECTOR', ''}};
         end
 
-    	function plot(obj)
+    	function plot(obj, axes)
+            if nargin<2; axes= gca();end;
     		if isempty(obj.dmMask)
 	    		[xi,yi,mask] = naomi.compute.actuatorPosision();
 	    		dmMask = mask;
@@ -19,8 +20,8 @@ classdef IF < naomi.data.dmVector
 	    	values = mask*1.0;
     		values(mask) = mask(mask)*obj.data;
     		values(~mask) = nan;
-    		clf; imagesc(values);
-            colorbar;    
+    		cla(axes); imagesc(axes, values);
+            colorbar(axes);    
     	end
  	end
 end

@@ -12,7 +12,7 @@ classdef Config < handle
         naomiVersion = '01-04-2018';
         
         % location where the script has been started
-        location = 'IPAG';
+        location = 'Bench';
         % possible loction and their root directory associated
         locationRoots = {
             {'IPAG',   'N:\Bench\'},
@@ -494,8 +494,8 @@ classdef Config < handle
 
         function posVector = grid2screen(obj, hPos, vPos, hSize, vSize)
             G = obj.screenGrid;
-            if hPos<0.0; hPos = G{5}+hPos; end;
-            if vPos<0.0; vPos = G{6}+vPos; end;
+            if hPos<=0.0; hPos = G{5}+hPos; end;
+            if vPos<=0.0; vPos = G{6}+vPos; end;
             posVector = [ G{3} + G{1}*(hPos/G{5}), ...
                           G{4} + G{2}*(vPos/G{6}), ...
                           G{1}*(hSize/G{5}), ...
@@ -510,11 +510,13 @@ classdef Config < handle
                 switch name         
                     %% figure related to configuration 
                     case 'Phase Reference'
-                        set(fig, 'Position', obj.grid2screen(0,-10,13,10)); 
+                        set(fig, 'Position', obj.grid2screen(1,-10,13,10)); 
                     case 'Phase Mask'
                         set(fig, 'Position', obj.grid2screen(13,-10,13,10));                                 
                     case 'Zernique to Command' 
-                        set(fig, 'Position', obj.grid2screen(0,-20,26,10)); 
+                        set(fig, 'Position', obj.grid2screen(1,-20,26,10));
+                    case 'Last Phase'
+                         set(fig, 'Position',obj.grid2screen(-20,-28,20,28));
 %                     case 'Influence Function'
 %                     %% figure related to measurement 
 %                     case 'Last Phase'

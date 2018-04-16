@@ -10,12 +10,13 @@ classdef Mask < naomi.data.Phase
         function sh = staticHeader(obj)
         	sh = {{'DPR_TYPE', 'PHASE_MASK', ''}};
         end
-	    function plot(obj)
+	    function plot(obj, axes)
+            if nargin<2; axes = gca; end
         	mask = obj.data;
-            clf; imagesc(mask);                       		
-            title('Phase Mask');
-            xlabel('Y   =>+');
-            ylabel('+<=   X');
+            cla(axes); imagesc(axes,mask);                       		
+            title(axes, 'Phase Mask');
+            xlabel(axes, 'Y   =>+');
+            ylabel(axes, '+<=   X');
         end
     end
 end

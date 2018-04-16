@@ -14,40 +14,51 @@ classdef ZtP < naomi.data.PhaseCube
             ZtPSpartaData = naomi.data.ZtPSpartaData(obj.data, obj.header, obj.context);
         end
         
-        function plotOneMode(obj, z)
-        	clf; 
-        	imagesc(squeeze(obj.data(z,:,:))); 
-        	colorbar;
-		    title(sprintf('Mode %i',z));
-		    xlabel('Y  =>'); ylabel('<=  X');
+        function plotOneMode(obj, z, axes)
+            if nargin<3; axes = gca; end;
+        	cla(axes); 
+        	imagesc(axes, squeeze(obj.data(z,:,:))); 
+        	colorbar(axes);
+		    title(axes, sprintf('Mode %i',z));
+		    xlabel(axes, 'Y  =>'); ylabel(axes, '<=  X');
+        end
+        function axesList = makeAxesList(maxZernike)
+            axesList = {};
+            n = 7; m =6; % :TOTO adapt n and m in function to maxZernike 
+            for iZernike=1:maxZernike
+                axesList{length(axesList)+1} = subplot(n,m,iZernike*2-1); % screen phase
+                axesList{length(axesList)+1} = subplot(n,m,iZernike*2); % residuals
+            end
         end
         
-    	function plotModes(obj, maxZernike)
-    		if nargin<2; maxZernike=21;end;
+    	function plotModes(obj, maxZernike, axesList)
+            if nargin<2; maxZernike=21;end;
+            if nargin<3; gcf; axesList = obj.makeAxesList(maxZernike); end;
+    		
     		ZtPArray = obj.data;
-    		[~, nSubAperture, ~] = size(ZtPArray);
-    		ZtPRefArray = naomi.compute.theoriticalZtP(
-    						 nSubAperture, obj.getKey('XCENTER', 0),  obj.getKey('YCENTER', 0),
-    						       ATOTOTOTOTOT FIFNFIFNINQIASNIFNAISFIASNFIN
-    						       ) 
-
-    			);
-
-    		[nZernike,nSubAperture,~] = size(ZtPArray);
+    		
+            [nZernike,nSubAperture,~] = size(ZtPArray);
+    		ZtPRefArray = naomi.compute.theoriticalZtP(...
+    						 nSubAperture, ...
+                             obj.getKey('XCENTER', 0), ...
+                             obj.getKey('YCENTER', 0), ...
+                             obj.getKey('ZTPDIAMP', 74), ...
+                             maxZernike); 
+    		
 			nZernike = min(nZernike,maxZernike);			
 			
 			clf;
-			[residualVector, gainVector] = naomi.compute.ztpDifference(ZtPArray, ZtPRefArray, maxZernike);
+			[residualVector, ~] = naomi.compute.ztpDifference(ZtPArray, ZtPRefArray, maxZernike);
 			
     		for iZernike=1:nZernike
-			    subplot(7,6,iZernike*2-1);
-			    imagesc(squeeze(ZtPArray(iZernike,:,:)));
-			    set(gca,'XTickLabel','','YTickLabel','');
-			    title(sprintf('Mode %i',iZernike));
-			    subplot(7,6,iZernike*2);
-			    imagesc(squeeze(ZtPArray(iZernike,:,:) - ZtPRefArray(iZernike,:,:)));
-			    set(gca,'XTickLabel','','YTickLabel','');
-			    title(sprintf('%.3fum',residualVector(iZernike)));
+			    ax = axesList{iZernike*2-1};
+			    imagesc(ax, squeeze(ZtPArray(iZernike,:,:)));
+			    set(ax,'XTickLabel','','YTickLabel','');
+			    title(ax, sprintf('Mode %i',iZernike));
+			    ax = axesList{iZernike*2};
+			    imagesc(ax, squeeze(ZtPArray(iZernike,:,:) - ZtPRefArray(iZernike,:,:)));
+			    set(ax,'XTickLabel','','YTickLabel','');
+			    title(ax, sprintf('%.3fum',residualVector(iZernike)));
 			end	
      	end
  	end

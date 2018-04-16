@@ -19,14 +19,15 @@ classdef PtZ < naomi.data.PhaseCube
 		    xlabel('Y  =>'); ylabel('<=  X');
         end
 
-    	function plot(obj)
+    	function plot(obj, axes)
+            if nargin<2; axes= gca;end;
             IF = obj.data;
-            clf; imagesc(IF);
+            cla(axes); imagesc(axes, IF);
             ttl = 'Zernique to command';
-            title(ttl);                    
-            xlabel('Zerniques');
-            ylabel('commands');
-            colorbar;    
+            title(axes, ttl);                    
+            xlabel(axes, 'Zerniques');
+            ylabel(axes, 'commands');
+            colorbar(axes);    
      	end
  	end
 end

@@ -45,8 +45,9 @@ classdef AutocolSequence< naomi.data.BaseData
             time = obj.data(':',obj.TIME_INDEX);
         end
         
-        function plotMonitoring(obj, angle, timeScale)
+        function plotMonitoring(obj, angle, timeScale, axes)
             if nargin<3; timeScale = 's';end
+            if nargin<4; axes = gca; end;
             t = obj.time;
             switch timeScale
                 case 's'; t = t .* 24*3600;
@@ -56,30 +57,31 @@ classdef AutocolSequence< naomi.data.BaseData
                 otherwise
                     error('scale must be "s", "m", "h" or "d"')
             end
-            errorbar(t-t(1), obj.(angle), obj.(strcat(angle,'Err')));
+            errorbar(axes, t-t(1), obj.(angle), obj.(strcat(angle,'Err')));
             %plot(t-t(1), obj.(angle), 'b-');
-            xlabel(strcat('time [', timeScale, ']'));
-            ylabel(strcat(angle, ' [arcsec]'));
-            title( sprintf('%.3f +- %.4f', mean(obj.(angle)), std(obj.(angle))));
+            xlabel(axes, strcat('time [', timeScale, ']'));
+            ylabel(axes, strcat(angle, ' [arcsec]'));
+            title(axes, sprintf('%.3f +- %.4f', mean(obj.(angle)), std(obj.(angle))));
         end
-        function plotDependency(obj, axis, angle)
+        function plotDependency(obj, axis, angle, axes)
+            if nargin<4; axes = gca;end;
             ax = obj.(axis);
             an = obj.(angle);
             
-            errorbar(an, ax, obj.(strcat(angle,'Err')));
-            xlabel(strcat(axis,' [mm]'));
-            ylabel(strcat(angle, ' [arcsec]'));
+            errorbar(axes, an, ax, obj.(strcat(angle,'Err')));
+            xlabel(axes, strcat(axis,' [mm]'));
+            ylabel(axes, strcat(angle, ' [arcsec]'));
            
             ttl = sprintf('Gimbal #%d', obj.getKey('GSNUM', -99));
             
             if length(ax)>1
-                hold on;
+                hold(axes, 'on');
                 pol = obj.fit(axis, angle);
                 x = [min(ax), max(ax)];
-                plot(x, x.*pol(1) + pol(2), 'k-');
+                plot(axes, x, x.*pol(1) + pol(2), 'k-');
                 
-                title(strcat(ttl,sprintf(' gain = %.3f ', pol(1))));
-                hold off;
+                title(axes, strcat(ttl,sprintf(' gain = %.3f ', pol(1))));
+                hold(axes, 'off');
             end
         end 
         

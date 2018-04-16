@@ -9,23 +9,24 @@ classdef Flat < naomi.data.Phase
         function sh = staticHeader(obj)
         	sh = {{'DPR_TYPE', 'FLATO', ''}};
         end
-        function plot(obj)
+        function plot(obj, axes)
+            if nargin<2; axes=gca; end;
         	phase = obj.data;
-            clf; imagesc(phase);
-
+            cla(axes); imagesc(axes, phase);
+            
             if strcmp(obj.getKey('LOOP', 'OPEN', 'OPEN'))
             	ttl = 'Open Loop Flat';
             else
             	ttl = 'Close Loop Flat';
             end	
             	
-            title({ttl,...
+            title(axes, {ttl,...
                    sprintf('rms=%.3fum ptv=%.3fum',...
                    naomi.compute.nanstd(phase(:)),...
                    max(phase(:)) - min(phase(:)))});
-            xlabel('Y   =>+');
-            ylabel('+<=   X');
-            colorbar;    
+            xlabel(axes, 'Y   =>+');
+            ylabel(axes, '+<=   X');
+            colorbar(axes);    
         end     	   
     end
 end

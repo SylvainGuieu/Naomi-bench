@@ -50,15 +50,23 @@ classdef IFMatrix < naomi.data.PhaseCube
             end 
         end
 
-        function plotQc(obj, emphasizedActuatorNumber)
+        function plotQc(obj, emphasizedActuatorNumber, axesList)
+            % emphasizedActuatorNumber if the emphasized actuator 
+            % axesList (optional) must have 4 axes 
+            if nargin<2
+                emphasizedActuatorNumber = 0;
+            end
+            if nargin<3; 
+                gcf();
+                axesList = {subplot(6,1,1), subplot(6,1,2), ...
+                            subplot(6,1,3), subplot(2,1,2)};
+            end
             % plot the QC plot for the ifm
             IFM = obj.data;
             [nAct,nSubAperture,~] = size(IFM);
 
 
-            if nargin<2
-                emphasizedActuatorNumber = 0;
-            end
+            
             threshold = 0.2;
 
             [xVector, yVector, signVector] = obj.computeActuatorPosition();
@@ -69,39 +77,43 @@ classdef IFMatrix < naomi.data.PhaseCube
             flag = flag .* (abs(hwhmVector - median(hwhmVector))/median(hwhmVector) < threshold);
             nNotOk = nAct - sum(flag);
 
-            subplot(6,1,1);
-            plot(maxVector,'o-');
-            if emphasizedActuatorNumber; plot(maxVector(emphasizedActuatorNumber),'rx'); end;
-            ylim([0,1.2*max(maxVector)]);
-            grid; grid minor;
-            xlabel('Actuator');
-            ylabel('amp (um/1)');
-            title('Influence Functions of all actuators');
+           
+            ax = axesList{1};
+            plot(ax, maxVector,'o-');
+            if emphasizedActuatorNumber; plot(ax, maxVector(emphasizedActuatorNumber),'rx'); end;
+            ylim(ax, [0,1.2*max(maxVector)]);
+            grid(ax); grid(ax, 'minor');
+            xlabel(ax, 'Actuator');
+            ylabel(ax, 'amp (um/1)');
+            title(ax, 'Influence Functions of all actuators');
 
-            subplot(6,1,2);
-            plot(signVector,'o-');
-            if emphasizedActuatorNumber; plot(signVector(emphasizedActuatorNumber),'rx'); end;            
-            ylim([-1.2,1.2]);
-            grid; grid minor;
-            xlabel('Actuator');
-            ylabel('sign');
+            
+            ax = axesList{2};
+            plot(ax, signVector,'o-');
+            if emphasizedActuatorNumber; plot(ax, signVector(emphasizedActuatorNumber),'rx'); end;            
+            ylim(ax, [-1.2,1.2]);
+            grid(ax); grid(ax, 'minor');
+            xlabel(ax, 'Actuator');
+            ylabel(ax, 'sign');
 
-            subplot(6,1,3);
-            plot(hwhmVector,'o-');
-            if emphasizedActuatorNumber; plot(hwhmVector(emphasizedActuatorNumber),'rx'); end;
-            ylim([0,1.2*max(hwhmVector)]);
-            grid; grid minor;
-            xlabel('Actuator');
-            ylabel('fwhm (pix)');
+            
+            ax = axesList{3};
+            plot(ax, hwhmVector,'o-');
+            if emphasizedActuatorNumber; plot(ax, hwhmVector(emphasizedActuatorNumber),'rx'); end;
+            ylim(ax, [0,1.2*max(hwhmVector)]);
+            grid(ax); grid(ax, 'minor');
+            xlabel(ax, 'Actuator');
+            ylabel(ax, 'fwhm (pix)');
 
-            subplot(2,1,2);
-            scatter(xVector(:),yVector(:));
-            xlim([0,nSubAperture]);
-            ylim([0,nSubAperture]);
-            set(gca,'ydir','reverse');
-            grid; grid minor;
-            xlabel('Y   => +');
-            ylabel('+ <=   X');
+            
+            ax = axesList{4};
+            scatter(ax, xVector(:),yVector(:));
+            xlim(ax, [0,nSubAperture]);
+            ylim(ax, [0,nSubAperture]);
+            set(ax,'ydir','reverse');
+            grid(ax); grid(ax, 'minor');
+            xlabel(ax, 'Y   => +');
+            ylabel(ax, '+ <=   X');
         end            
     end
 end

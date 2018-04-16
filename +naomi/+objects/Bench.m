@@ -109,11 +109,11 @@ classdef Bench < naomi.objects.BaseObject
         	% if sz [m] is not given take the default in config.pupillDiameter
         	% if xScale/yScale [m/pixel] has not been computed look at config.pixelScale
 
-        	if isempty(obj.xScale)
+        	if isempty(obj.xPixelScale)
         		obj.config.log('Warning asking for pixel scale, but it was not measured. Default pixelScale is returned\n', 2);
         		scale = obj.config.pixelScale;
         	else
-        		scale = 0.5 * (obj.xScale + obj.yScale);
+        		scale = 0.5 * (obj.xPixelScale + obj.yPixelScale);
         	end        	
         	if nargin<2; sz = obj.config.pupillDiameter; end
         	sizePix = sz/scale;
