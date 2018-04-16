@@ -1,15 +1,16 @@
-function phase(bench)
+function phase(bench, axes) 
 		% plot the last phase received  
-		
+		if nargin<2; axes = gca; end;
+        
 	    phase = bench.lastPhaseArray;
 		if isempty(phase)
-			clf;
-			title('No phase screen received yet');
+			cla(axes);
+			title(axes,'No phase screen received yet');
 			return 
 		end	    
 		
 
-        clf; imagesc(phase);		        
+        cla(axes); imagesc(axes, phase);		        
         if bench.isPhaseReferenced  
         	tit = 'Phase screen - reference'; 
         else  
@@ -17,11 +18,11 @@ function phase(bench)
         end 
         	
         	
-        title({tit,...
+        title(axes, {tit,...
                sprintf('rms=%.3fum ptv=%.3fum',...
                naomi.compute.nanstd(phase(:)),...
                max(phase(:)) - min(phase(:)))});
-        xlabel('Y   =>+');
-        ylabel('+<=   X');
-        colorbar;    
+        xlabel(axes, 'Y   =>+');
+        ylabel(axes, '+<=   X');
+        colorbar(axes);    
 end

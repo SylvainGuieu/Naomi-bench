@@ -32,7 +32,7 @@ function phaseArray = phase(bench, nPhase, filterTipTilt, substractReference)
 		end
 		% Apply the mask 
 		rawPhaseArray(maskArray~=1) = NaN;
-		if bench.checkPhase(rawPhaseArray)
+		if ~bench.checkPhase(rawPhaseArray)
             bench.config.log('Warning Invalid sup-appertures inside the mask !!\n');
         end
 

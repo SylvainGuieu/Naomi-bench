@@ -189,8 +189,8 @@ classdef Config < handle
         rXOrder = 2; %tip
         rYOrder = 3; %tilt
         % Sign of rX movement regarding to zernic order 
-        rXSign = 1;
-        rYSign = 1;
+        rXSign = -1;
+        rYSign = -1;
         
         % set gimbalNumber to negative value will force to ask user  
         gimbalNumber = -9; 
@@ -206,8 +206,8 @@ classdef Config < handle
                         {4,14.5,15.7, 3300, 5000}
                        };
         % these parameters are modified when the gimbalNumber is set 
-        gimbalRxZero = 14.5;
-        gimbalRyZero = 15.7; 
+        gimbalRxZero = 14.3963; % as aligned in IPAG 
+        gimbalRyZero = 15.6511; 
         gimbalRxGain = 3300;
         gimbalRyGain = 5000;
         
@@ -234,13 +234,13 @@ classdef Config < handle
         screenVerticalOffset = 0;
         
         % grid define the position of area where the plot will be ploted
-        %              |- horizontal screen size in pixel
-        %              |     |- vertical screen size in pixel
+        %              |- horizontal screen size in pixel (-1 for auto)
+        %              |     |- vertical screen size in pixel (-1 for auto)
         %              |     |    |- horizontal offset in pixel
         %              |     |    |  |- vertical offset in pixel
         %              |     |    |  |  |- h grid resolution
         %              |     |    |  |  |    |- v grid resolution
-        screenGrid = {1900, 1000, 0, 0, 100, 100};
+        screenGrid = {-1,   -1, 0, 0, 100, 100};
 
 
 
@@ -494,6 +494,14 @@ classdef Config < handle
 
         function posVector = grid2screen(obj, hPos, vPos, hSize, vSize)
             G = obj.screenGrid;
+            if G{1}<0 || G{2}<0
+                % size inferior to zero,  change it to the screen size
+                % the first time.
+                set(0,'units','pixels');
+                screenSizes = get(0,'screensize');
+                if G{1}<0; G{1} = screenSizes(3); end
+                if G{2}<0; G{2} = screenSizes(4); end
+            end
             if hPos<=0.0; hPos = G{5}+hPos; end;
             if vPos<=0.0; vPos = G{6}+vPos; end;
             posVector = [ G{3} + G{1}*(hPos/G{5}), ...

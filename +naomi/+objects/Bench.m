@@ -110,7 +110,7 @@ classdef Bench < naomi.objects.BaseObject
         	% if xScale/yScale [m/pixel] has not been computed look at config.pixelScale
 
         	if isempty(obj.xPixelScale)
-        		obj.config.log('Warning asking for pixel scale, but it was not measured. Default pixelScale is returned\n', 2);
+        		obj.config.log('Warning asking for pixel scale, but it was not measured. Default pixelScale is returned\n', 5);
         		scale = obj.config.pixelScale;
         	else
         		scale = 0.5 * (obj.xPixelScale + obj.yPixelScale);
@@ -187,7 +187,7 @@ classdef Bench < naomi.objects.BaseObject
         end
 
         function biasVector = biasVector(obj)
-            if obj.simulated
+            if obj.config.simulated
                 biasVector = obj.simulator.biasVector;
             else
                 biasVector = obj.dm.biasVector;
@@ -277,8 +277,8 @@ classdef Bench < naomi.objects.BaseObject
             % Check the integrity of a phase screen
             check = 1;
             maskArray = obj.maskArray;
-            if ~all(maskArray(:) == 1)
-                if any(isnan(phase(maskArray==1)))
+            if ~all(maskArray(:))
+                if any(isnan(phase(maskArray)))
                     check = 0;
                 end
             end
