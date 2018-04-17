@@ -19,6 +19,7 @@ function strokeData = stroke(bench,zernikeMode,amplitudeVector)
 		  {'MJD-OBS', config.mjd, 'MJD at script startup'}, 
 		  {'MODE', zernikeMode, 'Zernike mode used'}
 		};
+    
 	for s=1:Nstep
 	    % Set DM
 	    naomi.action.cmdModal(bench, zernikeMode, amplitudeVector(s) * (1).^(s-1));

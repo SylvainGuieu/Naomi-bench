@@ -34,19 +34,29 @@ function [IFMData, IFMcleanData] = IFM(bench, nPushPull, nLoop, amplitude, ifPau
 	IFMatrix = zeros(nActuator,nSubAperture,nSubAperture);
 
 	% Loop
+    bench.registerProcess('IFM', nLoop*nActuator);
 	for iLoop=1:nLoop
 	    
 	    % Loop on actuators
 	    for iActuator=1:nActuator
+            if bench.isProcessKilled('IFM')
+                % the process has been killed 
+                IFMData = [];
+                IFMcleanData = [];
+                return
+            end
+            
 	        IFarray = naomi.measure.IF(bench, iActuator, nPushPull, amplitude).data;
 	        IFMatrix(iActuator,:,:) = IFMatrix(iActuator,:,:) + reshape(IFarray,1,nSubAperture,nSubAperture) / nLoop;
 	        pause(ifPause);
+            bench.processStep('IFM', iLoop*iActuator);
+                
 	    end
 	    
 	    % Reverse amplitude (push-pull -> pull-push)
 	    amplitude = -amplitude;
-	end
-
+    end
+    bench.killProcess('IFM');
 	h = {{'MJD-OBS' ,mjd, 'modified julian when script started'},
 		 {'IF_AMP'  ,amplitude,'[Cmax] amplitude of push-pull'},
 	     {'IF_NPP'  ,nPushPull,'number of push-pull'},
@@ -54,5 +64,6 @@ function [IFMData, IFMcleanData] = IFM(bench, nPushPull, nLoop, amplitude, ifPau
 	     {'IF_PAUSE',ifPause,'pause between actioneu'}};
 
 	IFMData = naomi.data.IFMatrix(IFMatrix, h , {bench});
-	IFMCleanData = naomi.make.cleanIFM(bench, IFMData);
+	IFMcleanData = naomi.make.cleanIFM(bench, IFMData);
+    bench.killProcess('IFM measurement');
 end

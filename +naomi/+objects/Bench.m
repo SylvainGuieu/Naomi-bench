@@ -11,7 +11,10 @@ classdef Bench < naomi.objects.BaseObject
     autocol; % autocolimatrice object (only at IPAG calibration bench) 
     ACEStatus = false; % true/false if ASE has been started
     subsystems = {'config', 'wfs', 'dm', 'environment', 'gimbal', 'autocol'};
-
+    
+    % processes is a container.Map object. It is used to check if a process
+    % is running or not and allows to kill interactively a process
+    processes;
 
     % computed x,y pixel scale as returned by naomi.measure.pixelScale
     % unti is m/pixel
@@ -73,7 +76,7 @@ classdef Bench < naomi.objects.BaseObject
         function obj = Bench(varargin)
         	obj.config = naomi.Config();
         	obj.start(varargin{:});
-                    
+            obj.processes = container.Map();
         end
 
         function test = has(obj, name)
@@ -118,7 +121,51 @@ classdef Bench < naomi.objects.BaseObject
         	if nargin<2; sz = obj.config.pupillDiameter; end
         	sizePix = sz/scale;
         end
-
+    
+        function registerProcess(obj, processName, stepSize)
+            if nargin<3; stepSize = 0; end;
+            obj.processes(processName) = {now,0,stepSize};
+        end
+        function test = isProcessRunning(obj, processName)
+            test = ~obj.isProcessKilled(processName);
+        end
+        function test = isProcessKilled(obj, processName)
+           test = true;
+           if isKey(obj.processes, processName)
+               def = obj.processes(processName);
+               test = def{1}<=0.0;
+           end
+        end
+        function processStep(obj, processName, step)
+            
+            def = obj.processes(processName);
+            if nargin<3
+               def{2} = def{2}+1;
+            else
+               def{2} = step;
+            end
+            obj.processes(processName) = def;
+        end
+        function status = processStatus(obj, processName)       
+            % return a float between 0 to 1 that give the avancement 
+            % of the process.
+            % In the computation function do the following
+            % bench.registerProcess('p1', 10)
+            % for i=1:10
+            %      bench.processStep('p1', i);
+            %      ....
+            %
+            % Than a graphical interface can do :
+            %  bench.processStatus('p1');
+            def = obj.processes(processName);
+            status = min(def{2}/def{3}, 1.0);
+        end
+        function killProcess(obj, processName)
+            if isKey(obj.processes, processName)
+                 def = obj.processes(processName);
+                obj.processes(processName) = {-1,def{2},def{3}};
+            end
+        end
         function test = isAligned(obj)
             % check if the bench has been aligned
             test = ~isempty(obj.xCenter);
@@ -138,6 +185,46 @@ classdef Bench < naomi.objects.BaseObject
             test  = max(abs(obj.wfs.ref(:)))> 0;
         end
 
+        function motorObject = axisMotor(obj, tip_or_tilt)
+            switch tip_or_tilt
+                case obj.config.TIP
+                    switch obj.config.rXOrder
+                        case obj.config.TIP
+                            motorObject = obj.gimbal.rX;
+                        otherwise
+                            motorObject = obj.gimbal.rY;
+                    end
+                case obj.config.TILT
+                    switch obj.config.rXOrder
+                        case  obj.config.TILT
+                            motorObject = obj.gimbal.rX;
+                        otherwise
+                            motorObject = obj.gimbal.rY;
+                    end
+                otherwise
+                    error(sprintf ('expecting tip or tilt got %s', tip_or_tilt));
+            end     
+        end
+        function mSign = axisSign(obj, tip_or_tilt)
+            switch tip_or_tilt
+                case obj.config.TIP
+                    switch obj.config.rXOrder
+                        case obj.config.TIP
+                            mSign = obj.config.rXSign;
+                        otherwise
+                            mSign = obj.config.rYUSign;
+                    end
+                case obj.config.TILT
+                    switch obj.config.rXOrder
+                        case  obj.config.TILT
+                            mSign = obj.config.rXSign;
+                        otherwise
+                            mSign = obj.config.rYSign;
+                    end
+                otherwise
+                    error(sprintf ('expecting tip or tilt got %s', tip_or_tilt));
+            end     
+        end
         function zernikeVector = zernikeVector(obj)
             if obj.config.simulated
                 zernikeVector = obj.simulator.zernikeVector;

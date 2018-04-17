@@ -1,7 +1,4 @@
-function [ZtP,PtZ] = ZtP(bench, nPushPull, amplitude, nZernike)
-	global stopZtPMeasurement
-	stopZtPMeasurement = false;
-
+function [ZtPData,PtZData] = ZtP(bench, nPushPull, amplitude, nZernike)
 	config = bench.config;
 	
 	if nargin<2; nPushPull = config.ztpNpushPull; end;
@@ -32,13 +29,13 @@ function [ZtP,PtZ] = ZtP(bench, nPushPull, amplitude, nZernike)
          {'ZTPDIAMP',bench.sizePix(pupillDiameter) ,'Pupill diameter in  wfs pixel'}      
 		 };
 		 
-	ZtP = naomi.data.ZtP(ZtPArray, h, {bench});
+	ZtPData = naomi.data.ZtP(ZtPArray, h, {bench});
 
 	% setup dm and wfs 
 	naomi.action.resetDm(bench);
 	naomi.action.resetWfs(bench);
 		
-
+    bench.registerProcess('ZtP', nZernike*nPushPull);
 	for iZernike=1:nZernike
 		if stopZtPMeasurement
 			Ztp = [];
@@ -49,6 +46,12 @@ function [ZtP,PtZ] = ZtP(bench, nPushPull, amplitude, nZernike)
 	    amp = amplitude ./ max(abs(squeeze(bench.ZtPArray()(iZernike,:))));
 	    config.log(sprintf(' %i',z), 1);  
 	    for p=1:nPushPull
+            if bench.isProcessKilled('ZtP')
+                ZtPData =[];
+                PtZData = [];
+                return 
+            end
+            
 	    	% take the zernikeVector reference
 	        ref = bench.zernikeVector()(iZernike);
 	        naomi.action.cmdModal(bench, iZernike, ref + amp);	        
@@ -58,8 +61,8 @@ function [ZtP,PtZ] = ZtP(bench, nPushPull, amplitude, nZernike)
 	        pull = naomi.measure.phase(bench,1);
 	        ZtPArray(iZernike,:,:) = ZtPArray(iZernike,:,:) + reshape((push - pull)/(2*amp*nPushPull),1,nSubAperture,nSubAperture);
 	        % put back the zernike vector as it was
-
 	        naomi.action.cmdModal(bench, iZernike, ref);
+            bench.processStep('ZtP', p*iZernike);
 	    end   
 	    
 	    % Cleanup piston
@@ -76,7 +79,8 @@ function [ZtP,PtZ] = ZtP(bench, nPushPull, amplitude, nZernike)
 		    bench.config.figure('Mode');
 		    ZtP.plotOneMode(iZernike);	   
 		end
-	end
+    end
+    bench.killProcess('ZtP');
 	config.log('\n', 1); 
 	% Compute the Phase to Naomi matrix (command matrix)
     Tmp = reshape(ZtPArray,nZernike,[]);
@@ -86,6 +90,6 @@ function [ZtP,PtZ] = ZtP(bench, nPushPull, amplitude, nZernike)
     % Set back
     PtZArray = reshape(Tmp,nSubAperture,nSubAperture,nZernike);
 	
-	PtZ = naomi.data.PtZ(PtZArray, h, {bench}); 
+	PtZData = naomi.data.PtZ(PtZArray, h, {bench}); 
 
 end

@@ -177,7 +177,8 @@ classdef Config < handle
         pupillTipTiltThresholdManual = 1;
         % for automatic centering (gimbal motors)
         pupillTipTiltThresholdAuto = 0.1;
-        
+        % the motor command gain for the auto alignment 
+        pupillTipTiltAlignGain = 0.5;
         
         %%%%%%%%%%%%%%%%%%%%%
         % gimbal movement specification 
@@ -185,9 +186,9 @@ classdef Config < handle
 
         % Specify if the gimbal is used on the bench and motorized
         useGimbal = true;
-        % Which order correspond to rX and rY motor movement 
-        rXOrder = 2; %tip
-        rYOrder = 3; %tilt
+        % Which order correspond to rX and rY motor movement tip or tilt 
+        rXOrder = 'tip';  %tip
+        rYOrder = 'tilt'; % not used just for consistancy
         % Sign of rX movement regarding to zernic order 
         rXSign = -1;
         rYSign = -1;
@@ -251,6 +252,8 @@ classdef Config < handle
         BENCH = 'Bench';
         DUMMY = 'DUMMY';
         
+        TIP = 'tip';
+        TILT = 'tilt';
         
         % define the properties / FITS key / fits comment used by writeFits Header
         propDef = {
