@@ -15,9 +15,10 @@ classdef IFMatrix < naomi.data.PhaseCube
             % the actuator number
             data = matlab.io.fits.readImg(file);
             data = permute(data, [3,1,2]);
+            data = double(data);
         end
         function fitsWriteData(obj, fileName)
-            fitswrite(permute(obj.data, [2,3,1]),fileName);
+            fitswrite(single(permute(obj.data, [2,3,1])),fileName);
             %matlab.io.fits.writeImg(.file, obj.getData());
         end
         function [xS,yS] = computeScale(obj)
@@ -43,7 +44,7 @@ classdef IFMatrix < naomi.data.PhaseCube
             end            
 
         end
-        function [maxVector,hwhmVector] = computeMaximums(obj, signVector)
+        function maxVector = computeMaximums(obj, signVector)
             IFM = obj.data;
             [nAct,nSubAperture,~] = size(IFM);
             IFMa = abs(IFM);
@@ -53,13 +54,27 @@ classdef IFMatrix < naomi.data.PhaseCube
             % Get maximum
             [maxVector,~] = max(reshape(IFMa,nAct,nSubAperture*nSubAperture),[],2);
             maxVector = maxVector .* signVector;
+            
+        end
 
+        function hwhmVector = computeHwhm(obj, maxVector, signVector)
+            IFM = obj.data;
+            [nAct,nSubAperture,~] = size(IFM);
+            IFMa = abs(IFM);
+            if nargin<2
+                maxVector = obj.computeMaximums();
+            end
+            if nargin<3
+                signVector = ones(nAct,1);
+            end
             hwhmVector = zeros(nAct,1);
             for a=1:nAct
                 num = naomi.compute.nansum(reshape(IFMa(a,:,:),nSubAperture*nSubAperture,1) > maxVector(a) * 0.5);
                 hwhmVector(a) = sqrt(num/3.14159);
             end 
         end
+
+
         function plotScreenPhase(obj, actNumber, axes)
             if nargin<3; axes = gca; end
             data =  obj.data;
@@ -68,6 +83,76 @@ classdef IFMatrix < naomi.data.PhaseCube
             colorbar(axes);
             xlim(axes, [1,nSubAperture]);
             ylim(axes, [1,nSubAperture]);
+        end
+
+        function [xProfile,yProfile, xCenter, yCenter] = computeProfiles(obj, actNumber, widthPixel)
+            if nargin<3
+                widthPixel = 31;
+            end
+            % make sure it is even
+            halfWidth = int32(widthPixel/2);
+            widthPixel = 2*halfWidth+1;
+
+            data = obj.data;
+            [~,nSubAperture,~] = size(data); 
+            data = squeeze(data(actNumber, :, :));
+            [xCenter,yCenter] = naomi.compute.IFCenter(data);
+            x = min(max(1, int32(xCenter)), nSubAperture);
+            y = min(max(1, int32(yCenter)), nSubAperture);
+            x
+            y
+            nSubAperture
+            
+
+            xProfile = squeeze(data(max(1, x-halfWidth):min(nSubAperture, x+halfWidth), y ));
+            yProfile = squeeze(data( x, max(1, y-halfWidth):min(nSubAperture, y+halfWidth)));
+        end
+
+        function plotProfiles(obj, actNumber, widthPixel, axesList, directions)
+            if nargin<3
+                widthPixel = 31;
+            end
+            if nargin<4
+                gcf; 
+                axesList = {subplot(2,1,1), subplot(2,1,2)};
+            end
+            if nargin<5
+                directions = {0,0};
+            end
+            [~,nSubAperture,~] = size(obj.data);
+            halfWidth = (widthPixel/2);
+
+            [xProfile, yProfile, xCenter, yCenter] = obj.computeProfiles(actNumber, widthPixel);
+            [nX,~] = size(xProfile);
+            [~,nY] = size(yProfile);
+
+            ax = axesList{1};
+            x = linspace( max(xCenter-halfWidth, 1), min(xCenter+halfWidth, nSubAperture), nX);
+            y = xProfile;
+            if directions{1}
+                plot(ax, y, x);
+                ylim(ax, [xCenter-halfWidth,  xCenter+halfWidth]);
+            else
+                plot(ax, x, y)
+                xlim(ax, [xCenter-halfWidth,  xCenter+halfWidth]);
+            end
+
+            ax = axesList{2};
+            x = linspace( max(yCenter-halfWidth, 1), min(yCenter+halfWidth, nSubAperture), nY);
+            y = yProfile;
+            
+
+            if directions{2}
+                plot(ax, y, x);
+                ylim(ax, [yCenter-halfWidth,  yCenter+halfWidth]);
+            else
+                plot(ax, x, y);
+                xlim(ax, [1, 128]);
+                xlim(ax, [yCenter-halfWidth,  yCenter+halfWidth]);
+            end
+
+            %plot(ax, linspace(yCenter-halfWidth, yCenter+halfWidth, size(yProfile)), yProfile);
+            %xlim(ax, [1,widthPixel]);
         end
         function plotQc(obj, emphasizedActuatorNumber, axesList)
             % emphasizedActuatorNumber if the emphasized actuator 
@@ -89,7 +174,8 @@ classdef IFMatrix < naomi.data.PhaseCube
             threshold = 0.2;
 
             [xVector, yVector, signVector] = obj.computeActuatorPosition();
-            [maxVector, hwhmVector] = obj.computeMaximums(signVector);
+            maxVector = obj.computeMaximums(signVector);
+            hwhmVector = obj.computeHwhm(maxVector, signVector);
 
             % Accept threshold around median
             flag = (abs(maxVector - median(maxVector))/median(maxVector) < threshold);
