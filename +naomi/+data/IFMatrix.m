@@ -27,6 +27,12 @@ classdef IFMatrix < naomi.data.PhaseCube
         function IFMatrixSpartaData = toSparta(obj)
             IFMatrixSpartaData = naomi.data.IFMatrixSpartaData(obj.data, obj.header, obj.context);
         end
+        function IFData = IF(obj, actNumnber)
+            data = obj.data;
+            data = squeeze(data(actNumnber,:,:));
+
+            IFData = naomi.data.IF(data, {{'ACTNUM', actNumnber, 'Pushed actuator'}}, obj.context);        end
+        end
 
         function [xVector, yVector, signVector] = computeActuatorPosition(obj)
             IFM = obj.data;
@@ -74,86 +80,7 @@ classdef IFMatrix < naomi.data.PhaseCube
             end 
         end
 
-
-        function plotScreenPhase(obj, actNumber, axes)
-            if nargin<3; axes = gca; end
-            data =  obj.data;
-            [~,nSubAperture,~] = size(data);
-            cla(axes); imagesc(axes, squeeze(data(actNumber,:,:)));
-            colorbar(axes);
-            xlim(axes, [1,nSubAperture]);
-            ylim(axes, [1,nSubAperture]);
-        end
-
-        function [xProfile,yProfile, xCenter, yCenter] = computeProfiles(obj, actNumber, widthPixel)
-            if nargin<3
-                widthPixel = 31;
-            end
-            % make sure it is even
-            halfWidth = int32(widthPixel/2);
-            widthPixel = 2*halfWidth+1;
-
-            data = obj.data;
-            [~,nSubAperture,~] = size(data); 
-            data = squeeze(data(actNumber, :, :));
-            [xCenter,yCenter] = naomi.compute.IFCenter(data);
-            x = min(max(1, int32(xCenter)), nSubAperture);
-            y = min(max(1, int32(yCenter)), nSubAperture);
-            x
-            y
-            nSubAperture
-            
-
-            xProfile = squeeze(data(max(1, x-halfWidth):min(nSubAperture, x+halfWidth), y ));
-            yProfile = squeeze(data( x, max(1, y-halfWidth):min(nSubAperture, y+halfWidth)));
-        end
-
-        function plotProfiles(obj, actNumber, widthPixel, axesList, directions)
-            if nargin<3
-                widthPixel = 31;
-            end
-            if nargin<4
-                gcf; 
-                axesList = {subplot(2,1,1), subplot(2,1,2)};
-            end
-            if nargin<5
-                directions = {0,0};
-            end
-            [~,nSubAperture,~] = size(obj.data);
-            halfWidth = (widthPixel/2);
-
-            [xProfile, yProfile, xCenter, yCenter] = obj.computeProfiles(actNumber, widthPixel);
-            [nX,~] = size(xProfile);
-            [~,nY] = size(yProfile);
-
-            ax = axesList{1};
-            x = linspace( max(xCenter-halfWidth, 1), min(xCenter+halfWidth, nSubAperture), nX);
-            y = xProfile;
-            if directions{1}
-                plot(ax, y, x);
-                ylim(ax, [xCenter-halfWidth,  xCenter+halfWidth]);
-            else
-                plot(ax, x, y)
-                xlim(ax, [xCenter-halfWidth,  xCenter+halfWidth]);
-            end
-
-            ax = axesList{2};
-            x = linspace( max(yCenter-halfWidth, 1), min(yCenter+halfWidth, nSubAperture), nY);
-            y = yProfile;
-            
-
-            if directions{2}
-                plot(ax, y, x);
-                ylim(ax, [yCenter-halfWidth,  yCenter+halfWidth]);
-            else
-                plot(ax, x, y);
-                xlim(ax, [1, 128]);
-                xlim(ax, [yCenter-halfWidth,  yCenter+halfWidth]);
-            end
-
-            %plot(ax, linspace(yCenter-halfWidth, yCenter+halfWidth, size(yProfile)), yProfile);
-            %xlim(ax, [1,widthPixel]);
-        end
+       
         function plotQc(obj, emphasizedActuatorNumber, axesList)
             % emphasizedActuatorNumber if the emphasized actuator 
             % axesList (optional) must have 4 axes 
