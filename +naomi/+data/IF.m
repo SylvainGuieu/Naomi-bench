@@ -1,7 +1,7 @@
 classdef IF < naomi.data.Phase
 	properties
-	
-
+       profileResult; % store the result of a fitted profile
+       fitType = 'gauss' % the type of fitting
 	end	
 	methods
         function obj = IF(varargin)
@@ -10,113 +10,155 @@ classdef IF < naomi.data.Phase
         function sh = staticHeader(obj)
         	sh = {{'DPR_TYPE', 'IF', ''}};
         end
+        
+        function plotProfile(obj, axes)
+            if nargin<2; axes = gca; end
+            data =  obj.data;
+            [nSubAperture,~] = size(data);
+            [Y,X] = meshgrid(1:nSubAperture);
+            fit = obj.profileFit;
+            model = naomi.compute.ifmProfileModel(fit, X, Y);
+            alpha = linspace(0, 2*pi, 50);
+            cla(axes); imagesc(axes, model);
+            colorbar(axes);
+            daspect(axes, [1 1 1]);
+            xlim(axes, [1,nSubAperture]);
+            ylim(axes, [1,nSubAperture]);
+            hold(axes, 'on'); 
+                plot(axes,  fit.yHwhm*cos(alpha+fit.angle)+fit.yCenter, fit.xHwhm*sin(alpha+fit.angle)+fit.xCenter, 'k-'); 
+            hold(axes, 'off');
+        end
+        
+        function plotProfileResidual(obj, axes)
+            if nargin<2; axes = gca; end
+            data =  obj.data;
+            [nSubAperture,~] = size(data);
+            [Y,X] = meshgrid(1:nSubAperture);
+            fit = obj.profileFit;
+            model = naomi.compute.ifmProfileModel(fit, X, Y);
+            alpha = linspace(0, 2*pi, 50);
+            residual =  data-model;
+            cla(axes); imagesc(axes,residual);
+            colorbar(axes);
+            daspect(axes, [1 1 1]);
+            title(axes, sprintf('rms=%.3e', naomi.compute.nanstd(residual(:))));
+            xlim(axes, [1,nSubAperture]);
+            ylim(axes, [1,nSubAperture]);
+            hold(axes, 'on'); 
+                plot(axes,  fit.yHwhm*cos(alpha+fit.angle)+fit.yCenter, fit.xHwhm*sin(alpha+fit.angle)+fit.xCenter, 'k-'); 
+            hold(axes, 'off');
+        end
 
-    function plotScreenPhase(obj, axes)
-        if nargin<2; axes = gca; end
+            
+        function plotScreenPhase(obj, axes)
+        
+            if nargin<2; axes = gca; end
+            data =  obj.data;
+            [nSubAperture,~] = size(data);
+            cla(axes); imagesc(axes, squeeze(data(:,:)));
+            colorbar(axes);
+            xlim(axes, [1,nSubAperture]);
+            ylim(axes, [1,nSubAperture]);
 
-        data =  obj.data;
-        [nSubAperture,~] = size(data);
-        cla(axes); imagesc(axes, squeeze(data(:,:)));
-        colorbar(axes);
-        xlim(axes, [1,nSubAperture]);
-        ylim(axes, [1,nSubAperture]);
-        [x,y, actSign] = obj.position;
+            fit = obj.profileFit;
 
-        maxValue = obj.maximum(actSign);
-        hwhmValue = obj.hwhm(maxValue, actSign);
+            alpha = linspace(0, 2*pi, 50);
 
-        title(axes, sprintf('#%d maximum=%.3f hwhm=%.3f x,y =%.1f, %.1f', obj.getkey('ACTNUM', -99), ...
-                                                    maxValue, hwhmValue, 
-                                                    x, y
-                                                ));
+
+            hold(axes, 'on'); 
+
+                plot(axes,  fit.yHwhm*cos(alpha+fit.angle)+fit.yCenter, fit.xHwhm*sin(alpha+fit.angle)+fit.xCenter, 'k-'); 
+            hold(axes, 'off');
+
+            title(axes, sprintf('#%d Amp=%.3f hwhm=%.3f x,y =%.1f, %.1f', obj.getKey('ACTNUM', -99), ...
+                                                        fit.amplitude, fit.hwhm, ...
+                                                        fit.xCenter, fit.yCenter));
     end
-
-    function [x,y, actSign] = position(obj)
-        data = obj.data;
-        [x,y] = naomi.compute.IFCenter(data);
-        actSign = sign(data(int32(x),int32(y)));  
+    function fit = profileFit(obj)
+        if isempty(obj.profileResult) || ~strcmp(obj.profileResult.type, obj.fitType)
+                obj.profileResult = naomi.compute.fittedIFprofile(obj.data, obj.fitType);
+             end        
+         fit = obj.profileResult;
     end
-
-    function maxValue= maximum(obj, actSign)
-        data = obj.data;
-       
-        maxValue = max(data(:));
-        if nargin>1; maxValue = maxValue .* actSign; end;
-    end
-    function hwhmValue = hwhm(obj, maxValue, actSign)
+    function [xProfile,yProfile] = getXYProfiles(obj, xCenter,yCenter)
+        
         if nargin<2
-            maxValue = obj.maximum;
+            fit = obj.profileFit;
+            xCenter = fit.xCenter;
+            yCenter = fit.yCenter;
         end
-        if nargin<3
-            actSign = 1;
-        end
-        data = obj.data;
-        [nSubAperture, ~] = size(data);
-        num = naomi.compute.nansum(reshape(data,nSubAperture*nSubAperture,1) > maxValue * 0.5);
-        hwhmValue = sqrt(num/3.14159);
-    end
-    function [xProfile,yProfile, xCenter, yCenter] = computeProfile(obj, widthPixel)
-        if nargin<2
-                widthPixel = 51;
-        end
-        halfWidth = int32(widthPixel/2);
-        widthPixel = 2*halfWidth+1;
-
+        x0 = int32(xCenter);
+        y0 = int32(yCenter);
         data = obj.data;
         [nSubAperture,~] = size(data); 
         
-        [xCenter,yCenter] = naomi.compute.IFCenter(data);
-        x = min(max(1, int32(xCenter)), nSubAperture);
-        y = min(max(1, int32(yCenter)), nSubAperture);
-        
-        xProfile = squeeze(data(max(1, x-halfWidth):min(nSubAperture, x+halfWidth), y ));
-        yProfile = squeeze(data( x, max(1, y-halfWidth):min(nSubAperture, y+halfWidth)));
+        xProfile = squeeze(data(:,y0));
+        yProfile = squeeze(data(x0,:));
     end
 
-    function plotProfiles(obj,  widthPixel, axesList, directions)
+    function plotProfiles(obj, axesList, directions)
+        
+            [nSubAperture,~] = size(obj.data);
+            
             if nargin<2
-                widthPixel = 51;
-            end
-            if nargin<3
                 gcf; 
                 axesList = {subplot(2,1,1), subplot(2,1,2)};
             end
-            if nargin<4
+            if nargin<3
                 directions = {0,0};
             end
-            [nSubAperture,~] = size(obj.data);
+            
+            widthPixel = nSubAperture;
             halfWidth = (widthPixel/2);
-
-            [xProfile, yProfile, xCenter, yCenter] = obj.computeProfiles(widthPixel);
+   
+            fit = obj.profileFit;
+            
+            xCenter = fit.xCenter;
+            yCenter = fit.yCenter;
+            
+            [xProfile, yProfile] = obj.getXYProfiles(xCenter, yCenter);
+            
+            
             [nX,~] = size(xProfile);
             [~,nY] = size(yProfile);
-
+                
             ax = axesList{1};
-            x = linspace( max(xCenter-halfWidth, 1), min(xCenter+halfWidth, nSubAperture), nX);
-            y = xProfile;
+            r = linspace( 1, nSubAperture, nSubAperture);
+            profile = xProfile;
+            rModel = linspace(1, nSubAperture, nSubAperture*4);
+            profileModel = naomi.compute.ifmProfileModel(fit, rModel, fit.yCenter); 
+            
             if directions{1}
-                plot(ax, y, x);
-                ylim(ax, [xCenter-halfWidth,  xCenter+halfWidth]);
+                plot(ax, profile, r);
+                hold(ax, 'on'); plot(ax, profileModel, rModel);hold(ax, 'off');
+                %ylim(ax, [xCenter-halfWidth,  xCenter+halfWidth]);
+                ylim(ax, [1, nSubAperture]);
             else
-                plot(ax, x, y)
-                xlim(ax, [xCenter-halfWidth,  xCenter+halfWidth]);
+                plot(ax, r, profile);
+                hold(ax, 'on'); plot(ax, rModel, profileModel);hold(ax, 'off');
+                %xlim(ax, [xCenter-halfWidth,  xCenter+halfWidth]);
+                xlim(ax, [1, nSubAperture]);
             end
 
             ax = axesList{2};
-            x = linspace( max(yCenter-halfWidth, 1), min(yCenter+halfWidth, nSubAperture), nY);
-            y = yProfile;
+            r = linspace( max(yCenter-halfWidth, 1), min(yCenter+halfWidth, nSubAperture), nY);
+            profile = yProfile;
+            profileModel = naomi.compute.ifmProfileModel(fit, fit.xCenter, rModel);
             
-
             if directions{2}
-                plot(ax, y, x);
-                ylim(ax, [yCenter-halfWidth,  yCenter+halfWidth]);
+                plot(ax, profile, r);
+                hold(ax, 'on'); plot(ax, profileModel, rModel);hold(ax, 'off');
+                %ylim(ax, [yCenter-halfWidth,  yCenter+halfWidth]);
+                ylim(ax, [1, nSubAperture]);
             else
-                plot(ax, x, y);
-                xlim(ax, [1, 128]);
-                xlim(ax, [yCenter-halfWidth,  yCenter+halfWidth]);
+                plot(ax, r, profile);
+                hold(ax, 'on'); plot(ax, rModel, profileModel);hold(ax, 'off');       
+                %xlim(ax, [yCenter-halfWidth,  yCenter+halfWidth]);
+                xlim(ax, [1, nSubAperture]);
             end
 
         end
+    end
 end
 
 

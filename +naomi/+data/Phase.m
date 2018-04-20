@@ -14,8 +14,11 @@ classdef Phase < naomi.data.BaseData
         function plot(obj, axes)
             if nargin<2; axes= gc;end;
         	phase = obj.data;
+            [nSubAperture,~] = size(phase);
             cla(axes); imagesc(axes, phase);
-
+            xlim(axes, [1,nSubAperture]);
+            ylim(axes, [1,nSubAperture]);
+            
             
             if strcmp(obj.getKey('PHASEREF','NO'), 'NO'); tit = 'Phase screen';
             else tit = 'Phase screen - reference'; end;

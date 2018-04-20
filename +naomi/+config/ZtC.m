@@ -12,8 +12,7 @@ function  success = ZtC(bench, data_or_file)
 		fullPath = fullfile(path, file);
 		data = naomi.data.ZtC(fullPath);
 				
-	end
-
+	
 	elseif ischar(data_or_file)
 			data =  naomi.data.ZtC(data_or_file);
 	

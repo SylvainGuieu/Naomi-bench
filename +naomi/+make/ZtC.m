@@ -5,14 +5,14 @@ function ZtCData = ZtC(bench, IFMData)
 
 	config = bench.config
 	if nargin<2
-		IFMData = bench.IFMCData;
+		IFMData = bench.IFMData;
 	end
 	
 	
 	diameter = config.ztcPupillDiameter;	
-	centralObscurtionDiameter = config.centralObscurtionDiameter; 
+	centralObscurtionDiameter = config.ztcCentralObscurtionDiameter; 
 	nEigenValue = config.ztcNeigenValue;
-	nZernike = bench.nZernike;
+	nZernike = config.ztcNzernike;
 
 	
 	
@@ -31,7 +31,7 @@ function ZtCData = ZtC(bench, IFMData)
          {'NZER', nZernike, 'Number of Zerniques'}
 	    };
 	
-	if strcomp(config.ztcMode, 'naomi')
+	if strcmp(config.ztcMode, 'naomi')
 		h{length(h)} = {'DPR_TYPE', 'ZTC_MATRIX', ''};
 	end
 	ZtCData = naomi.data.ZtC(ZtCArray, h, {bench});			

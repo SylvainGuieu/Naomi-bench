@@ -268,12 +268,11 @@ classdef Config < handle
                      {'centerAmplitude','CTAMP',   'push/pull amplitude for IFC computation'}, 
                      {'scaleNpushPull',       'SCNPP',   'Number of push/pull for scale computation'}, 
                      {'scaleAmplitude', 'SCAMP',   'push/pull amplitude for scale computation'}, 
-                     {'referenceNp',    'RFNP',    'Number of push for flat/reference measurement'},
                      {'rXOrder',        'RXORDER', 'Zernike order or rx motor movement'},
                      {'rYOrder',        'RYORDER', 'Zernike order or ry motor movement'},
                      {'rXSign',         'RXSIGN',  'Zernike sign or rx positive motor movement'},
                      {'rYSign',         'RYSIGN',  'Zernike sign or ry positive motor movement'}, 
-                     {'naomiVecrion',   'VERSION', 'naomi calibartion bench software version'}
+                     {'naomiVersion',   'VERSION', 'naomi calibartion bench software version'}
             };
     end
     

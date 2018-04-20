@@ -11,8 +11,7 @@ function  success = IFM(bench, data_or_file)
 		if isequal(file, 0); return; end;
 		fullPath = fullfile(path, file);
 		data = naomi.data.IFMatrix(fullPath);	
-	end
-
+	
 	elseif ischar(data_or_file)
 			data =  naomi.data.IFMatrix(data_or_file);
 	

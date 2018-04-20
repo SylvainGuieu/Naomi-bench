@@ -1,6 +1,9 @@
-function dmCommand(bench, axes)
-    % plot the DM monitoring 
-    if nargin<2; axes = gca; end;
+function dmCommand(bench, cmdVector, axes)
+    % plot the DM command map 
+    % the command Vector can be given otherwhise 
+    % the one in bench.cmdVector + bench.biasVector is taken
+
+    if nargin<3; axes = gca; end;
 	
     if strcmp(bench.config.dmID, bench.config.DUMMY)
         
@@ -10,7 +13,9 @@ function dmCommand(bench, axes)
                              'HorizontalAlignment', 'center' );
         return
     end
-    cmdVector = bench.cmdVector + bench.biasVector;
+    if nargin<2 || isempty(cmdVector)
+    	cmdVector = bench.cmdVector + bench.biasVector;
+    end
 	[xi,yi,mask] = naomi.compute.actuatorPosistion();
 	values = mask*1.0;
 	values(mask) = mask(mask)*cmdVector;

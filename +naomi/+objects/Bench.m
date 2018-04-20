@@ -12,7 +12,7 @@ classdef Bench < naomi.objects.BaseObject
     ACEStatus = false; % true/false if ASE has been started
     subsystems = {'config', 'wfs', 'dm', 'environment', 'gimbal', 'autocol'};
     
-    % processes is a container.Map object. It is used to check if a process
+    % processes is a containers.Map object. It is used to check if a process
     % is running or not and allows to kill interactively a process
     processes;
 
@@ -76,7 +76,7 @@ classdef Bench < naomi.objects.BaseObject
         function obj = Bench(varargin)
         	obj.config = naomi.Config();
         	obj.start(varargin{:});
-            obj.processes = container.Map();
+            obj.processes = containers.Map();
         end
 
         function test = has(obj, name)
@@ -242,7 +242,7 @@ classdef Bench < naomi.objects.BaseObject
         end
         function set.ZtCData(obj, ZtCData)
         	obj.config.log('Setting a new Zernique to Command Matrix\n', 1);
-            if obj.simulated
+            if obj.config.simulated
                 obj.simulator.zernike2Command = ZtCData.data;
             else
              if obj.has('dm')
@@ -253,7 +253,7 @@ classdef Bench < naomi.objects.BaseObject
         end
 
         function ZtCArray = ZtCArray(obj)
-            if obj.simulated
+            if obj.config.simulated
                 ZtCArray = obj.simulator.zernike2Command;
             else
                 ZtCArray = obj.dm.zernike2Command;
@@ -263,7 +263,7 @@ classdef Bench < naomi.objects.BaseObject
 
         function set.biasData(obj, biasData)
             obj.config.log('Setting a new DM bias\n', 1);
-            if obj.simulated
+            if obj.config.simulated
                 obj.simulator.biasVector = biasData.data;
             else
              if obj.has('dm')

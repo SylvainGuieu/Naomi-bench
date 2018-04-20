@@ -1,6 +1,7 @@
 classdef IFMatrix < naomi.data.PhaseCube
 	properties
-		
+        profileResult; % store the result of a fitted profile
+        fitType = 'gauss' % the type of fitting
 	end	
 	methods
         function obj = IFMatrix(varargin)
@@ -8,6 +9,10 @@ classdef IFMatrix < naomi.data.PhaseCube
         end
         function sh = staticHeader(obj)
         	sh = {{'DPR_TYPE', 'IFM', ''}};
+        end
+        function setData(obj, data)
+            setData@naomi.data.PhaseCube(data);
+            obj.profileResult = []; % empty profiles since data has changed 
         end
         function data = fitsReadData(obj, file)
             % for historical reason anc compatibility with sparta 
@@ -21,6 +26,13 @@ classdef IFMatrix < naomi.data.PhaseCube
             fitswrite(single(permute(obj.data, [2,3,1])),fileName);
             %matlab.io.fits.writeImg(.file, obj.getData());
         end
+        
+        function fit = fitResult(obj)
+            if isempty(obj.profileResult) || ~strcmp(obj.profileResult.type, obj.fitType)
+                obj.profileResult = naomi.compute.fittedIFMprofile(obj.data, obj.fitType);
+            end
+            fit = obj.profileResult;
+        end
         function [xS,yS] = computeScale(obj)
             naomi.compute.IFMScale(obj.data);            
         end        
@@ -31,8 +43,11 @@ classdef IFMatrix < naomi.data.PhaseCube
             data = obj.data;
             data = squeeze(data(actNumnber,:,:));
 
-            IFData = naomi.data.IF(data, {{'ACTNUM', actNumnber, 'Pushed actuator'}}, obj.context);        end
+            IFData = naomi.data.IF(data, {{'ACTNUM', actNumnber, 'Pushed actuator'}}, obj.context); 
+            IFData.fitType = obj.fitType;
         end
+
+        
 
         function [xVector, yVector, signVector] = computeActuatorPosition(obj)
             IFM = obj.data;
@@ -48,8 +63,8 @@ classdef IFMatrix < naomi.data.PhaseCube
                 yVector(a) = y;
                 signVector(a) = sign(IFM(a,int32(x),int32(y)));
             end            
-
         end
+
         function maxVector = computeMaximums(obj, signVector)
             IFM = obj.data;
             [nAct,nSubAperture,~] = size(IFM);
@@ -79,8 +94,9 @@ classdef IFMatrix < naomi.data.PhaseCube
                 hwhmVector(a) = sqrt(num/3.14159);
             end 
         end
-
-       
+        
+        
+                
         function plotQc(obj, emphasizedActuatorNumber, axesList)
             % emphasizedActuatorNumber if the emphasized actuator 
             % axesList (optional) must have 4 axes 
@@ -99,26 +115,28 @@ classdef IFMatrix < naomi.data.PhaseCube
 
             
             threshold = 0.2;
+            
+            fit = obj.fitResult;
 
-            [xVector, yVector, signVector] = obj.computeActuatorPosition();
-            maxVector = obj.computeMaximums(signVector);
-            hwhmVector = obj.computeHwhm(maxVector, signVector);
+            %[xVector, yVector, signVector] = obj.computeActuatorPosition();
+            %maxVector = obj.computeMaximums(signVector);
+            %hwhmVector = obj.computeHwhm(maxVector, signVector);
 
             % Accept threshold around median
-            flag = (abs(maxVector - median(maxVector))/median(maxVector) < threshold);
-            flag = flag .* (abs(hwhmVector - median(hwhmVector))/median(hwhmVector) < threshold);
+            flag = (abs(fit.amplitude - median(fit.amplitude))/median(fit.amplitude) < threshold);
+            flag = flag .* (abs(fit.hwhm - median(fit.hwhm))/median(fit.hwhm) < threshold);
             nNotOk = nAct - sum(flag);
 
            
             ax = axesList{1};
             
-            plot(ax, maxVector,'o-');
-            if emphasizedActuatorNumber; 
+            plot(ax, abs(fit.amplitude), 'o-');
+            if emphasizedActuatorNumber
                 hold(ax, 'on');
-                plot(ax,emphasizedActuatorNumber, maxVector(emphasizedActuatorNumber),'rx'); 
+                plot(ax,emphasizedActuatorNumber, abs(fit.amplitude(emphasizedActuatorNumber)),'rx'); 
                 hold(ax, 'off');
-            end;
-            ylim(ax, [0,1.2*max(maxVector)]);
+            end
+            ylim(ax, [0,1.2*max(fit.amplitude)]);
             grid(ax);  set(ax,'xminorgrid','on','yminorgrid','on');
             xlabel(ax, 'Actuator');
             ylabel(ax, 'amp (um/1)');
@@ -126,12 +144,12 @@ classdef IFMatrix < naomi.data.PhaseCube
             
             
             ax = axesList{2};
-            plot(ax, signVector,'o-');
-            if emphasizedActuatorNumber; 
+            plot(ax, sign(fit.amplitude),'o-');
+            if emphasizedActuatorNumber
                 hold(ax, 'on');
-                plot(ax, emphasizedActuatorNumber, signVector(emphasizedActuatorNumber),'rx');
+                plot(ax, emphasizedActuatorNumber,sign(fit.amplitude(emphasizedActuatorNumber)) ,'rx');
                 hold(ax, 'off');
-            end;            
+            end
             ylim(ax, [-1.2,1.2]);
             grid(ax);  set(ax,'xminorgrid','on','yminorgrid','on');
             xlabel(ax, 'Actuator');
@@ -139,31 +157,39 @@ classdef IFMatrix < naomi.data.PhaseCube
 
             
             ax = axesList{3};
-            plot(ax, hwhmVector,'o-');
-            if emphasizedActuatorNumber;
+            plot(ax, 2*fit.hwhm,'o-');
+            if emphasizedActuatorNumber
                 hold(ax, 'on');
-                plot(ax,emphasizedActuatorNumber,  hwhmVector(emphasizedActuatorNumber),'rx'); 
+                plot(ax,emphasizedActuatorNumber,  2*fit.hwhm(emphasizedActuatorNumber),'rx'); 
                 hold(ax, 'off');
             end;
-            ylim(ax, [0,1.2*max(hwhmVector)]);
+            ylim(ax, [0,1.2*max(2*fit.hwhm)]);
             grid(ax, 'on'); set(ax,'xminorgrid','on','yminorgrid','on');
             xlabel(ax, 'Actuator');
             ylabel(ax, 'fwhm (pix)');
 
             
             ax = axesList{4};
-            scatter(ax, xVector(:),yVector(:));
-            if emphasizedActuatorNumber;
+            scatter(ax, fit.xCenter , fit.yCenter);
+            hold(ax, 'on');
+                plot(ax, fit.xCenter(1), fit.yCenter(1) ,'gO'); 
+            hold(ax, 'off');
+            if emphasizedActuatorNumber
                 hold(ax, 'on');
-                plot(ax, xVector(emphasizedActuatorNumber), yVector(emphasizedActuatorNumber) ,'rx'); 
+                plot(ax, fit.xCenter(emphasizedActuatorNumber), fit.yCenter(emphasizedActuatorNumber) ,'rx'); 
                 hold(ax, 'off');
-            end;
+            end
             xlim(ax, [0,nSubAperture]);
             ylim(ax, [0,nSubAperture]);
             set(ax,'ydir','reverse');
             grid(ax);  set(ax,'xminorgrid','on','yminorgrid','on');
             xlabel(ax, 'Y   => +');
             ylabel(ax, '+ <=   X');
-        end            
+            daspect(ax, [1 1 1])
+        end
+        
+        function gui(obj)
+            ifmExplorerGui(obj);
+        end
     end
 end
