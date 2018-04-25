@@ -433,7 +433,7 @@ classdef Bench < naomi.objects.BaseObject
         
         
         
-        function value = getKeys(bench, key, default)
+        function value = getKey(bench, key, default)
             % define here all the relation between bench parameters and
             % data header keyword
             K = naomi.KEYS;
@@ -460,6 +460,20 @@ classdef Bench < naomi.objects.BaseObject
                     else
                         value = bench.config.dmId;
                     end
+                case K.TEMP0
+                    if bench.has('environment')
+                        value = bench.environment.getTemp(0);
+                    else
+                        value = K.UNKNOWN_FLOAT;
+                    end
+                case K.TEMP1
+                    if bench.has('environment')
+                        value = bench.environment.getTemp(1);
+                    else
+                        value = K.UNKNOWN_FLOAT;
+                    end
+                
+                
                 otherwise
                     if nargin<2
                         error('unknown key "%s"', key);
@@ -469,7 +483,9 @@ classdef Bench < naomi.objects.BaseObject
                     
             end
         end
-            
+        function test(obj)
+            obj.getKey('TEMP1');
+        end
         function populateHeader(obj, h)
             % populate a generic fits header for all files a maximum of
             % information is populated here

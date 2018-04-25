@@ -185,6 +185,13 @@ classdef KEYS
        RYGAIN = 'RY_GAIN';
        RYGAINc = '[arcsec mecanical/mm] gain convertion of motor rY';
        
+       TEMP0 = 'TEMP0'
+       TEMP0c = '[deg celcius] temperature on the QSM';
+       
+       TEMP1 = 'TEMP1'
+       TEMP1c = '[deg celcius] temperature on the QSM';
+       
+       
        %% default  for unknown  values in header 
        UNKNOWN_STR = '?';
        UNKNOWN_FLOAT = -999.99;
