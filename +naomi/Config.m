@@ -31,8 +31,8 @@ classdef Config < handle
         % ACE root directory 
         ACEROOT =  'C:\AlpaoCoreEngine';
         
-        dmIDChoices = {'BAX153','BAX159','BAX199','BAX200', 'BAX201', 'DUMMY'};
-        dmID = '';
+        dmIdChoices = {'BAX153','BAX159','BAX199','BAX200', 'BAX201', 'DUMMY'};
+        dmId = '';
         
         
         % flag for tiptilt removal when measuring phase by
@@ -314,7 +314,7 @@ classdef Config < handle
                      {'location',       'ORIGIN',  'Where data has been taken IPAG/ESO-HQ/BENCH'},
                      {'mjd',            'MJD-OBS', 'Modified Julian Date of writing header'},
                      {'dateobs',        'DATE-OBS','Date of writing header'},
-                     {'dmID',           'DM-ID' ,  'DM identification'},
+                     {'dmId',           'DM-ID' ,  'DM identification'},
                      {'fullPupillDiameter', 'FPUPDIAM', 'Full DM Pupill Diamter [m]'},                    
                      {'dmCentralActuator',    'CENTACT', 'DM center actuator number'},                     
                      {'centerNpushPull',      'CTNPP',   'Number of push/pull for IFC computation'},
@@ -507,23 +507,23 @@ classdef Config < handle
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %
-        %   dmID set/ask/get/choices function 
+        %   dmId set/ask/get/choices function 
         %
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-        function askDmID(obj)
+        function askDmId(obj)
              % ask the dmId from a dialog box
-             dmIds = obj.dmIDChoices;
+             dmIds = obj.dmIdChoices;
              [iDmID,~] = listdlg('PromptString','Select a DM:','SelectionMode','single','ListString',dmIds);
-             obj.dmID = char(dmIds(iDmID));
+             obj.dmId = char(dmIds(iDmID));
         end
-        function dmID = getDmID(obj)
+        function dmId = getDmId(obj)
             % return DmID or ask 
-            if strcmp(obj.dmID, '')
-                obj.askDmID()
+            if strcmp(obj.dmId, '')
+                obj.askDmId()
             end
-            dmID = obj.dmID
+            dmId = obj.dmId
         end
 
         

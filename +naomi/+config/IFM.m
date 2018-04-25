@@ -32,7 +32,7 @@ function  success = IFM(bench, data_or_file)
 	
 	success = true;
 	
-	if bench.config.plotVerbose
+	if bench.config.plotVerbose 
 		naomi.plot.figure('IFM');
 		bench.IFMData.plot();
 	end

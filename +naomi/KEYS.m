@@ -43,6 +43,15 @@ classdef KEYS
         CENTACTc = 'DM center actuator number';
         CENTACTd = 121;
         
+        ACTNUM = 'ACTNUM';
+        ACTNUMc = 'relevant actuator number pushed';
+        
+        IFAMP = 'IF_AMP';
+        IFAMPc = '[Cmax] amplitude of push-pull';
+        
+        IFNPP =  'IF_NPP';
+        IFNPPc = 'number of push-pull';
+        
         RXORDER = 'RXORDER';
         RXORDERc = 'tip or tilt movement of the rx motor';
         RXORDERd = 'tip';
@@ -176,7 +185,10 @@ classdef KEYS
        RYGAIN = 'RY_GAIN';
        RYGAINc = '[arcsec mecanical/mm] gain convertion of motor rY';
        
-       
+       %% default  for unknown  values in header 
+       UNKNOWN_STR = '?';
+       UNKNOWN_FLOAT = -999.99;
+       UNKNOWN_INT = -999;
        
     end
 end

@@ -1,4 +1,4 @@
-function [IFMData, IFMcleanData] = IFM(bench, nPushPull, nLoop, amplitude, ifPause)
+function [IFMData, IFMcleanData] = IFM(bench, callback, nPushPull, nLoop, amplitude, ifPause)
 %   measure.IFM  Get the Influence Function of all actuators 
 % 
 %   IFM = measure.IFM(bench, nPushPull, nLoop, amplitude, ifPause)
@@ -8,7 +8,8 @@ function [IFMData, IFMcleanData] = IFM(bench, nPushPull, nLoop, amplitude, ifPau
 %   between each loop (to reverse creep).
 % 
 %   bench: naomi bench structure including wfs and dm object
-%   
+%   callback : a call back function called after each push pull measurement
+%              the call back is receiving a naomi.data.IF object
 %   nPushPull: number of push-pull
 %   nLoop: Number of loop across actuator (recommended 2)
 %   amplitude: amplitude of the push-pull
@@ -20,11 +21,13 @@ function [IFMData, IFMcleanData] = IFM(bench, nPushPull, nLoop, amplitude, ifPau
 
 	config = bench.config;
 	mjd =  config.mjd;
-
-	if nargin<2; nPushPull = config.ifNpushPull; end
-	if nargin<3; nLoop = config.ifmNloop; end
-	if nargin<4; amplitude   = config.ifAmplitude; end
-	if nargin<5; ifPause  = config.ifPause; end
+    
+    if nargin<2; callback = [];
+    
+	if nargin<3; nPushPull = config.ifNpushPull; end
+	if nargin<4; nLoop = config.ifmNloop; end
+	if nargin<5; amplitude   = config.ifAmplitude; end
+	if nargin<6; ifPause  = config.ifPause; end
 
 	wfs = bench.wfs;
 	dm  = bench.dm;
@@ -46,7 +49,11 @@ function [IFMData, IFMcleanData] = IFM(bench, nPushPull, nLoop, amplitude, ifPau
                 return
             end
             
-	        IFarray = naomi.measure.IF(bench, iActuator, nPushPull, amplitude).data;
+            IFData = naomi.measure.IF(bench, iActuator, nPushPull, amplitude);
+            if ~isempty(callback)
+                callback(IFData);
+            end
+	        IFarray = IFData.data;
 	        IFMatrix(iActuator,:,:) = IFMatrix(iActuator,:,:) + reshape(IFarray,1,nSubAperture,nSubAperture) / nLoop;
 	        pause(ifPause);
             bench.processStep('IFM', iLoop*iActuator);

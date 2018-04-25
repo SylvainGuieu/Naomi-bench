@@ -17,8 +17,8 @@ function start(config)
     % Create today folder
     mkdir(config.todayDirectory);
     
-    dmID = config.getDmID();% this will ask for dmID if not set
-    switch dmID
+    dmId = config.getDmId();% this will ask for dmId if not set
+    switch dmId
         case "DUMMY"
             naomi.startReference(wfs, config);
             

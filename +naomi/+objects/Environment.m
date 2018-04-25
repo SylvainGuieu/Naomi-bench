@@ -11,6 +11,10 @@ classdef Environment < naomi.objects.BaseObject
         function obj = Environment()
         end
         
+        function temp = getTemp(obj, channel)
+            temp = 0;
+        end
+        
         function populateHeader(obj, h)
             % populate a generic fits header for all files a maximum of
             % information is populated here

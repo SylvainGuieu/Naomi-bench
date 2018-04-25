@@ -42,8 +42,13 @@ classdef IFMatrix < naomi.data.PhaseCube
         function IFData = IF(obj, actNumnber)
             data = obj.data;
             data = squeeze(data(actNumnber,:,:));
-
-            IFData = naomi.data.IF(data, {{'ACTNUM', actNumnber, 'Pushed actuator'}}, obj.context); 
+            
+            K = naomi.KEYS;
+            h = {{K.ACTNUM, actNumnber,K.ACTNUMc},...
+                 {K.IFAMP ,obj.getKey(K.IFAMP, -99.9), K.IFAMPc},...
+                 {K.IFNPP, obj.getKey(K.IFNPP, -9), K.IFNPPc}};
+            
+            IFData = naomi.data.IF(data, h); 
             IFData.fitType = obj.fitType;
         end
               

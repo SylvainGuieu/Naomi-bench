@@ -1,4 +1,4 @@
-classdef DmBias < naomi.data.BaseData
+classdef DmBias < naomi.data.DmCommand
 	properties
 	
 	end	
@@ -6,7 +6,7 @@ classdef DmBias < naomi.data.BaseData
     
 	methods
         function obj = DmBias(varargin)
-            obj = obj@naomi.data.BaseData(varargin{:});
+            obj = obj@naomi.data.DmCommand(varargin{:});
         end
         function sh = staticHeader(obj)
         	sh = {{naomi.KEYS.DPRTYPE, 'DM_BIAS', naomi.KEYS.DPRTYPEc}};

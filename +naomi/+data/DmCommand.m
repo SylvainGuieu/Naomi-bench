@@ -3,7 +3,7 @@ classdef DmCommand < naomi.data.BaseData
 	
     % clip the command to +1 -1 in plot
     clipped = true; 
-    DmBias; % attached dm bias if empty this is 0
+   
     end	
         
     
@@ -15,21 +15,15 @@ classdef DmCommand < naomi.data.BaseData
         function sh = staticHeader(obj)
         	sh = {{naomi.KEYS.DPRTYPE, 'DM_VECTOR', naomi.KEYS.DPRTYPEc}};
         end
-        function cmdVector = fullCommandVector(obj)
-            % the command plus the bias if any 
-            cmdVector = obj.data;
-            if ~isempty(obj.DmBias)
-                cmdVector = cmdVector + obj.DmBias.data;
-            end
-        end
+        
             
         function nSaturated = nSaturated(obj)
-           nSaturated = sum(abs(obj.fullCommandVector)>=1);
+           nSaturated = sum(abs(obj.data)>=1);
         end
         function plot(obj, axes)
             if nargin<2; axes= gca();end;
             
-            cmdVector = obj.fullCommandVector;
+            cmdVector = obj.data;
             plot(axes, cmdVector);            
             title( axes, sprintf('DM Mean = %.1f%%  Max abs = %.1f%%', mean(cmdVector)*100,max(cmdVector)*100));
             xlabel('Actuator'); ylabel('cmd');
@@ -46,7 +40,7 @@ classdef DmCommand < naomi.data.BaseData
             [nActY, nActX] = size(mask);
             
 	    	values = mask*1.0;
-    		values(mask) = mask(mask).*obj.fullCommandVector;
+    		values(mask) = mask(mask).*obj.data;
     		values(~mask) = nan;
             % clip to +1 / -1
             if obj.clipped

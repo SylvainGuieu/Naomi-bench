@@ -5,7 +5,7 @@ function dmCommand(bench, cmdVector, axes)
 
     if nargin<3; axes = gca; end;
 	
-    if strcmp(bench.config.dmID, bench.config.DUMMY)
+    if strcmp(bench.config.dmId, bench.config.DUMMY)
         
 	
         cla(axes);

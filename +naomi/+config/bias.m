@@ -10,11 +10,11 @@ function  success = bias(bench, data_or_file)
 		[file, path] = naomi.askFitsFile('Select a DM Bias file BIAS_*');
 		if isequal(file, 0); return; end;
 		fullPath = fullfile(path, file);
-		data = naomi.data.dmBias(fullPath);
+		data = naomi.data.DmBias(fullPath);
 				
 	
 	elseif ischar(data_or_file)
-			data =  naomi.data.dmBias(data_or_file);
+			data =  naomi.data.DmBias(data_or_file);
 	
 	elseif isempty(data_or_file)
 		bench.dmBiasData = [];			

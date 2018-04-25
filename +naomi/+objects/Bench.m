@@ -366,7 +366,11 @@ classdef Bench < naomi.objects.BaseObject
             if obj.config.simulated
                 nSubAperture = obj.simulator.nSubAperture;
             else
-                nSubAperture = obj.wfs.nSubAperture;
+                if obj.has('wfs')
+                    nSubAperture = obj.wfs.nSubAperture;
+                else
+                    nSubAperture = 0;
+                end
             end
         end
 
@@ -426,7 +430,46 @@ classdef Bench < naomi.objects.BaseObject
                 end
             end
         end
-
+        
+        
+        
+        function value = getKeys(bench, key, default)
+            % define here all the relation between bench parameters and
+            % data header keyword
+            K = naomi.KEYS;
+            switch key 
+                case K.WFSNSUB                    
+                    value = bench.nSubAperture;
+                    
+                case K.WFSNAME
+                    if bench.has('wfs')
+                        value = bench.wfs.model;
+                    else
+                        value = K.UNKNOWN_STR;
+                    end
+                    
+                case K.ZTCDIAM
+                    value = bench.config.ztcPupillDiameter;
+                    
+                case K.FPUPDIAM
+                    value = bench.config.fullPupillDiameter;
+                    
+                case K.DMID
+                    if bench.has('dm')
+                        value = bench.dm.sSerialName;
+                    else
+                        value = bench.config.dmId;
+                    end
+                otherwise
+                    if nargin<2
+                        error('unknown key "%s"', key);
+                    else
+                        value = default;
+                    end
+                    
+            end
+        end
+            
         function populateHeader(obj, h)
             % populate a generic fits header for all files a maximum of
             % information is populated here

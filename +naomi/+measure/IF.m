@@ -1,4 +1,4 @@
-function IF = IF(bench,  act, nPushPull, amplitude)
+function IFData = IF(bench,  act, nPushPull, amplitude)
 %   IF  measure the Influence Function of one actuator 
 % 
 %   IF = measure.IF(bench act, nPushPull, amplitude)
@@ -38,17 +38,15 @@ function IF = IF(bench,  act, nPushPull, amplitude)
     end
     
     naomi.action.cmdZonal(bench, act, ref);
-    IF = (tppush - tppull) / (2*amplitude*nPushPull);
+    IFArray = (tppush - tppull) / (2*amplitude*nPushPull);
    	 
-    % Compute value of maximum
-    Max = max(abs(IF(~isnan(IF))));
     
-    
-    h = {{'MJD-OBS',config.mjd, 'modified julian when script started'},
-         {'ACTNUM',act, 'IF actuator number'}, 
-	     {'IF_AMP',amplitude,'[Cmax] amplitude of push-pull'},
-         {'IF_NPP',nPushPull,'number of push-pull'}};
+    K = naomi.KEYS;
+    h = {{K.MJDOBS,config.mjd, K.MJDOBSc},...
+         {K.ACTNUM,act,  K.ACTNUMc      },...
+	     {K.IFAMP ,amplitude, K.IFAMPc},...
+         {K.IFNPP,nPushPull,  K.IFNPPc}};
 
-    IF = naomi.data.IF(IF, h, {bench});    
+    IFData = naomi.data.IF(IFArray, h, {bench});    
 end
 

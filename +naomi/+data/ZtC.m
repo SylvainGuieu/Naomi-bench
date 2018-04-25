@@ -43,11 +43,11 @@ classdef ZtC < naomi.data.BaseData
             cmd = squeeze(obj.data(idx,':'));
             cmd = cmd';
             cmd = cmd.*amplitude;
-            
-            dmCommandData = naomi.data.DmCommand(cmd);
+                        
             if ~isempty(obj.DmBiasData)
-                dmCommandData.DmBiasData = obj.DmBiasData;
-            end            
+                cmd = cmd + obj.DmBiasData.data;                
+            end       
+            dmCommandData = naomi.data.DmCommand(cmd);
         end
         function zernikeData = zernike(obj,zernike)
             K = naomi.KEYS;

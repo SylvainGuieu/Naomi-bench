@@ -58,13 +58,18 @@ classdef BaseData < handle
            K = naomi.KEYS;
             
            info =  obj.getKey(K.DATE, 'Unknown');
-           tpl = obj.getKey(K.TPLNAME, '');
-           if tpl; info = strcat(info, '/ ', tpl);end
+           %tpl = obj.getKey(K.TPLNAME, '');
+           %if tpl; info = strcat(info, '/ ', tpl);end
            dpr = obj.getKey(K.DPRTYPE, '');
            if dpr; info = strcat(info, '/ ', dpr); end
-           dm = obj.getKey(K.DMNAME, '');
+           dm = obj.getKey(K.DMID, '');
            if dm; info = strcat(info, '/ ', dm); end
         end
+        
+        function dmId = dmId(obj)
+            dmId = obj.getKey(naomi.KEYS.DMID, '');
+        end
+        
         function addHeader(obj, header)
             if isa(header,'containers.Map')
                 ks = keys(header);
