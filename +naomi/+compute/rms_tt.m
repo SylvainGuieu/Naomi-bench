@@ -13,7 +13,7 @@ function Rms = rms_tt(phi)
 
 % Get size
 [nSubAperture,~] = size(phi);
-[Y,X] = meshgrid(1:nSubAperture,1:nSubAperture);
+[X,Y] = meshgrid(1:nSubAperture,1:nSubAperture);
 
 % Clean tip-tilt
 phic = phi;

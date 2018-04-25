@@ -1,0 +1,16 @@
+function [phaseArray] = theoriticalPhase(bench, zernike, amplitude)
+%UNTITLED Summary of this function goes here
+%   Detailed explanation goes here
+    phaseArray = naomi.compute.theoriticalPhase(bench.nSubAperture, ...
+                                                bench.xCenter, ...
+                                                bench.yCenter, ...
+                                                bench.sizePix(bench.config.ztcPupillDiameter),...
+                                                zernike, ...
+                                                bench.orientation);
+    phaseArray = phaseArray*amplitude;                                      
+%     K = naomi.KEYS;
+%     h = {{K.ZERN, zernike, K.ZERNc}};
+%     phaseData = naomi.data.Phase(phaseArray* amplitude, h);
+                               
+end
+

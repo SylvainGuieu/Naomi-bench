@@ -8,11 +8,11 @@ warning('off', 'MATLAB:subscripting:noSubscriptsSpecified');
 bench = naomi.objects.Bench();
 %%%
 % local config for test purpose
-bench.config.useGimbal = true;
+bench.config.useGimbal = false;
 %
 
-bench.startACE();
-bench.startWfs();
+%bench.startACE();
+%bench.startWfs();
 %bench.startDm();
 
 if bench.config.useGimbal

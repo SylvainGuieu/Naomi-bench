@@ -1,8 +1,7 @@
 classdef ZtC < naomi.data.BaseData
 	properties
         % a Bias attached to this ZtC if any
-        BiasData; 
-
+        DmBiasData;
 	end	
 	methods
         function obj = ZtC(varargin)
@@ -10,7 +9,18 @@ classdef ZtC < naomi.data.BaseData
         end
         function sh = staticHeader(obj)
         	sh = {{'DPR_TYPE', 'ZTC_MATRIX', ''}};
-        end   
+        end 
+        function idx = zernike2index(obj, zernike)
+            % convert the given zernike number to the table index
+            idx = zernike;
+        end
+        function zernike = firstZernike(obj)
+            % the first zernike number of the data 
+            zernike = 1;
+        end
+        function zernike = lastZernike(obj)
+            [zernike,~] = size(obj.data);
+        end
         function data = fitsReadData(obj, file)
             % for historical reason anc compatibility with sparta 
             % the data is stored with the last dimension beeing 
@@ -18,22 +28,30 @@ classdef ZtC < naomi.data.BaseData
             data = matlab.io.fits.readImg(file);
             data = double(data)';
         end
+        
         function fitsWriteData(obj, fileName)
                 fitswrite(single(obj.data'),fileName);
                 %matlab.io.fits.writeImg(.file, obj.getData());
-        end   
-        function dmVectorData = dmVector(obj, zernike, amplitude);
+        end
+        
+        function dmCommandData = dmCommandData(obj, zernike, amplitude)
             if nargin<3
                 amplitude = 1.0;
             end
-            cmd = squeeze(obj.data(zernike,':'));
+            idx = obj.zernike2index(zernike);
+            
+            cmd = squeeze(obj.data(idx,':'));
             cmd = cmd';
             cmd = cmd.*amplitude;
             
-            if ~isempty(obj.BiasData)
-                cmd = cmd + app.BiasData.data;
-            end
-            dmVectorData = naomi.data.dmVector(cmd);
+            dmCommandData = naomi.data.DmCommand(cmd);
+            if ~isempty(obj.DmBiasData)
+                dmCommandData.DmBiasData = obj.DmBiasData;
+            end            
+        end
+        function zernikeData = zernike(obj,zernike)
+            K = naomi.KEYS;
+            zernikeData = naomi.data.Zernike(zernike, {{K.ORIENT,obj.getKey(K.ORIENT, K.ORIENTd)}}, obj.context);
         end
     	function plot(obj, axes)
             if nargin <2; axes = gca; end;
@@ -54,8 +72,11 @@ classdef ZtC < naomi.data.BaseData
         end
         
         function ZtCSpartaData = toSparta(obj)
-            ZtCSpartaData = naomi.data.ZtCSpartaData(obj.data, obj.header, obj.context);
+            % SPARTA does not contains the piston and is limited to 20
+            % thernikes
+            ZtCSpartaData = naomi.data.ZtCSparta(obj.data(2:21,':'), obj.header, obj.context);
         end
+        
         function gui(obj)
             ztcExplorerGui(obj);
         end

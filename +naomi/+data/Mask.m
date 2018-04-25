@@ -1,7 +1,6 @@
 classdef Mask < naomi.data.Phase
 	properties
 	
-
 	end	
 	methods
         function obj = Mask(varargin)
@@ -15,8 +14,7 @@ classdef Mask < naomi.data.Phase
         	mask = obj.data;
             cla(axes); imagesc(axes,mask);                       		
             title(axes, 'Phase Mask');
-            xlabel(axes, 'Y   =>+');
-            ylabel(axes, '+<=   X');
+            naomi.plot.phaseAxesLabel(axes, obj.getKey(naomi.KEYS.ORIENT, naomi.KEYS.ORIENTd));
         end
     end
 end

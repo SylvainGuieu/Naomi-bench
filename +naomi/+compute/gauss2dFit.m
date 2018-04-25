@@ -18,7 +18,7 @@ function args = gauss2dFit(img, fitOrientation, sigmaGuess, amplitudeGuess)
     
     %img = img(max(1:xCi-bSize));
     [xSize, ySize] = size(img);
-    [Y,X] = meshgrid(1:xSize, 1:ySize);
+    [X,Y] = meshgrid(1:xSize, 1:ySize);
  	
     mask = ~isnan(img);
     

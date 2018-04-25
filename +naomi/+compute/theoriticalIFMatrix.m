@@ -21,7 +21,7 @@ function IFM_t = theoriticalIFMatrix(IFMatrix,amplitude,iFWidth)
 [nActuator,nSubAperture,~] = size(IFMatrix);
 
 % Pixel grid
-[Y,X] = meshgrid(1:nSubAperture,1:nSubAperture);
+[X,Y] = meshgrid(1:nSubAperture); 
 
 % Create outputs
 tIFMatrix = zeros(nActuator,nSubAperture,nSubAperture);

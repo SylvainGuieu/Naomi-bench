@@ -24,9 +24,9 @@ function movementArray = motorStepResponse(bench, direction)
             [a,b] = autocol.getAllXY();
             oneMeasurement.data = [a,b];
             oneMeasurement.update(); % update the header keyword
-            bench.config.figure('autocol alpha');
+            naomi.plot.figure('autocol alpha');
             oneMeasurement.plotAlpha;   % plot it
-            bench.config.figure('autocol beta');
+            naomi.plot.figure('autocol beta');
             oneMeasurement.plotBeta;   % plot it
             pause(0.1);
     end
@@ -35,9 +35,9 @@ function movementArray = motorStepResponse(bench, direction)
     %         [a,b] = autocol.getAllXY();
     %         oneMeasurement.data = [a,b];
     %         oneMeasurement.update(); % update the header keyword
-    %         bench.config.figure('autocol alpha');
+    %         naomi.plot.figure('autocol alpha');
     %         oneMeasurement.plotAlpha;   % plot it
-    %         bench.config.figure('autocol beta');
+    %         naomi.plot.figure('autocol beta');
     %         oneMeasurement.plotBeta;   % plot it
     %     end;
 

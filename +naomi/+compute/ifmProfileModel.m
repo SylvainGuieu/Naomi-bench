@@ -12,6 +12,8 @@ function model = ifmProfileModel(fitResult, X, Y)
             model = naomi.fitFunc.gaussE(fitResult.args, data);
         case 'gauss'            
             model = naomi.fitFunc.gauss(fitResult.args, data);
+        case 'naomi'
+            model = naomi.fitFunc.naomi(fitResult.args, data);
         case 'lorentzE'
              model = naomi.fitFunc.lorentzE(fitResult.args, data);
         case 'lorentz'

@@ -36,7 +36,7 @@ function strokeData = stroke(bench,zernikeMode,amplitudeVector)
     strokeData = naomi.data.Stroke(outputArray, h, {bench});
 
     if config.plotVerbose
-    	bench.config.figure('Modal Stroke'); clf;
+    	naomi.plot.figure('Modal Stroke'); clf;
     	strokeData.plot();
     end
 end

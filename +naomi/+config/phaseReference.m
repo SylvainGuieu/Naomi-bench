@@ -20,7 +20,7 @@ function success= phaseReference(bench, data_or_file)
 			bench.phaseReferenceData = [];			
 			isConfigured = false;
 			if bench.config.plotVerbose
-				bench.config.figure('Phase Reference');
+				naomi.plot.figure('Phase Reference');
 				clf;
 			end;
 			success  = true;
@@ -34,7 +34,7 @@ function success= phaseReference(bench, data_or_file)
 	success = true;
 		
 	if bench.config.plotVerbose
-		bench.config.figure('Phase Reference');
+		naomi.plot.figure('Phase Reference');
 		bench.phaseReferenceData.plot();
 	end	
 	bench.config.log('a Phase reference has been configured',2);

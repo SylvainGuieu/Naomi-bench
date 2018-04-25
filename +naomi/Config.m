@@ -34,6 +34,15 @@ classdef Config < handle
         dmIDChoices = {'BAX153','BAX159','BAX199','BAX200', 'BAX201', 'DUMMY'};
         dmID = '';
         
+        
+        % flag for tiptilt removal when measuring phase by
+        % naomi.measure.phase
+        filterTipTilt = false;
+    
+        % flag to remove a reference (if any stored in the bench object) 
+        % to the measured phased by naomi.measure.phase
+        substractReference = true;
+        
         % Bench pupill diameter size in m
         % this is the physical pupill of the DM on the bench 
         % not the one used for ZtC (see bellow)  
@@ -64,8 +73,30 @@ classdef Config < handle
 
 
         % Assumed aproximative pixel scale for start-up alignment
-        pixelScale = 0.38e-3; % m / pixel
+        % normaly, after measurement this value is not used anymore
+        xPixelScale = 0.38e-3; % m / pixel
+        yPixelScale = 0.38e-3; % m / pixel
         
+        % Assumed aproximative x,y center for start-up alignment
+        % normaly, after measurement this value is not used anymore
+        xCenter = 64.0; % pixel 
+        yCenter = 64.0; % pixel
+        
+        % orientation is used to determine the correspondance between the 
+        % receive phase / dm position and conventional zernike definition
+        % when plotted the phase screen is left untouched but the DM can be
+        % rotated as well as theoritical phases
+        % orientation can be 
+        %   'xy' : phase screen and dm in the same orientation
+        %   'yx' : phase screen and dm are rotated by 90 degree
+        %   '-xy' : the x axis is flipped 
+        %   'x-y' : y axis is flipped 
+        %   '-x-y' : x and y axis flipped 
+        %   etc ...
+        % After measured by the bench this value is not used anymore
+        orientation = 'yx';
+        
+        dmasdasda= [39,203];
         
         % center actuator id number
         dmCentralActuator = 121;       
@@ -142,6 +173,9 @@ classdef Config < handle
         %   Flat measurement 
         %
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
+        
+        % flat prefered mode (for gui use) 'closed' or 'open'
+        flatLoopMode = 'closed';
         % flat measurement, number of phase 
         flatNphase = 5; 
         
@@ -151,7 +185,26 @@ classdef Config < handle
         flatCloseNzernike  = 15;
         % number of iteration to close loop on flat 
         flatCloseNstep  = 10;
-
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %
+        %   zernike  measurement 
+        %
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
+         % zernike measurement prefered mode (for gui use) 'closed' or 'open'
+        zernikeLoopMode = 'open';
+        % zerniket measurement, number of phase 
+        zernikeNphase = 1; 
+        % amplitude used to play the zernike (for gui use)
+        zernikeAmplitude = 1.0;
+        % gain used to measure the zernike in close loop 
+        zernikeCloseGain = 0.5;
+        % number of Zernique to close the loop on zernike
+        zernikeCloseNzernike  = 15;
+        % number of iteration to close loop on zernike
+        zernikeCloseNstep  = 10;
+        
+        
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %
         %   Stroke  measurement 
@@ -306,7 +359,7 @@ classdef Config < handle
                     found = true;
                 end
             end
-            if ~found;
+            if ~found
                 error(strcat('unknown location ', location));
             end
             obj.dataDirectory   = fullfile(obj.rootDirectory,'Data');
@@ -343,7 +396,7 @@ classdef Config < handle
             found = false;
             for i=1:length(obj.ifDef)
                 def = obj.ifDef{i};
-                if strcomp(mode,def{1})
+                if strcmp(mode,def{1})
                     obj.ifNpushPull = def{2};
                     obj.ifAmplitude = def{3};
                     obj.ifmNloop = def{4};
@@ -351,7 +404,7 @@ classdef Config < handle
                     found = true;
                 end
             end
-            if ~found: error(strcat('unknown mode ',mode)); end 
+            if ~found; error(sprintf('unknown mode %s',mode)); end 
 
             obj.ifMode = mode; 
         end 
@@ -383,7 +436,7 @@ classdef Config < handle
             found = false;
             for i=1:length(obj.ztcDef)
                 def = obj.ztcDef{i};
-                if strcomp(mode,def{1})
+                if strcmp(mode,def{1})
                     obj.ztcPupillDiameter = def{2};
                     obj.ztcCentralObscurtionDiameter = def{3};
                     obj.ztcNeigenValue = def{4};
@@ -391,7 +444,7 @@ classdef Config < handle
                     found = true;
                 end
             end
-            if ~found: error(strcat('unknown mode ',mode)); end 
+            if ~found; error(strcat('unknown mode ',mode)); end 
 
             obj.ztcMode = mode; 
         end 

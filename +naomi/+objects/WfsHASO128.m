@@ -69,9 +69,7 @@ classdef WfsHASO128 < naomi.objects.Wfs
         end
         function populateHeader(obj, f)
                 % populate fits header
-                naomi.addToHeader(f, 'WFMODEL', obj.model, 'Wave front model');
-                naomi.addToHeader(f, 'WFNSUB', obj.nSubAperture, 'Wave front number of sub apperture');
-               
+                populateHeader@naomi.Wfs(obj, f);
           end
     end
     

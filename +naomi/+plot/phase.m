@@ -22,7 +22,6 @@ function phase(bench, axes)
                sprintf('rms=%.3fum ptv=%.3fum',...
                naomi.compute.nanstd(phase(:)),...
                max(phase(:)) - min(phase(:)))});
-        xlabel(axes, 'Y   =>+');
-        ylabel(axes, '+<=   X');
+        naomi.plot.phaseAxesLabel(axes, bench.orientation);
         colorbar(axes);    
 end

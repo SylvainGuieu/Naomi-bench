@@ -10,11 +10,13 @@ classdef PhaseReference < naomi.data.Phase
         	sh = {{'DPR_TYPE', 'REF_DUMMY', ''}};
         end
         function plot(obj, axes)
-            if nargin<2; axes= gc;end;
+            if nargin<2; axes= gca;end;
         	phase = obj.data;
+            [nSubAperture, ~] = size(phase);
             cla(axes); imagesc(axes, phase);
 
-            
+            xlim(axes, [1,nSubAperture]);
+            ylim(axes, [1,nSubAperture]);
             
             tit = 'Phase Reference';
             	
@@ -22,9 +24,10 @@ classdef PhaseReference < naomi.data.Phase
                    sprintf('rms=%.3fum ptv=%.3fum',...
                    naomi.compute.nanstd(phase(:)),...
                    max(phase(:)) - min(phase(:)))});
-            xlabel(axes, 'Y   =>+');
-            ylabel(axes, '+<=   X');
-            colorbar(axes);    
+            naomi.plot.phaseAxesLabel(  axes, obj.getKey(naomi.KEYS.ORIENT, naomi.KEYS.ORIENTd));
+            
+            colorbar(axes); 
+            daspect([1,1,1]); %square
         end
     end
 end

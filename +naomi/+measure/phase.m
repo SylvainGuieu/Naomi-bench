@@ -13,8 +13,8 @@ function phaseArray = phase(bench, nPhase, filterTipTilt, substractReference)
 	if nargin<2 || isempty(nPhase); 
 		nPhase = bench.config.defaultNphase;
 	end
-	if nargin<3 || isempty(filterTipTilt); filterTipTilt = bench.filterTipTilt; end;
-	if nargin<4 || isempty(substractReference); substractReference = bench.substractReference; end;
+	if nargin<3 || isempty(filterTipTilt); filterTipTilt = bench.config.filterTipTilt; end;
+	if nargin<4 || isempty(substractReference); substractReference = bench.config.substractReference; end;
 
 	nSubAperture = bench.nSubAperture;
 	phaseArray = zeros(nSubAperture, nSubAperture)*0.0;
@@ -51,7 +51,7 @@ function phaseArray = phase(bench, nPhase, filterTipTilt, substractReference)
 	
 	if filterTipTilt
 		[tip,tilt] = naomi.compute.tipTilt(phaseArray);
-		[yArray,xArray] = meshgrid(1:nSubAperture, 1:nSubAperture);
+		[xArray,yArray] = meshgrid(1:nSubAperture, 1:nSubAperture);
       	phaseArray = phaseArray + (xArray-nSubAperture/2) * tip;
       	phaseArray = phaseArray + (yArray-nSubAperture/2) * tilt;
 	end
@@ -61,7 +61,7 @@ function phaseArray = phase(bench, nPhase, filterTipTilt, substractReference)
 
 	bench.lastPhaseArray = phaseArray;
 	if bench.config.plotVerbose
-		bench.config.figure('Last Phase');
+		naomi.plot.figure('Last Phase');
 		naomi.plot.phase(bench);
 	end
 end

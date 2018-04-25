@@ -1,4 +1,4 @@
-function [xi,yj,mask] = actuatorPosition()
+function [xi,yj,mask] = actuatorPosition(orientation)
 % actPos  Compute the 2d indices of DM241 actuators
 %
 %   [xi,yj,mask] = actuatorPosition()
@@ -14,7 +14,9 @@ function [xi,yj,mask] = actuatorPosition()
 %   m:   mask of 0/1 to convert vector to map
 
     % Compute mesh and mask
-    [Y,X] = meshgrid(-8:1:8,-8:1:8);
+    if nargin<1; orientation = 'xy'; end
+    
+    [X,Y] = naomi.compute.orientedMeshgrid(-8:1:8, orientation);
     mask = (Y.^2+X.^2) < 8.75*8.75;
     
     % Return only actuator in mask

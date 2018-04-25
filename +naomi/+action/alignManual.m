@@ -19,7 +19,7 @@ function [dX,dY,dTip,dTilt,dFoc] = alignManual(bench)
 		
 		phaseArray = naomi.measure.phase(bench);
 		[dX,dY,dTip,dTilt,dFoc] = naomi.measure.missalignment(bench, phaseArray);
-		bench.config.figure('Alignment');
+		naomi.plot.figure('Alignment');
 		
 		naomi.plot.phase(bench);
 		title({'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',
@@ -30,7 +30,7 @@ function [dX,dY,dTip,dTilt,dFoc] = alignManual(bench)
 
     end
     uiwait(msgbox(sprintf('Alignement is OK\n')));    
-    bench.config.figure('Alignment');clf; close;
+    naomi.plot.figure('Alignment');clf; close;
     
 
 end

@@ -43,9 +43,11 @@ classdef Wfs < naomi.objects.BaseObject
         function Reset(obj)
            
         end
-        function populateHeader(obj, h)                         
-            naomi.addToHeader(f, 'WFSMODEL', obj.model, 'Wave front sensor model');
-            naomi.addToHeader(f, 'WFSNSUB',  obj.nSubAperture,  'Wave front number of sub apperture');
+        function populateHeader(obj, h)  
+            K = naomi.KEYS:
+            naomi.addToHeader(f, K.WFSNAME, obj.model,  K.WFSNAMEc);
+            naomi.addToHeader(f, K.WFSNSUB, obj.nSubAperture, WFSNSUBc);
+               
         end;
     end    
 end

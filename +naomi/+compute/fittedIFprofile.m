@@ -1,6 +1,6 @@
 function fitResult = fittedIFprofile(img, fitType, sigmaGuess, amplitudeGuess)
     if nargin<2
-        fitType = 'gauss';
+        fitType = 'naomi';
     end
     
     if nargin<3
@@ -17,13 +17,13 @@ function fitResult = fittedIFprofile(img, fitType, sigmaGuess, amplitudeGuess)
     [xSize, ySize] = size(img);
     
     if strcmp(fitType, 'maximum')
-        s = sign(img(int32(xC), int32(yC)));
+        s = sign(img(int32(yC), int32(xC)));
         b = 4;
         % take the maximum of a small box within the xC, yC
-%         boxed = img( max(int32(yC-b),1):min(int32(yC+b),ySize), ...
-%                      max(int32(xC-b),1):min(int32(xC+b),ySize));
-        boxed = img( max(int32(xC-b),1):min(int32(xC+b),ySize), ...
-                     max(int32(yC-b),1):min(int32(yC+b),ySize));
+        boxed = img( max(int32(yC-b),1):min(int32(yC+b),ySize), ...
+                     max(int32(xC-b),1):min(int32(xC+b),ySize));
+%         boxed = img( max(int32(xC-b),1):min(int32(xC+b),ySize), ...
+%                      max(int32(yC-b),1):min(int32(yC+b),ySize));
         
         if s>0
             amplitude = max(boxed(:));
@@ -49,7 +49,7 @@ function fitResult = fittedIFprofile(img, fitType, sigmaGuess, amplitudeGuess)
         return 
     end
    
-    [Y,X] = meshgrid(1:xSize, 1:ySize);
+    [X,Y] = meshgrid(1:xSize, 1:ySize);
  	
     mask = ~isnan(img);
     
@@ -104,7 +104,11 @@ function fitResult = fittedIFprofile(img, fitType, sigmaGuess, amplitudeGuess)
             lb = [-realmax('double'), 1, 0.0, 1 ];
             ub = [realmax('double'), xSize,xSize,ySize];
             func = @naomi.fitFunc.gauss;
-            
+        case 'naomi'
+            args0 = [amplitudeGuess,xC, sigmaGuess, yC];
+            lb = [-realmax('double'), 1, 0.0, 1 ];
+            ub = [realmax('double'), xSize,xSize,ySize];
+            func = @naomi.fitFunc.naomi;
         case 'gaussER'
             args0 = [amplitudeGuess,xC, sigmaGuess, yC, sigmaGuess, 0.0];
             % define lower and upper bounds [Amp,xo,wx,yo,wy, phi]
@@ -141,7 +145,7 @@ function fitResult = fittedIFprofile(img, fitType, sigmaGuess, amplitudeGuess)
     fitResult.amplitude = args(1);
     fitResult.offset = offset;
     switch fitType
-        case 'gauss'
+        case {'gauss', 'naomi'}
             fitResult.xCenter = args(2);
             fitResult.yCenter = args(3);
             fitResult.xHwhm = args(4);

@@ -9,6 +9,18 @@ classdef ZtCSparta < naomi.data.ZtC
         end
         function sh = staticHeader(obj)
         	sh = {{'DPR_TYPE', 'ZTC_MATRIX_SPARTA', ''}};
-        end        
+        end   
+        function idx = zernike2index(obj, zernike)
+            % convert the given zernike number to the table index
+            idx = zernike-1;
+        end
+        function zernike = firstZernike(obj)
+            % the first zernike number of the data 
+            zernike = 2;
+        end
+        function zernike = lastZernike(obj)
+            [zernike,~] = size(obj.data);
+            zernike = zernike+1;
+        end
  	end
 end

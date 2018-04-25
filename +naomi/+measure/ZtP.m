@@ -1,6 +1,7 @@
 function [ZtPData,PtZData] = ZtP(bench, nPushPull, amplitude, nZernike)
 	config = bench.config;
-	
+	K = naomi.KEYS;
+    
 	if nargin<2; nPushPull = config.ztpNpushPull; end;
 	if nargin<3; amplitude = config.ztpAmplitude; end;
 	if nargin<4; nZernike  = config.ztpNzernike; end; 
@@ -14,23 +15,20 @@ function [ZtPData,PtZData] = ZtP(bench, nPushPull, amplitude, nZernike)
 
 	config.log('Measure phase for NAOMI modes\n', 1);
     if ~isempty(bench.ZtCData)
-        pupillDiameter = bench.ZtCData.getKey('DIAM', 0);
+        pupillDiameter = bench.ZtCData.getKey(K.ZTCDIAM, 0);
         if pupillDiameter ==0 % assume this is the configured pupill diameter
             pupillDiameter = bench.config.ztcPupillDiameter;
         end
+        
     else % assume this is the configured pupill diameter
         pupillDiameter = bench.config.ztcPupillDiameter;
     end
-	h = {{'MJD-OBS', config.mjd, 'MJD when measure script started'},
-	     {'ZTPNPP',  nPushPull, 'Number of push-pull'}, 
-		 {'ZTPAMP', amplitude,  '[Cmax] amplitude of push-pull'}, 
-		 {'ZTPNZER', nZernike,  'number of zernikes'},
-         {'ZTPDIAM', pupillDiameter,'Pupill diameter in[m]'}, 
-         {'ZTPDIAMP',bench.sizePix(pupillDiameter) ,'Pupill diameter in  wfs pixel'}      
-		 };
-		 
-	ZtPData = naomi.data.ZtP(ZtPArray, h, {bench});
-
+    xPscale =  bench.xPixelScale;
+    yPscale =  bench.yPixelScale;
+    
+    xCenter = bench.xCenter;
+    yCenter = bench.yCenter;
+    
 	% setup dm and wfs 
 	naomi.action.resetDm(bench);
 	naomi.action.resetWfs(bench);
@@ -76,7 +74,7 @@ function [ZtPData,PtZData] = ZtP(bench, nPushPull, amplitude, nZernike)
 	    
 	    % Plot
 	    if config.plotVerbose
-		    bench.config.figure('Mode');
+		    naomi.plot.figure('Mode');
 		    ZtP.plotOneMode(iZernike);	   
 		end
     end
@@ -90,6 +88,19 @@ function [ZtPData,PtZData] = ZtP(bench, nPushPull, amplitude, nZernike)
     % Set back
     PtZArray = reshape(Tmp,nSubAperture,nSubAperture,nZernike);
 	
+    h = {{K.MJDOBS,   config.mjd,    K.MJDOBSc},
+	     {K.NPP  ,    nPushPull,     K.NPPc}, 
+		 {K.PUSHAMP,  amplitude,     K.PUSHAMPc},     
+		 {K.NZERN,    nZernike,       K.NZERNc},
+         
+         {K.ZTCDIAM,  pupillDiameter, k.ZTCDIAMc},
+         {K.XPSCALE,  xPscale,        K.XPSCALEc},
+         {K.YPSCALE,  yPscale,        K.YPSCALEc}, 
+         {K.XCENTER,  xCenter,        K.XCENTERc},
+         {K.YCENTER,  yCenter,        K.YCENTERc},
+		 };
+    
+	ZtPData = naomi.data.ZtP(ZtPArray, h, {bench});
 	PtZData = naomi.data.PtZ(PtZArray, h, {bench}); 
 
 end

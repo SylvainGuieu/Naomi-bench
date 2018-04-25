@@ -16,7 +16,7 @@ function cmdRelativeModal(bench, zernikeNum, amplitudeOffset)
 	end
 
 	if bench.config.plotVerbose
-		bench.config.figure('DM Command');
+		naomi.plot.figure('DM Command');
 		naomi.plot.dmCommand(bench);
 	end	
 end

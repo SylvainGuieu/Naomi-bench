@@ -4,8 +4,8 @@ function success = pixelScale(bench, xScale, yScale)
 	success = false;
 
 	
-	bench.xPixelScale = xScale;
-	bench.yPixelScale = yScale;
+	bench.measuredXpixelScale = xScale;
+	bench.measuredYpixelScale = yScale;
 	bench.config.log(sprintf('Pixel scale configured  xS=%.2f yX=%.2f ', xScale, yScale), 2);
 	success = true;
 end

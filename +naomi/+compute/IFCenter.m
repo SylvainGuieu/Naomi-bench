@@ -20,7 +20,7 @@ IFcleanArray(IFcleanArray<0.1*max(IFcleanArray(:))) = NaN;
 IFcleanArray = IFcleanArray - min(IFcleanArray(~isnan(IFcleanArray)));
 
 % Compute barycenter
-[Y,X] = meshgrid(1:nSub,1:nSub);
+[X,Y] = meshgrid(1:nSub,1:nSub);
 C = naomi.compute.nansum(IFcleanArray(:));
 xC = naomi.compute.nansum(IFcleanArray(:) .* X(:)) / C;
 yC = naomi.compute.nansum(IFcleanArray(:) .* Y(:)) / C;

@@ -15,7 +15,7 @@ classdef IF < naomi.data.Phase
             if nargin<2; axes = gca; end
             data =  obj.data;
             [nSubAperture,~] = size(data);
-            [Y,X] = meshgrid(1:nSubAperture);
+            [X,Y] = meshgrid(1:nSubAperture);
             fit = obj.profileFit;
             model = naomi.compute.ifmProfileModel(fit, X, Y);
             alpha = linspace(0, 2*pi, 50);
@@ -25,7 +25,7 @@ classdef IF < naomi.data.Phase
             xlim(axes, [1,nSubAperture]);
             ylim(axes, [1,nSubAperture]);
             hold(axes, 'on'); 
-                plot(axes,  fit.yHwhm*cos(alpha+fit.angle)+fit.yCenter, fit.xHwhm*sin(alpha+fit.angle)+fit.xCenter, 'k-'); 
+                plot(axes,  fit.yHwhm*cos(alpha+fit.angle)+fit.xCenter, fit.xHwhm*sin(alpha+fit.angle)+fit.yCenter, 'k-'); 
             hold(axes, 'off');
         end
         
@@ -33,7 +33,7 @@ classdef IF < naomi.data.Phase
             if nargin<2; axes = gca; end
             data =  obj.data;
             [nSubAperture,~] = size(data);
-            [Y,X] = meshgrid(1:nSubAperture);
+            [X,Y] = meshgrid(1:nSubAperture);
             fit = obj.profileFit;
             model = naomi.compute.ifmProfileModel(fit, X, Y);
             alpha = linspace(0, 2*pi, 50);
@@ -45,7 +45,7 @@ classdef IF < naomi.data.Phase
             xlim(axes, [1,nSubAperture]);
             ylim(axes, [1,nSubAperture]);
             hold(axes, 'on'); 
-                plot(axes,  fit.yHwhm*cos(alpha+fit.angle)+fit.yCenter, fit.xHwhm*sin(alpha+fit.angle)+fit.xCenter, 'k-'); 
+                plot(axes,  fit.yHwhm*cos(alpha+fit.angle)+fit.xCenter, fit.xHwhm*sin(alpha+fit.angle)+fit.yCenter, 'k-'); 
             hold(axes, 'off');
         end
 
@@ -67,7 +67,7 @@ classdef IF < naomi.data.Phase
 
             hold(axes, 'on'); 
 
-                plot(axes,  fit.yHwhm*cos(alpha+fit.angle)+fit.yCenter, fit.xHwhm*sin(alpha+fit.angle)+fit.xCenter, 'k-'); 
+                plot(axes,  fit.yHwhm*cos(alpha+fit.angle)+fit.xCenter, fit.xHwhm*sin(alpha+fit.angle)+fit.yCenter, 'k-'); 
             hold(axes, 'off');
 
             title(axes, sprintf('#%d Amp=%.3f hwhm=%.3f x,y =%.1f, %.1f', obj.getKey('ACTNUM', -99), ...
@@ -92,8 +92,8 @@ classdef IF < naomi.data.Phase
         data = obj.data;
         [nSubAperture,~] = size(data); 
         
-        xProfile = squeeze(data(:,y0));
-        yProfile = squeeze(data(x0,:));
+        xProfile = squeeze(data(y0, :));
+        yProfile = squeeze(data(:, x0));
     end
 
     function plotProfiles(obj, axesList, directions)
@@ -130,29 +130,30 @@ classdef IF < naomi.data.Phase
             
             if directions{1}
                 plot(ax, profile, r);
-                hold(ax, 'on'); plot(ax, profileModel, rModel);hold(ax, 'off');
+                hold(ax, 'on'); plot(ax, profileModel, rModel, 'r:');hold(ax, 'off');
                 %ylim(ax, [xCenter-halfWidth,  xCenter+halfWidth]);
                 ylim(ax, [1, nSubAperture]);
             else
                 plot(ax, r, profile);
-                hold(ax, 'on'); plot(ax, rModel, profileModel);hold(ax, 'off');
+                hold(ax, 'on'); plot(ax, rModel, profileModel, 'r:');hold(ax, 'off');
                 %xlim(ax, [xCenter-halfWidth,  xCenter+halfWidth]);
                 xlim(ax, [1, nSubAperture]);
             end
 
             ax = axesList{2};
-            r = linspace( max(yCenter-halfWidth, 1), min(yCenter+halfWidth, nSubAperture), nY);
+            %r = linspace( max(yCenter-halfWidth, 1), min(yCenter+halfWidth, nSubAperture), nY);
+            r = linspace( 1, nSubAperture, nSubAperture);
             profile = yProfile;
             profileModel = naomi.compute.ifmProfileModel(fit, fit.xCenter, rModel);
             
             if directions{2}
                 plot(ax, profile, r);
-                hold(ax, 'on'); plot(ax, profileModel, rModel);hold(ax, 'off');
+                hold(ax, 'on'); plot(ax, profileModel, rModel, 'r:');hold(ax, 'off');
                 %ylim(ax, [yCenter-halfWidth,  yCenter+halfWidth]);
                 ylim(ax, [1, nSubAperture]);
             else
                 plot(ax, r, profile);
-                hold(ax, 'on'); plot(ax, rModel, profileModel);hold(ax, 'off');       
+                hold(ax, 'on'); plot(ax, rModel, profileModel, 'r:');hold(ax, 'off');       
                 %xlim(ax, [yCenter-halfWidth,  yCenter+halfWidth]);
                 xlim(ax, [1, nSubAperture]);
             end

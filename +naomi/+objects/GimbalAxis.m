@@ -127,9 +127,14 @@ classdef GimbalAxis < naomi.objects.BaseObject
         end
         function populateHeader(obj, h)
                 % populate fits header
-                naomi.addToHeader(h, upper(strcat(obj.axisName,'ZERO')), obj.zero,   strcat('Zero position of ',obj.axisName,'motor [mm]'));
-                naomi.addToHeader(h, upper(strcat(obj.axisName,'GAIN')), obj.gain,   strcat('Gain of ', obj.axisName,' motor [arcsec/mm]'));
-                naomi.addToHeader(h, upper(strcat(obj.axisName,'POS')), obj.getPos,  strcat('position of ', obj.axisName,' when header writing [mm]'));
+                ax = upper(strcat(obj.axisName));
+                K = naomi.KEYS;
+                
+                naomi.addToHeader(h, K.([ax 'ZERO']),  obj.zero,  K.([ax 'ZEROc']));
+                naomi.addToHeader(h, K.([ax 'GAIN']),  obj.gain,  K.([ax 'GAINc']));
+                naomi.addToHeader(h, K.([ax 'POS']),  obj.getPos, K.([ax 'POSc']));
+                
+              
           end
     end
 end         

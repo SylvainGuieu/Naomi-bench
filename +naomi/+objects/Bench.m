@@ -18,9 +18,15 @@ classdef Bench < naomi.objects.BaseObject
 
     % computed x,y pixel scale as returned by naomi.measure.pixelScale
     % unti is m/pixel
-    xPixelScale;
-    yPixelScale;
-
+    % the method to get the pixelScale is xPixelScale and yPixelSCale
+    measuredXpixelScale;
+    measuredYpixelScale;
+    
+    
+    % measured orientation see Config for detailed
+    measuredOrientation;
+    
+    
     % center of dm in pixel unit has returned by naomi.measure.missalignment
     % unit is meters [m]
     dX;
@@ -33,19 +39,13 @@ classdef Bench < naomi.objects.BaseObject
 
     % center of dm in pixel unit has returned by naomi.measure.IFC
     % unit is in pixel 
-    xCenter;
-    yCenter;
-
+    measuredXcenter;
+    measuredYcenter;
+    
 
     % the lastPhaseArray recorded by naomi.measure.phase
     lastPhaseArray;
-
-    % flag for tiptilt removal 
-    filterTipTilt = false;
-    % flag true will remove the phase reference (if any stored) 
-    % to the measured phased by naomi.measure.phase
-    substractReference = true;
-
+    
     % The mask data as created by naomi.make.pupillMask 
     maskData; 
 
@@ -68,8 +68,11 @@ classdef Bench < naomi.objects.BaseObject
     % changing the ZtCData will change the dm.zernike2Command
     ZtCData;
 
-    % the DM biasData changing it will also changed the dm.biasVector
-    biasData;
+    % the DmBiasData changing it will also changed the bench.dm.biasVector
+    dmBiasData;
+    
+    % the measured or loadded ZtP. this is not need for operation
+    ZtPData;
 
     end
     methods
@@ -106,24 +109,80 @@ classdef Bench < naomi.objects.BaseObject
                 end
             end
         end
-
+        
+        function value = getMeasuredParam(obj, paramName, configName)
+            if nargin<2
+                value = obj.(paramName);
+                if isempty(value)
+                    error(sprintf('parameter "%s" has not been measured', paramName));
+                end
+            else
+                value = obj.(paramName);
+                if isempty(value)
+                    value = obj.config.(configName);
+                    if isempty(value)
+                        error(sprintf('parameter "%s" has not been measured neither configured', configName));
+                    end
+                end
+            end
+        end
+                
+        
+        function xPixelScale = xPixelScale(obj)
+            % measured or configured xPixelScale 
+            % use isScaled method to check if the value has been measured
+            xPixelScale = obj.getMeasuredParam('measuredXpixelScale', 'xPixelScale');
+        end
+        
+        function yPixelScale = yPixelScale(obj)
+            % measured or configured yPixelScale 
+            % use isScaled method to check if the value has been measured
+            yPixelScale = obj.getMeasuredParam('measuredYpixelScale', 'yPixelScale');
+        end
+        function meanPixelScale = meanPixelScale(obj)
+            meanPixelScale = (obj.xPixelScale + obj.yPixelScale)/2.0;
+        end
+        function test = isScaled(obj)
+            % check if the pixel scale has been measured or not 
+            test = ~isempty(obj.measuredXpixelScale);
+        end
+        
+        
+        function xCenter = xCenter(obj)
+            % measured or configured xCenter 
+            % use isCentered method to check if the value has been measured
+            xCenter = obj.getMeasuredParam('measuredXcenter', 'xCenter');
+        end
+        function yCenter = yCenter(obj)
+            % measured or configured xCenter 
+            % use isCentered method to check if the value has been measured
+            yCenter = obj.getMeasuredParam('measuredYcenter', 'yCenter');
+        end
+        function test = isCentered(obj)
+            % check is the centers has been measured 
+            test = ~isempty(obj.measuredXcenter);
+        end
+            
+        
+        function orientation = orientation(obj)
+            % the mirror vs dm orientation has measured or configured
+            % use the isOriented method to check if it has been measured
+            orientation = obj.getMeasuredParam('measuredOrientation', 'orientation');
+        end
+        function test = isOriented(obj)
+            test = ~isempty(obj.measuredOrientation);
+        end
+        
+        
         function  sizePix = sizePix(obj, sz)
         	%return the size in pixel for a given pupill size in mm
         	% if sz [m] is not given take the default in config.pupillDiameter
         	% if xScale/yScale [m/pixel] has not been computed look at config.pixelScale
-
-        	if isempty(obj.xPixelScale)
-        		obj.config.log('Warning asking for pixel scale, but it was not measured. Default pixelScale is returned\n', 5);
-        		scale = obj.config.pixelScale;
-        	else
-        		scale = 0.5 * (obj.xPixelScale + obj.yPixelScale);
-        	end        	
-        	if nargin<2; sz = obj.config.pupillDiameter; end
-        	sizePix = sz/scale;
+            sizePix = sz/obj.meanPixelScale;
         end
     
         function registerProcess(obj, processName, stepSize)
-            if nargin<3; stepSize = 0; end;
+            if nargin<3; stepSize = 0; end
             obj.processes(processName) = {now,0,stepSize};
         end
         function test = isProcessRunning(obj, processName)
@@ -171,10 +230,7 @@ classdef Bench < naomi.objects.BaseObject
             test = ~isempty(obj.xCenter);
         end
 
-        function test = isScaled(obj)
-            % check if the pixel scale has been measured 
-            test = ~isempty(obj.xPixelScale);
-        end
+        
 
         function test = isZtPCalibrated(obj)
             % check if the zernike to command is loaded
@@ -261,16 +317,16 @@ classdef Bench < naomi.objects.BaseObject
         end
 
 
-        function set.biasData(obj, biasData)
+        function set.dmBiasData(obj, dmBiasData)
             obj.config.log('Setting a new DM bias\n', 1);
             if obj.config.simulated
-                obj.simulator.biasVector = biasData.data;
+                obj.simulator.biasVector = dmBiasData.data(':');
             else
              if obj.has('dm')
-                    obj.dm.biasVector = biasData.data;
+                    obj.dm.biasVector = dmBiasData.data(':');
              end
             end
-            obj.biasData = biasData;
+            obj.dmBiasData = dmBiasData;
         end
 
         function biasVector = biasVector(obj)

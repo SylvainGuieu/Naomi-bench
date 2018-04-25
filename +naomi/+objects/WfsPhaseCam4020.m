@@ -63,7 +63,7 @@ classdef WfsPhaseCam4020 < naomi.objects.Wfs
          
          function populateHeader(obj, f)
                 % populate fits header
-                populate@naomi.Wfs(obj);
+                populateHeader@naomi.Wfs(obj, f);
                 
           end
     end

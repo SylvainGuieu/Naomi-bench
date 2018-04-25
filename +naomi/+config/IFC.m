@@ -18,10 +18,10 @@ function success = IFC(bench, data_or_file)
 			data =  naomi.data.IF(data_or_file);		
 	elseif isempty(data_or_file)
 		bench.IFC = [];
-		bench.xCenter = [];
-		bench.yCenter = [];
+		bench.measuredCcenter = [];
+		bench.measuredYcenter = [];
 		if bench.config.plotVerbose
-			bench.config.figure('IF Central Actuator'); clf;
+			naomi.plot.figure('IF Central Actuator'); clf;
 		end
 		success = true;
 		return 
@@ -31,12 +31,12 @@ function success = IFC(bench, data_or_file)
 
 	bench.IFCData = data;
 	[xCenter,yCenter] = naomi.compute.IFCenter(data);
-	bench.xCenter = xCenter;
-	bench.yCenter = yCenter;
+	bench.measuredXcenter = xCenter;
+	bench.measuredYcenter = yCenter;
 	success = true;
 
 	if bench.config.plotVerbose
-		bench.config.figure('IF Central Actuator');% do not modify name for good placement 
+		naomi.plot.figure('IF Central Actuator');% do not modify name for good placement 
 		bench.IFCData.plot();
 	end	
 	bench.config.log(sprintf('IFCenter and xCenter=%.2f, yCenter=%.2f has been configured ', xCenter, yCenter),2);

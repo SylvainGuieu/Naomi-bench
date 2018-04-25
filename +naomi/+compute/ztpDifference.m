@@ -25,8 +25,10 @@ function [residualVector, gainVector] = ztpDifference(ZtPArray, ZtPRefArray, nZe
 	% Compute piston and remove since arbitrary
 	pistonVector = naomi.compute.nanmean(reshape(ZtPm,nZer,nSubAperture*nSubAperture),2);
 	ZtPm = bsxfun(@minus,ZtPm,reshape(pistonVector,nZer,1,1));
+    
+    pistonVector = naomi.compute.nanmean(reshape(ZtPRefArray,nZer,nSubAperture*nSubAperture),2);
 	ZtPRefm = bsxfun(@minus,ZtPRefArray,reshape(pistonVector,nZer,1,1));
-
+    
 
 	% Compute gainVector
 	gainVector = naomi.compute.nanstd(reshape(ZtPm,nZer,nSubAperture*nSubAperture),2);

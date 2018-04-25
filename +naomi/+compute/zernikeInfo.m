@@ -51,12 +51,12 @@ function equationStr = strZernike(n, m)
 
     terms = {};
     equationStr = '';
-    cMax = int16((n - m) / 2)
-    [n,m]
+    cMax = int16((n - m) / 2);
+    
     for k=0:cMax
-        [k, n, m]
+        
     	coef = ((-1)^k * factorial(n - k) ./ ...
-                (factorial(k) * factorial(int16((n + m) ./ 2.) - k) * factorial(int16((n - m) ./ 2.) - k)))
+                (factorial(k) * factorial(int16((n + m) ./ 2.) - k) * factorial(int16((n - m) ./ 2.) - k)));
 
         
         if coef ~= 0

@@ -13,7 +13,7 @@ function ZtCData = ZtC(bench, IFMData)
 	centralObscurtionDiameter = config.ztcCentralObscurtionDiameter; 
 	nEigenValue = config.ztcNeigenValue;
 	nZernike = config.ztcNzernike;
-
+    
 	
 	
 	ZtCArray = naomi.compute.ZtC(IFMData.data,  diameter,  centralObscurtionDiameter, config.dmCentralActuator, nEigenValue, nZernike);

@@ -20,7 +20,7 @@ function  success = IFM(bench, data_or_file)
 		success = false;
 		bench.config.log('IFM matrix removed', 2);
 		if bench.config.plotVerbose
-			bench.config.figure('IFM'); clf;
+			naomi.plot.figure('IFM'); clf;
 		end;
 		success = true;
 		return 
@@ -33,7 +33,7 @@ function  success = IFM(bench, data_or_file)
 	success = true;
 	
 	if bench.config.plotVerbose
-		bench.config.figure('IFM');
+		naomi.plot.figure('IFM');
 		bench.IFMData.plot();
 	end
 	bench.config.log('IFM matrix configured',2);

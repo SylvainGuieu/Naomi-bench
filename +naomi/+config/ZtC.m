@@ -21,7 +21,7 @@ function  success = ZtC(bench, data_or_file)
 		sucess = false;
 		bench.config.log('Zernique to Command matrix removed', 2);
 		if bench.config.plotVerbose
-			bench.config.figure('Zernique to Command'); clf;
+			naomi.plot.figure('Zernique to Command'); clf;
 		end;
 		success = true;
 		return 
@@ -34,7 +34,7 @@ function  success = ZtC(bench, data_or_file)
 	success = true;
 	
 	if bench.config.plotVerbose
-		bench.config.figure('Zernique to Command');
+		naomi.plot.figure('Zernique to Command');
 		bench.ZtCData.plot();
 	end
 	bench.config.log('Zernike to command matrix configured',2);

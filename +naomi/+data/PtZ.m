@@ -16,7 +16,8 @@ classdef PtZ < naomi.data.PhaseCube
         	imagesc(squeeze(obj.data(:,:,z))); 
         	colorbar;
 		    title(sprintf('Mode %i',z));
-		    xlabel('Y  =>'); ylabel('<=  X');
+            naomi.plot.phaseAxesLabel(  axes, obj.getKey(naomi.KEYS.ORIENT, naomi.KEYS.ORIENTd));
+		    
         end
 
     	function plot(obj, axes)

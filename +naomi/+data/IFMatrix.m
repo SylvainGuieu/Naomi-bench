@@ -46,57 +46,7 @@ classdef IFMatrix < naomi.data.PhaseCube
             IFData = naomi.data.IF(data, {{'ACTNUM', actNumnber, 'Pushed actuator'}}, obj.context); 
             IFData.fitType = obj.fitType;
         end
-
-        
-
-        function [xVector, yVector, signVector] = computeActuatorPosition(obj)
-            IFM = obj.data;
-            [nAct,nSubAperture,~] = size(IFM);
-
-            xVector = zeros(nAct,1);
-            yVector = zeros(nAct,1);
-            signVector = zeros(nAct,1);
-
-            for a=1:nAct
-                [x,y] = naomi.compute.IFCenter(squeeze(IFM(a,:,:)));
-                xVector(a) = x;
-                yVector(a) = y;
-                signVector(a) = sign(IFM(a,int32(x),int32(y)));
-            end            
-        end
-
-        function maxVector = computeMaximums(obj, signVector)
-            IFM = obj.data;
-            [nAct,nSubAperture,~] = size(IFM);
-            IFMa = abs(IFM);
-            if nargin<2
-                signVector = ones(nAct,1);
-            end
-            % Get maximum
-            [maxVector,~] = max(reshape(IFMa,nAct,nSubAperture*nSubAperture),[],2);
-            maxVector = maxVector .* signVector;
-            
-        end
-
-        function hwhmVector = computeHwhm(obj, maxVector, signVector)
-            IFM = obj.data;
-            [nAct,nSubAperture,~] = size(IFM);
-            IFMa = abs(IFM);
-            if nargin<2
-                maxVector = obj.computeMaximums();
-            end
-            if nargin<3
-                signVector = ones(nAct,1);
-            end
-            hwhmVector = zeros(nAct,1);
-            for a=1:nAct
-                num = naomi.compute.nansum(reshape(IFMa(a,:,:),nSubAperture*nSubAperture,1) > maxVector(a) * 0.5);
-                hwhmVector(a) = sqrt(num/3.14159);
-            end 
-        end
-        
-        
-                
+              
         function plotQc(obj, emphasizedActuatorNumber, axesList)
             % emphasizedActuatorNumber if the emphasized actuator 
             % axesList (optional) must have 4 axes 
@@ -183,8 +133,8 @@ classdef IFMatrix < naomi.data.PhaseCube
             ylim(ax, [0,nSubAperture]);
             set(ax,'ydir','reverse');
             grid(ax);  set(ax,'xminorgrid','on','yminorgrid','on');
-            xlabel(ax, 'Y   => +');
-            ylabel(ax, '+ <=   X');
+            
+            naomi.plot.phaseAxesLabel(ax, obj.getKey(naomi.KEYS.ORIENT, naomi.KEYS.ORIENTd));
             daspect(ax, [1 1 1])
         end
         

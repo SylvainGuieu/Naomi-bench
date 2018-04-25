@@ -27,7 +27,7 @@ end
 fprintf('Clean IFM with rad=%ipix and prc=%.1f%%\n',rad,prc);
 
 % Pixel grid
-[Y,X] = meshgrid(1:nSubAperture,1:nSubAperture);
+[X,Y] = meshgrid(1:nSubAperture);
 
 % Clean output
 IFM_clean = zeros(nActuator,nSubAperture,nSubAperture);

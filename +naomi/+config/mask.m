@@ -19,7 +19,7 @@ function success = mask(bench, data_or_file)
 			success = false;
 			bench.config.log('the mask has been removed',2);
 			if bench.config.plotVerbose
-				bench.config.figure('Phase Mask');
+				naomi.plot.figure('Phase Mask');
 				clf;
 			end;
 			return 
@@ -31,7 +31,7 @@ function success = mask(bench, data_or_file)
 	success = true;
 	
 	if bench.config.plotVerbose
-		bench.config.figure('Phase Mask');
+		naomi.plot.figure('Phase Mask');
 		bench.maskData.plot();
 	end	
 	bench.config.log('a mask has been configured',2);

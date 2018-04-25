@@ -22,14 +22,14 @@ classdef BaseData < handle
         
         function obj = BaseData(data, header, context)
             import matlab.io.*
-            if nargin<1; return; end;
-            if nargin<2; header = {}; end;
-            if nargin<3; context = {}; end;
+            if nargin<1; return; end
+            if nargin<2; header = {}; end
+            if nargin<3; context = {}; end
             
             if ischar(data) || isstring(data)
                 obj.file = matlab.io.fits.openFile(data);
             else
-               obj.dataCash = data;
+               obj.setData(data);
             end
             obj.header = containers.Map();
             % fill the header with the staticHeader for 
@@ -53,11 +53,23 @@ classdef BaseData < handle
         function sh = staticHeader(obj)
             sh = {};
         end
+        
+        function info = shortInfo(obj)
+           K = naomi.KEYS;
+            
+           info =  obj.getKey(K.DATE, 'Unknown');
+           tpl = obj.getKey(K.TPLNAME, '');
+           if tpl; info = strcat(info, '/ ', tpl);end
+           dpr = obj.getKey(K.DPRTYPE, '');
+           if dpr; info = strcat(info, '/ ', dpr); end
+           dm = obj.getKey(K.DMNAME, '');
+           if dm; info = strcat(info, '/ ', dm); end
+        end
         function addHeader(obj, header)
             if isa(header,'containers.Map')
                 ks = keys(header);
                 for iKey=1:length(ks)
-                    obj.header(ks{iKey}) = header{iKey};
+                    obj.header(ks{iKey}) = header(ks{iKey});
                 end
             elseif iscell(header)
                 for iKey=1:length(header)
