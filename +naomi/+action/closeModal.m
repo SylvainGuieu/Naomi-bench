@@ -19,32 +19,31 @@ wfs = bench.wfs;
 dm = bench.dm;
 config = bench.config;
 
-config.log(fprints('Close modal loop (%i step):\n',Nstep));
+config.log(sprintf('Close modal loop (%i step):\n',Nstep));
 
 [~,~,nZernike] = size(PtZArray);
 iZernike = minMode:maxMode;
 
-if nargin < 8; trgPhi = 0.0; end;
-
+if nargin < 7; trgPhi = 0.0; end;
     for step=1:Nstep
         % Read WFS
         phi  = naomi.measure.phase(bench, 1); 
         phir = phi - trgPhi;
-
+        
         % Control
         res = reshape(naomi.compute.nanzero(phir),1,[]) * reshape(PtZArray,[],nZernike);
 
         
-        naomi.action.cmdRelativeModal(iZernike,  -gain * res(iZernike) );
+        naomi.action.cmdRelativeModal(bench, iZernike,  -gain * res(iZernike) );
             
         % print 
         rmsc = naomi.compute.rms_tt(phir);
         cmd = dm.cmdVector + dm.biasVector;
-        config.log( fprints('%2i rms = %.3f rmsc = %.3f ptv = %.3f cmax = %.3f cmean = %.3f\n', ...
+        config.log( sprintf('%2i rms = %.3f rmsc = %.3f ptv = %.3f cmax = %.3f cmean = %.3f\n', ...
                                    step,naomi.compute.nanstd(phir(:)),rmsc,...
                                    max(phir(:)) - min(phir(:)),...
-                                   max(abs(cmd(:))),mean(cmd(:)))
-                        );
+                                   max(abs(cmd(:))),mean(cmd(:))));
+                       
     end
 
 end

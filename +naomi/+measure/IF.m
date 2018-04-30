@@ -18,22 +18,25 @@ function IFData = IF(bench,  act, nPushPull, amplitude)
 	if nargin<3; nPushPull = config.ifNpushPull; end
 	if nargin<4; amplitude = config.ifAmplitude; end
 
-	dm = bench.dm;
-	wfs = bench.wfs;
-
+	
+    %naomi.action.resetDm(bench);
+    %naomi.action.resetWfs(bench);
+    
     nSubAperture = bench.nSubAperture;
     tppush = ones(nSubAperture,nSubAperture) * 0.0;
     tppull = ones(nSubAperture,nSubAperture) * 0.0;
     
     % Loop on N push-pull
-    ref = dm.cmdVector(act);
+    ref = bench.dm.cmdVector(act);
     for pp=1:nPushPull
-        naomi.action.cmdZonal(bench, act, ref + amp);
-        naomi.measure.phase(bench,1); % get phase first without storing it  
+        naomi.action.cmdZonal(bench, act, ref + amplitude);
+        pause(0.1);
+        %naomi.measure.phase(bench,1); % get phase first without storing it  
 
         tppush = tppush + naomi.measure.phase(bench,1);        
-        naomi.action.cmdZonal(bench, act, ref - amp);
-        naomi.measure.phase(bench,1); % get phase first 
+        naomi.action.cmdZonal(bench, act, ref - amplitude);
+        pause(0.1);
+        %naomi.measure.phase(bench,1); % get phase first 
         tppull = tppull + naomi.measure.phase(bench,1);
     end
     

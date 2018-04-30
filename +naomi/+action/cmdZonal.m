@@ -2,7 +2,7 @@ function cmdZonal(bench, actNum, amplitude)
 
 	if bench.config.simulated
 		if nargin<3
-			bench.simulator.cmdVector = actNum;
+			bench.simulator.cmdVector(':') = actNum;
 		else
 			bench.simulator.cmdVector(actNum) = amplitude;
 		end
@@ -12,9 +12,9 @@ function cmdZonal(bench, actNum, amplitude)
 		else		
 			bench.dm.cmdVector(actNum) = amplitude;
 		end
-	end
+    end
 
-
+    bench.dmCounter = bench.dmCounter + 1;
 	if bench.config.plotVerbose
 		naomi.plot.figure('DM Command');
 		naomi.plot.dmCommand(bench);

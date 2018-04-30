@@ -12,8 +12,8 @@ bench.config.useGimbal = false;
 %
 
 %bench.startACE();
-%bench.startWfs();
-%bench.startDm();
+bench.startWfs();
+bench.startDm();
 
 if bench.config.useGimbal
 	bench.startGimbal();

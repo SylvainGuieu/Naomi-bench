@@ -5,8 +5,13 @@ classdef Config < handle
     properties
         verbose = 2; % verbose level for NAOMI measurement/action/config ... 
         plotVerbose = true; % standalone plot are ploted or not when doing measurement 
-        % turn on of the simulator 
-        simulated = false;
+        % turn on/off the simulator 
+        simulated = 1;
+        simulatorIFM = '/Users/guieus/DATA/NAOMI/IFM_direct.fits';
+        simulatorZtC = '/Users/guieus/DATA/NAOMI/NTC_2018-04-03T11-19-30.fits';
+        simulatorBias;
+        simulatorTurbu;
+        
         % software version. This is writen in the fits files to eventualy check one
         % day for uncompatibilities 
         naomiVersion = '01-04-2018';
@@ -58,7 +63,7 @@ classdef Config < handle
         ztcDef = {
                   {'naomi',        28.0e-3, 0.0, 140, 100},
                   {'naomi-sparta', 28.0e-3, 0.0, 140, 21 }, 
-                  {'full',         36.5e-3, 0.0, 220, 100}
+                  {'full',        99.99e-3, 0.0, 220, 100} % make a big mask = no mask 
                 };
         % current ztcMode 
         ztcMode = 'naomi';
@@ -110,7 +115,7 @@ classdef Config < handle
         %default number of phase average 
         defaultNphase = 1;
 
-        % number of Np for phase refernence
+        % number of Nphase for phase refernence
         phaseRefNphase = 2;
 
 

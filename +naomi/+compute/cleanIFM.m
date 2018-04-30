@@ -17,7 +17,7 @@ function IFM_clean = cleanIFM (IFM, rad, prc)
 %
 %   IFM_clean(nActuator,nSubAperture,nSubAperture): output Influence Functions
 
-[nActuator, nSubAperture] = size(IFM);
+[nActuator, nSubAperture, ~] = size(IFM);
 
 if rad > 0.5*nSubAperture
     error('Radius is too large');

@@ -22,15 +22,12 @@ function [IFMData, IFMcleanData] = IFM(bench, callback, nPushPull, nLoop, amplit
 	config = bench.config;
 	mjd =  config.mjd;
     
-    if nargin<2; callback = [];
+    if nargin<2; callback = [];end
     
 	if nargin<3; nPushPull = config.ifNpushPull; end
 	if nargin<4; nLoop = config.ifmNloop; end
 	if nargin<5; amplitude   = config.ifAmplitude; end
-	if nargin<6; ifPause  = config.ifPause; end
-
-	wfs = bench.wfs;
-	dm  = bench.dm;
+	if nargin<6; ifPause  = config.ifmPause; end
 
 	nActuator = bench.nActuator;
 	nSubAperture = bench.nSubAperture;
@@ -38,6 +35,10 @@ function [IFMData, IFMcleanData] = IFM(bench, callback, nPushPull, nLoop, amplit
 
 	% Loop
     bench.registerProcess('IFM', nLoop*nActuator);
+    
+    naomi.action.resetDm(bench);
+    naomi.config.mask(bench, []); % remove the mask
+    
 	for iLoop=1:nLoop
 	    
 	    % Loop on actuators
@@ -72,5 +73,5 @@ function [IFMData, IFMcleanData] = IFM(bench, callback, nPushPull, nLoop, amplit
 
 	IFMData = naomi.data.IFMatrix(IFMatrix, h , {bench});
 	IFMcleanData = naomi.make.cleanIFM(bench, IFMData);
-    bench.killProcess('IFM measurement');
+    bench.killProcess('IFM');
 end

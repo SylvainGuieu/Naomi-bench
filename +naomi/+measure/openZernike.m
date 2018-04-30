@@ -1,14 +1,14 @@
 function phaseData = openZernike(bench, zernike, amplitude, nPhase)
 	config = bench.config;
-    if nargin<2; amplitude = config.zernikeAmplitude; end
-	if nargin<3; nPhase = config.zernikeNphase; end
+    if nargin<3; amplitude = config.zernikeAmplitude; end
+	if nargin<4; nPhase = config.zernikeNphase; end
     
 	naomi.action.resetDm(bench);
 	naomi.config.pupillMask(bench);
 	naomi.action.resetWfs(bench);		
 	
     
-    naomi.action.cmdModal(zernike, amplitude);
+    naomi.action.cmdModal(bench, zernike, amplitude);
 	
     % Do not remove the tiptilt or leave it as it is ??? 
 	phaseArray = naomi.measure.phase(bench,nPhase);
@@ -23,6 +23,6 @@ function phaseData = openZernike(bench, zernike, amplitude, nPhase)
 	phaseData = naomi.data.Phase(phaseArray, h, {bench});
 	if config.plotVerbose
 		naomi.plot.figure('Last Phase');
-        naomi.plot.phase(bench, phaseArray);
+        naomi.plot.phase(bench);
 	end
 end

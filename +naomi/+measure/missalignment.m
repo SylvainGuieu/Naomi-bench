@@ -7,5 +7,5 @@ function [dX,dY,dTip,dTilt,dFoc] = missalignment(bench)
 	% - dTip : in um rms
 	% - dTilt  : in um rms  
 	% - dFoc  : un um rms 
-    [dX,dY,dTip,dTilt,dFoc] = naomi.make.missalignment(bench, naomi.measure.phase(bench));
+    [dX,dY,dTip,dTilt,dFoc] = naomi.make.missalignment(bench, naomi.measure.phase(bench,1,0,0));
 end

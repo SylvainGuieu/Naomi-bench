@@ -9,6 +9,7 @@ classdef Bench < naomi.objects.BaseObject
     environment;
     gimbal; % gimabal object 
     autocol; % autocolimatrice object (only at IPAG calibration bench) 
+    simulator; % dm/wavefront simulator  object 
     ACEStatus = false; % true/false if ASE has been started
     subsystems = {'config', 'wfs', 'dm', 'environment', 'gimbal', 'autocol'};
     
@@ -45,9 +46,13 @@ classdef Bench < naomi.objects.BaseObject
 
     % the lastPhaseArray recorded by naomi.measure.phase
     lastPhaseArray;
+    % incremental counter after each phase measurement 
+    phaseCounter = 0;
+    % incremental counter after each dm command 
+    dmCounter = 0;
     
     % The mask data as created by naomi.make.pupillMask 
-    maskData; 
+    maskData;
 
     % phaseReferenceData
     % the phase Reference data, this should be a naomi.data.PhaseReference object 
@@ -88,6 +93,7 @@ classdef Bench < naomi.objects.BaseObject
         	% if bench.has('wfs') & bench.has('dm')
         	% 	dosomething();
         	% end
+            
         	test = ~isempty(obj.(name));
         end
 
@@ -238,7 +244,8 @@ classdef Bench < naomi.objects.BaseObject
         end
 
         function test = isPhaseReferenced(obj)
-            test  = max(abs(obj.wfs.ref(:)))> 0;
+            %test  = max(abs(obj.wfs.ref(:)))> 0;
+            test = ~isempty(obj.phaseReferenceData);
         end
 
         function motorObject = axisMotor(obj, tip_or_tilt)
@@ -375,10 +382,10 @@ classdef Bench < naomi.objects.BaseObject
         end
 
         function nZernike = nZernike(obj)
-            [nZernike] = size(obj.zernikeVector);
+            nZernike = length(obj.zernikeVector);
         end
         function nActuator = nActuator(obj)
-            [nActuator] = size(obj.cmdVector);
+            nActuator = length(obj.cmdVector);
         end
 
 
@@ -401,13 +408,23 @@ classdef Bench < naomi.objects.BaseObject
         	end
         end
         function startWfs(obj)
-        	obj.startACE();
-        	if ~obj.has('wfs'); obj.wfs = naomi.startWfs(obj.config); end
+            if obj.config.simulated
+                obj.startSimulator();
+                obj.wfs = obj.simulator;
+            else
+                obj.startACE();
+                if ~obj.has('wfs'); obj.wfs = naomi.startWfs(obj.config); end
+            end
       	end
        	function startDm(obj)
-       		obj.startACE();
-        	if ~obj.has('dm'); 
-                obj.dm = naomi.startDm(obj.config); 
+            if obj.config.simulated
+               obj.startSimulator();
+               obj.dm = obj.simulator;
+            else
+                obj.startACE();
+                if ~obj.has('dm'); 
+                    obj.dm = naomi.startDm(obj.config); 
+                end
             end
        	end
         function startGimbal(obj)
@@ -418,8 +435,10 @@ classdef Bench < naomi.objects.BaseObject
 		end
 		function startEnvironment(obj)
 			if ~obj.has('environment'); obj.environment= naomi.startEnvironment(obj.config); end        	
-		end
-
+        end
+        function startSimulator(obj)
+            if ~obj.has('simulator'); obj.simulator = naomi.startSimulator(obj.config); end  
+        end
         function check = checkPhase(obj, phase)
             % Check the integrity of a phase screen
             check = 1;
@@ -489,7 +508,7 @@ classdef Bench < naomi.objects.BaseObject
         function populateHeader(obj, h)
             % populate a generic fits header for all files a maximum of
             % information is populated here
-
+            return 
             if isempty(obj.phaseReferenceData)
               naomi.addToHeader(h, 'PHASEREF', 'NO', 'YES/NO subtracted reference');
             else

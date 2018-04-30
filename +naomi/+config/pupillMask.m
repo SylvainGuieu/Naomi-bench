@@ -14,6 +14,6 @@ function success = pupillMask(bench, varargin)
 	%                      normaly measure at startup
 	% - centralObscurtion : central obscurtion in [m] if not given 
 	%						takes the bench.config.ztcCentralObscurtionDiameter	
-	naomi.config.mask(naomi.make.pupillMask(bench,  varargin{:}));
+	naomi.config.mask(bench, naomi.make.pupillMask(bench,  varargin{:}));
 	success = true;
 end

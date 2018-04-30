@@ -19,5 +19,7 @@ function ZtC = ZtC(IFM, diameter, centralObscurtionDiameter, dmCenterAct, nEigen
     scale = 0.5 * (xS + yS);
     diamPix = diameter / scale;
     centralObscurtionPix = centralObscurtionDiameter / scale;
-	[~,ZtC,~] = naomi.compute.commandMatrix(IFM,xCenter,yCenter,diamPix, centralObscurtionPix, nEigenValue, nZernike,1);
+	[~,ZtC,~] = naomi.compute.commandMatrix(IFM,xCenter,yCenter,diamPix, ...
+                                                centralObscurtionPix, ...
+                                                nEigenValue, nZernike;
 end

@@ -12,7 +12,8 @@ function cmdRelativeZonal(bench, actNum, amplitudeOffset)
 		else		
 			bench.dm.cmdVector(actNum) = bench.dm.cmdVector(actNum) + amplitudeOffset;
 		end
-	end
+    end
+    bench.dmCounter = bench.dmCounter + 1;
 	if bench.config.plotVerbose
 		naomi.plot.figure('DM Command');
 		naomi.plot.dmCommand(bench);

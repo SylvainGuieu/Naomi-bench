@@ -60,6 +60,7 @@ function phaseArray = phase(bench, nPhase, filterTipTilt, substractReference)
 
 
 	bench.lastPhaseArray = phaseArray;
+    bench.phaseCounter = bench.phaseCounter + 1;
 	if bench.config.plotVerbose
 		naomi.plot.figure('Last Phase');
 		naomi.plot.phase(bench);

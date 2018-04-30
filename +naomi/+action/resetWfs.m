@@ -1,3 +1,4 @@
 function resetWfs(bench)
-	bench.wfs.Reset
+	bench.wfs.Reset;
+    
 end

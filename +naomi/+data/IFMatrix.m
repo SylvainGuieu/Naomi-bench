@@ -1,7 +1,7 @@
 classdef IFMatrix < naomi.data.PhaseCube
 	properties
         profileResult; % store the result of a fitted profile
-        fitType = 'gauss' % the type of fitting
+        fitType = 'naomi' % the type of fitting
 	end	
 	methods
         function obj = IFMatrix(varargin)
@@ -11,7 +11,7 @@ classdef IFMatrix < naomi.data.PhaseCube
         	sh = {{'DPR_TYPE', 'IFM', ''}};
         end
         function setData(obj, data)
-            setData@naomi.data.PhaseCube(data);
+            setData@naomi.data.PhaseCube(obj, data);
             obj.profileResult = []; % empty profiles since data has changed 
         end
         function data = fitsReadData(obj, file)
