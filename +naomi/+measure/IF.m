@@ -30,12 +30,12 @@ function IFData = IF(bench,  act, nPushPull, amplitude)
     ref = bench.dm.cmdVector(act);
     for pp=1:nPushPull
         naomi.action.cmdZonal(bench, act, ref + amplitude);
-        pause(0.1);
+        %pause(0.1);
         %naomi.measure.phase(bench,1); % get phase first without storing it  
 
         tppush = tppush + naomi.measure.phase(bench,1);        
         naomi.action.cmdZonal(bench, act, ref - amplitude);
-        pause(0.1);
+        %pause(0.1);
         %naomi.measure.phase(bench,1); % get phase first 
         tppull = tppull + naomi.measure.phase(bench,1);
     end

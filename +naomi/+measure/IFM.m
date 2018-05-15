@@ -38,7 +38,7 @@ function [IFMData, IFMcleanData] = IFM(bench, callback, nPushPull, nLoop, amplit
     
     naomi.action.resetDm(bench);
     naomi.config.mask(bench, []); % remove the mask
-    
+    start = now;
 	for iLoop=1:nLoop
 	    
 	    % Loop on actuators
@@ -49,8 +49,9 @@ function [IFMData, IFMcleanData] = IFM(bench, callback, nPushPull, nLoop, amplit
                 IFMcleanData = [];
                 return
             end
-            
+            fprintf("%d %.3f",iActuator, (start-now)*24*3600);
             IFData = naomi.measure.IF(bench, iActuator, nPushPull, amplitude);
+            fprintf(" %.3f\n",(start-now)*24*3600);
             if ~isempty(callback)
                 callback(IFData);
             end

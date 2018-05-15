@@ -2,9 +2,9 @@ function [ZtPData,PtZData] = ZtP(bench, nPushPull, amplitude, nZernike)
 	config = bench.config;
 	K = naomi.KEYS;
     
-	if nargin<2; nPushPull = config.ztpNpushPull; end;
-	if nargin<3; amplitude = config.ztpAmplitude; end;
-	if nargin<4; nZernike  = config.ztpNzernike; end; 
+	if nargin<2; nPushPull = config.ztpNpushPull; end
+	if nargin<3; amplitude = config.ztpAmplitude; end
+	if nargin<4; nZernike  = config.ztpNzernike; end
 
 	if nPushPull<0
 		[nZernike,~] = size(bench.ZtCArray);
@@ -35,14 +35,10 @@ function [ZtPData,PtZData] = ZtP(bench, nPushPull, amplitude, nZernike)
 		
     bench.registerProcess('ZtP', nZernike*nPushPull);
 	for iZernike=1:nZernike
-		if stopZtPMeasurement
-			Ztp = [];
-			PtZ = [];
-			return ;
-		end
+		
 
-	    amp = amplitude ./ max(abs(squeeze(bench.ZtPArray()(iZernike,:))));
-	    config.log(sprintf(' %i',z), 1);  
+	    amp = amplitude ./ max(abs(squeeze(bench.ZtCArray(iZernike,':'))));
+	    config.log(sprintf(' %i',iZernike), 1);  
 	    for p=1:nPushPull
             if bench.isProcessKilled('ZtP')
                 ZtPData =[];
@@ -51,7 +47,7 @@ function [ZtPData,PtZData] = ZtP(bench, nPushPull, amplitude, nZernike)
             end
             
 	    	% take the zernikeVector reference
-	        ref = bench.zernikeVector()(iZernike);
+	        ref = bench.zernikeVector(iZernike);
 	        naomi.action.cmdModal(bench, iZernike, ref + amp);	        
  	        push = naomi.measure.phase(bench,1);
 	        
@@ -65,7 +61,7 @@ function [ZtPData,PtZData] = ZtP(bench, nPushPull, amplitude, nZernike)
 	    
 	    % Cleanup piston
 	    ZtPArray(iZernike,:,:) = ...
-            ztPArray(iZernike,:,:) - ...
+            ZtPArray(iZernike,:,:) - ...
             naomi.compute.nanmean(reshape(ZtPArray(iZernike,:,:),[],1));
         
 	    if iZernike==1
@@ -75,7 +71,8 @@ function [ZtPData,PtZData] = ZtP(bench, nPushPull, amplitude, nZernike)
 	    % Plot
 	    if config.plotVerbose
 		    naomi.plot.figure('Mode');
-		    ZtP.plotOneMode(iZernike);	   
+            phaseData = naomi.data.PhaseZernike(squeeze(ZtPArray(iZernike, :, :)), {{naomi.KEYS.ZERN, iZernike, naomi.KEYS.ZERNc}});
+            phaseData.plotAll();   
 		end
     end
     bench.killProcess('ZtP');
@@ -87,17 +84,15 @@ function [ZtPData,PtZData] = ZtP(bench, nPushPull, amplitude, nZernike)
     
     % Set back
     PtZArray = reshape(Tmp,nSubAperture,nSubAperture,nZernike);
-	
-    h = {{K.MJDOBS,   config.mjd,    K.MJDOBSc},
-	     {K.NPP  ,    nPushPull,     K.NPPc}, 
-		 {K.PUSHAMP,  amplitude,     K.PUSHAMPc},     
-		 {K.NZERN,    nZernike,       K.NZERNc},
-         
-         {K.ZTCDIAM,  pupillDiameter, k.ZTCDIAMc},
-         {K.XPSCALE,  xPscale,        K.XPSCALEc},
-         {K.YPSCALE,  yPscale,        K.YPSCALEc}, 
-         {K.XCENTER,  xCenter,        K.XCENTERc},
-         {K.YCENTER,  yCenter,        K.YCENTERc},
+    h = {{K.MJDOBS,   config.mjd,    K.MJDOBSc},...
+	     {K.NPP  ,    nPushPull,     K.NPPc}, ...
+		 {K.PUSHAMP,  amplitude,     K.PUSHAMPc}, ...     
+		 {K.NZERN,    nZernike,       K.NZERNc}, ...  
+         {K.ZTCDIAM,  pupillDiameter, K.ZTCDIAMc}, ...
+         {K.XPSCALE,  xPscale,        K.XPSCALEc}, ...
+         {K.YPSCALE,  yPscale,        K.YPSCALEc}, ...
+         {K.XCENTER,  xCenter,        K.XCENTERc}, ...
+         {K.YCENTER,  yCenter,        K.YCENTERc}
 		 };
     
 	ZtPData = naomi.data.ZtP(ZtPArray, h, {bench});

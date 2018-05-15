@@ -248,21 +248,21 @@ classdef Bench < naomi.objects.BaseObject
             test = ~isempty(obj.phaseReferenceData);
         end
 
-        function motorObject = axisMotor(obj, tip_or_tilt)
+        function axisName = axisMotor(obj, tip_or_tilt)
             switch tip_or_tilt
                 case obj.config.TIP
                     switch obj.config.rXOrder
                         case obj.config.TIP
-                            motorObject = obj.gimbal.rX;
+                            axisName = 'rX';
                         otherwise
-                            motorObject = obj.gimbal.rY;
+                            axisName = 'rY';
                     end
                 case obj.config.TILT
                     switch obj.config.rXOrder
                         case  obj.config.TILT
-                            motorObject = obj.gimbal.rX;
+                            axisName = 'rX';
                         otherwise
-                            motorObject = obj.gimbal.rY;
+                            axisName = 'rY';
                     end
                 otherwise
                     error(sprintf ('expecting tip or tilt got %s', tip_or_tilt));
@@ -288,20 +288,23 @@ classdef Bench < naomi.objects.BaseObject
                     error(sprintf ('expecting tip or tilt got %s', tip_or_tilt));
             end     
         end
-        function zernikeVector = zernikeVector(obj)
+        function zernikeVector = zernikeVector(obj, varargin)
             if obj.config.simulated
                 zernikeVector = obj.simulator.zernikeVector;
             else
                 zernikeVector = obj.dm.zernikeVector;
             end
+             zernikeVector = zernikeVector(varargin{:});
         end
 
-        function cmdVector = cmdVector(obj)
+        function cmdVector = cmdVector(obj, varargin)
             if obj.config.simulated
                 cmdVector = obj.simulator.cmdVector;
             else
                 cmdVector = obj.dm.cmdVector;
             end
+            cmdVector = cmdVector(varargin{:});
+            
         end
         function set.ZtCData(obj, ZtCData)
         	obj.config.log('Setting a new Zernique to Command Matrix\n', 1);
@@ -315,12 +318,13 @@ classdef Bench < naomi.objects.BaseObject
             obj.ZtCData = ZtCData;
         end
 
-        function ZtCArray = ZtCArray(obj)
+        function ZtCArray = ZtCArray(obj, varargin)
             if obj.config.simulated
                 ZtCArray = obj.simulator.zernike2Command;
             else
                 ZtCArray = obj.dm.zernike2Command;
             end
+            ZtCArray = ZtCArray(varargin{:});
         end
 
 
@@ -336,12 +340,13 @@ classdef Bench < naomi.objects.BaseObject
             obj.dmBiasData = dmBiasData;
         end
 
-        function biasVector = biasVector(obj)
+        function biasVector = biasVector(obj, varargin)
             if obj.config.simulated
                 biasVector = obj.simulator.biasVector;
             else
                 biasVector = obj.dm.biasVector;
             end
+            biasVector = biasVector(varargin{:});
         end
 
         function set.phaseReferenceData(obj, PR)
@@ -360,13 +365,14 @@ classdef Bench < naomi.objects.BaseObject
             end
             
         end
-        function phaseReferenceArray = phaseReferenceArray(obj)
+        function phaseReferenceArray = phaseReferenceArray(obj, varargin)
             if isempty(obj.phaseReferenceData)
                 nSubAperture = obj.nSubAperture;
                 phaseReferenceArray = zeros(nSubAperture, nSubAperture);                
             else
                 phaseReferenceArray = obj.phaseReferenceData.data;
             end
+            phaseReferenceArray = phaseReferenceArray(varargin{:});
         end
 
         function nSubAperture = nSubAperture(obj)
@@ -389,13 +395,14 @@ classdef Bench < naomi.objects.BaseObject
         end
 
 
-        function maskArray = maskArray(obj)
+        function maskArray = maskArray(obj, varargin)
             if isempty(obj.maskData)
                 nSubAperture = obj.nSubAperture;
                 maskArray = ones(nSubAperture, nSubAperture);
             else
                 maskArray = obj.maskData.data;
             end
+            maskArray = maskArray(varargin{:});
         end
 
         function set.maskData(obj, maskData)
@@ -415,7 +422,15 @@ classdef Bench < naomi.objects.BaseObject
                 obj.startACE();
                 if ~obj.has('wfs'); obj.wfs = naomi.startWfs(obj.config); end
             end
-      	end
+        end
+        function stopWfs(obj)
+            if obj.config.simulated
+                obj.wfs = [];
+            else
+                obj.wfs = [];
+            end
+        end
+        
        	function startDm(obj)
             if obj.config.simulated
                obj.startSimulator();
@@ -426,15 +441,39 @@ classdef Bench < naomi.objects.BaseObject
                     obj.dm = naomi.startDm(obj.config); 
                 end
             end
-       	end
+        end
+        function stopDm(obj)
+            if obj.config.simulated
+                obj.dm = [];
+            else
+                obj.dm = [];
+            end
+        end
+        
         function startGimbal(obj)
-			if ~obj.has('gimbal'); obj.gimbal = naomi.startGimbal(obj.config); end        	
-		end
+            if obj.has('gimbal'); return ; end
+            
+            if obj.config.simulated
+                obj.startSimulator();
+                obj.gimbal = obj.simulator;
+            else
+                obj.gimbal = naomi.startGimbal(obj.config); 
+            end
+        end
+        function stopGimbal(obj)
+            obj.gimbal = [];
+        end
 		function startAutocol(obj)
 			if ~obj.has('autocol'); obj.autocol = naomi.startAutocol(obj.config); end        	
-		end
+        end
+        function stopAutocol(obj)
+            obj.autocol = [];
+        end
 		function startEnvironment(obj)
 			if ~obj.has('environment'); obj.environment= naomi.startEnvironment(obj.config); end        	
+        end
+        function stopEnvironment(obj)
+			obj.environment = [];       	
         end
         function startSimulator(obj)
             if ~obj.has('simulator'); obj.simulator = naomi.startSimulator(obj.config); end  
@@ -505,9 +544,10 @@ classdef Bench < naomi.objects.BaseObject
         function test(obj)
             obj.getKey('TEMP1');
         end
-        function populateHeader(obj, h)
+        function h = populateHeader(obj, h)
             % populate a generic fits header for all files a maximum of
             % information is populated here
+            h = naomi.addToHeader(h, 'TEST', 1, 'THIS IS A TEZT'); 
             return 
             if isempty(obj.phaseReferenceData)
               naomi.addToHeader(h, 'PHASEREF', 'NO', 'YES/NO subtracted reference');

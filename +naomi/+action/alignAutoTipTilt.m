@@ -8,8 +8,8 @@ function [dTip,dTilt] = alignAutoTipTilt(bench, gain, pupillDiameter, timeout)
     timeout = timeout/(24*3600);
 	tiltThreshold = bench.config.pupillTipTiltThresholdAuto;
 	
-	phaseArray = naomi.measure.phase(bench);
-	[~,~,dTip,dTilt,~] = naomi.measure.missalignment(bench, phaseArray);
+	
+	[~,~,dTip,dTilt,~] = naomi.measure.missalignment(bench);
     startTime = now;
     bench.registerProcess('alignAutoTipTilt');
     
@@ -22,16 +22,16 @@ function [dTip,dTilt] = alignAutoTipTilt(bench, gain, pupillDiameter, timeout)
             bench.config.log('ERROR: autoalignment failed -> timeout');
             break
         end
-		phaseArray = naomi.measure.phase(bench);
-		[~,~,dTip,dTilt,~] = naomi.measure.missalignment(bench, phaseArray);
+		
+		[~,~,dTip,dTilt,~] = naomi.measure.missalignment(bench);
         
-        mTip = bench.axisMotor('tip');
+        axisTip = bench.axisMotor('tip');
         sTip = bench.axisSign('tip');
-        mTip.moveByArcsec( -gain*sTip*dTip * 1e-6 *4/2 / pupillDiameter / 4.8e-6);
+        bench.gimbal.moveByArcsec(axisTip,  -gain*sTip*dTip * 1e-6 *4/2 / pupillDiameter / 4.8e-6);
         
-        mTilt = bench.axisMotor('tilt');
+        axisTilt = bench.axisMotor('tilt');
         sTilt = bench.axisSign('tilt');
-        mTilt.moveByArcsec( -gain*sTilt*dTilt * 1e-6 *4/2 / pupillDiameter / 4.8e-6);
+        bench.gimbal.moveByArcsec(axisTilt,  -gain*sTilt*dTilt * 1e-6 *4/2 / pupillDiameter / 4.8e-6);
         pause(0.1); % leave a bit of space for graphical process 
     end
     bench.killProcess('alignAutoTipTilt');

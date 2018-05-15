@@ -45,7 +45,7 @@ classdef ZtC < naomi.data.BaseData
             cmd = cmd.*amplitude;
                         
             if ~isempty(obj.DmBiasData)
-                cmd = cmd + obj.DmBiasData.data;                
+                cmd = cmd + obj.DmBiasData.data';                
             end       
             dmCommandData = naomi.data.DmCommand(cmd);
         end

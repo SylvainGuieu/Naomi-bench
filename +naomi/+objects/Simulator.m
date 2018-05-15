@@ -35,6 +35,19 @@ classdef Simulator < naomi.objects.BaseObject
         dmCenterAct = 121;
         orientation = 'yx';
         
+        rXMotorPosition = 0.0;
+        rYMotorPosition = 0.0;
+        rXgain = 3300;
+        rYgain = 5000;
+        rXzero = 14.5;
+        rYzero = 15.7;
+        
+        rXOrder = 2;  %tip
+        rYOrder = 3; % not used just for consistancy
+        % Sign of rX movement regarding to zernic order 
+        rXSign = -1;
+        rYSign = -1;
+        
     end
     
     methods
@@ -94,15 +107,41 @@ classdef Simulator < naomi.objects.BaseObject
                 end
                 allZernikeVector = zeros(obj.ztcNzernike, 1);
                 allZernikeVector(1:nZer) = zernikeVector;
-                                
+                
+                 
+                allZernikeVector(obj.rXOrder) = allZernikeVector(obj.rXOrder) +...
+                    (obj.rXMotorPosition - obj.rXzero)*obj.rXgain * ...
+                    obj.fullPupillDiameter*4.8e-6 /...
+                    (obj.rXSign*1e-6 * 4/2);
+                allZernikeVector(obj.rYOrder) = allZernikeVector(obj.rYOrder) + ...
+                    (obj.rYMotorPosition - obj.rYzero)*obj.rYgain * ...
+                    obj.fullPupillDiameter*4.8e-6 /...
+                    (obj.rYSign*1e-6 * 4/2);
+                
+                
                 cmdVector = cmdVector + (allZernikeVector'*obj.zernike2Command)';
                 
+            else
+                allZernikeVector = zeros(obj.ztcNzernike, 1);
+                allZernikeVector(obj.rXOrder) = allZernikeVector(obj.rXOrder) +...
+                    (obj.rXMotorPosition - obj.rXzero)*obj.rXgain * ...
+                    obj.fullPupillDiameter*4.8e-6 /...
+                    (obj.rXSign*1e-6 * 4/2);
+                allZernikeVector(obj.rYOrder) = allZernikeVector(obj.rYOrder) + ...
+                    (obj.rYMotorPosition - obj.rYzero)*obj.rYgain * ...
+                    obj.fullPupillDiameter*4.8e-6 /...
+                    (obj.rYSign*1e-6 * 4/2);
+                
+                cmdVector = cmdVector + (allZernikeVector'*obj.zernike2Command)';
             end
+            
+            
+            
             
             rawPhase = IFMArray'*cmdVector;
             rawPhase = reshape(rawPhase, nSubAperture, nSubAperture);
             
-            if 0%~isempty(obj.turbuArray)
+            if ~isempty(obj.turbuArray)
                 [turbuLength, ~, ~] = size(obj.turbuArray);
                 if obj.turbuIndex>turbuLength; obj.turbuIndex = 1; end;
                 rawPhase = rawPhase + squeeze(obj.turbuArray(obj.turbuIndex,:,:));
@@ -175,6 +214,74 @@ classdef Simulator < naomi.objects.BaseObject
            end
         end
         
+        %%% Motor
+        function moveDirecTo(obj, axis, position)
+            switch axis
+                case 'rX'
+                    obj.rXMotorPosition = position;
+                case 'rY'
+                    obj.rYMotorPosition = position;
+            end
+        end
+        
+        function moveToZero(obj, axis)
+            
+            if nargin<2
+                obj.rXMotorPosition = obj.rXzero;
+                obj.rYMotorPosition = obj.rYzero;         
+            else
+                switch axis
+                    case 'rX'
+                        obj.rXMotorPosition = obj.rXzero;
+                    case 'rY'
+                        obj.rYMotorPosition = obj.rYzero; 
+                    otherwise
+                        error('axis should be rX or rY');
+                end
+            end
+        end
+        
+        function moveTo(obj, axis, position)
+            switch axis
+                case 'rX'
+                    obj.rXMotorPosition = position;
+                case 'rY'
+                    obj.rYMotorPosition = position;
+            end
+        end
+        function moveBy(obj, axis, relPos)
+            switch axis
+                case 'rX'
+                    obj.rXMotorPosition = obj.rXMotorPosition + relPos;
+                case 'rY'
+                    obj.rYMotorPosition = obj.rYMotorPosition + relPos;
+            end
+        end
+        function moveByArcsec(obj, axis, arcsec)
+            switch axis
+                case 'rX'
+                    obj.rXMotorPosition = obj.rXMotorPosition + arcsec/obj.rXgain;
+                case 'rY'
+                    obj.rYMotorPosition = obj.rYMotorPosition + arcsec/obj.rYgain;
+            end
+        end
+        function pos = getPos(obj, axis)
+            switch axis
+                case 'rX'
+                    pos = obj.rXMotorPosition;
+                case 'rY'
+                    pos = obj.rYMotorPosition;
+            end
+        end
+        
+        function init(obj, axis)
+            switch axis
+                case 'rX'
+                    obj.rXMotorPosition = rXzero;
+                case 'rY'
+                    obj.rYMotorPosition = rYzero;
+            end
+        end    
     end
 end
 

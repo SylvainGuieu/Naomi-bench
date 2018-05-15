@@ -15,7 +15,7 @@ function simulator = startSimulator(config)
    end
    
    if ~isempty(config.simulatorTurbu) && strlength(config.simulatorTurbu)
-       turbuArray = naomi.data.PhaseCube(config.simulatorTurbu).data;
+       turbuArray = naomi.data.TurbuCube(config.simulatorTurbu).data;
    end
    simulator = naomi.objects.Simulator(IFM, biasVector, turbuArray, ZtC);
 end

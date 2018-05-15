@@ -10,7 +10,7 @@ classdef Config < handle
         simulatorIFM = '/Users/guieus/DATA/NAOMI/IFM_direct.fits';
         simulatorZtC = '/Users/guieus/DATA/NAOMI/NTC_2018-04-03T11-19-30.fits';
         simulatorBias;
-        simulatorTurbu;
+        simulatorTurbu = '/Users/guieus/DATA/NAOMI/turbu.fits';
         
         % software version. This is writen in the fits files to eventualy check one
         % day for uncompatibilities 
@@ -75,6 +75,9 @@ classdef Config < handle
         ztcNeigenValue = 140;
         % number of Zernique to command matrix 
         ztcNzernike = 100;
+        
+        % number of Zernique to command matrix for the ZtP measurement
+        ztpNzernike = 21;
 
 
         % Assumed aproximative pixel scale for start-up alignment
@@ -357,7 +360,7 @@ classdef Config < handle
             naomi.log(str, level, obj.verbose);
         end
         function set.location(obj, location)
-            found = false
+            found = false;
             for iLoc=1:length(obj.locationRoots)
                 if strcmp(location, obj.locationRoots{iLoc}{1})
                     obj.rootDirectory = obj.locationRoots{iLoc}{2};

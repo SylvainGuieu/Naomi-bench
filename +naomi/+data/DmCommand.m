@@ -40,7 +40,7 @@ classdef DmCommand < naomi.data.BaseData
             [nActY, nActX] = size(mask);
             
 	    	values = mask*1.0;
-    		values(mask) = mask(mask).*obj.data;
+    		values(mask) = mask(mask).*obj.data(':');
     		values(~mask) = nan;
             % clip to +1 / -1
             if obj.clipped
@@ -49,8 +49,8 @@ classdef DmCommand < naomi.data.BaseData
             end
     		cla(axes); imagesc(axes, values);
             colorbar(axes);    
-            xlim(axes, [1,nActX]);
-            ylim(axes, [1,nActY]);
+            xlim(axes, [1-0.5,nActX+0.5]);
+            ylim(axes, [1-0.5,nActY+0.5]);
             daspect(axes, [1 1 1]); %square aspect ratio
             
     	end

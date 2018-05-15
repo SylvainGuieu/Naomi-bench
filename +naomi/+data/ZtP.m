@@ -159,6 +159,9 @@ classdef ZtP < naomi.data.PhaseCube
 			    title(ax, sprintf('%.3fum',residualVector(iZernike)));
                 daspect(ax, [1 1 1]);
 			end	
-     	end
+        end
+        function gui(obj)
+            ztpExplorerGui(obj)
+        end
  	end
 end

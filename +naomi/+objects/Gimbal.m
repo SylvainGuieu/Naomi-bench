@@ -32,9 +32,29 @@ classdef Gimbal < naomi.objects.BaseObject
             obj.rY.gain = rYGain;
             
         end
-        function init(obj)
-            obj.rX.init();
-            obj.rY.init();
+        function pos = getPos(obj, axis)
+            pos = obj.(axis).getPos();
+        end
+        function moveDirecTo(obj, axis, position)
+            obj.(axis).moveDirectTo(position);
+        end
+        function moveTo(obj, axis, position)
+            obj.(axis).moveTo(position);
+        end
+        function moveBy(obj, axis, relPos)
+            obj.(axis).moveBy(relPos);
+        end
+        function moveByArcsec(obj, axis, arcsec)
+            obj.(axis).moveBy(arcsec);
+        end
+        
+        function init(obj, axis)
+            if nargin<2
+                obj.rX.init();
+                obj.rY.init();
+            else
+                obj.(axis).init();
+            end
         end
         function setVelocity(obj, velocity)
             % set the velocity of both axis
@@ -46,10 +66,15 @@ classdef Gimbal < naomi.objects.BaseObject
             obj.rX.setVelocities(slow, fast);
             obj.rY.setVelocities(slow, fast);
         end
-        function moveToZero(obj)
-            obj.rX.moveToZero();
-            obj.rY.moveToZero();
+        function moveToZero(obj, axis)
+            if nargin<2
+                obj.rX.moveToZero();
+                obj.rY.moveToZero();
+            else
+                obj.(axis).moveToZero();
+            end
         end
+        function 
           function delete(obj)
                 fprintf('Close connection to PI\n');
                 obj.rX.device.CloseConnection();

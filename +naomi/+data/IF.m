@@ -1,7 +1,7 @@
 classdef IF < naomi.data.Phase
 	properties
        profileResult; % store the result of a fitted profile
-       fitType = 'naomi' % the type of fitting
+       fitType = 'naomi'; % the type of fitting
 	end	
 	methods
         function obj = IF(varargin)
