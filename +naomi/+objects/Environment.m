@@ -291,9 +291,9 @@ classdef Environment < naomi.objects.BaseObject
         R_WARMGAIN = 11;
         
         R_FANVOLTAGE = [107 108];
-        R_FAN_MODE = [16 24];
-        R_FAN_LSPEED_VOLTAGE = [20 28];
-        R_FAN_HSPEED_VOLTAGE = [21 29];
+        R_FAN_MODE = [16 23];
+        R_FAN_LSPEED_VOLTAGE = [21 28];
+        R_FAN_HSPEED_VOLTAGE = [22 29];
         
 
         R_TEMP = [100 101 102];
@@ -389,7 +389,6 @@ classdef Environment < naomi.objects.BaseObject
         
         function delete(obj)
             fprintf('Close connection to Peltier Controler Laird-ETS-PR-59\n');
-            obj.stopMonitoring;
             fclose(obj.client);
             
         end
@@ -592,22 +591,23 @@ classdef Environment < naomi.objects.BaseObject
             end
             
             
-            if fanIn
-                obj.setRegister(obj.R_FAN_MODE(obj.F_IN), obj.ALLWAYSON); 
-            else
-                obj.setRegister(obj.R_FAN_MODE(obj.F_IN), obj.ALLWAYSOFF); 
-            end
-            if fanOut
-                obj.setRegister(obj.R_FAN_MODE(obj.F_OUT), obj.ALLWAYSON); 
-            else
-                obj.setRegister(obj.R_FAN_MODE(obj.F_OUT), obj.ALLWAYSOFF); 
-            end
-            
+%             if fanIn
+%                 obj.setRegister(obj.R_FAN_MODE(obj.F_IN), obj.ALLWAYSON); 
+%             else
+%                 obj.setRegister(obj.R_FAN_MODE(obj.F_IN), obj.ALLWAYSOFF); 
+%             end
+%             if fanOut
+%                 obj.setRegister(obj.R_FAN_MODE(obj.F_OUT), obj.ALLWAYSON); 
+%             else
+%                 obj.setRegister(obj.R_FAN_MODE(obj.F_OUT), obj.ALLWAYSOFF); 
+%             end
+            %obj.stopRegulation;
             obj.setRegister(obj.R_FAN_HSPEED_VOLTAGE(obj.F_IN), fanIn); 
             obj.setRegister(obj.R_FAN_LSPEED_VOLTAGE(obj.F_IN), fanIn); 
             obj.setRegister(obj.R_FAN_HSPEED_VOLTAGE(obj.F_OUT), fanOut); 
             obj.setRegister(obj.R_FAN_LSPEED_VOLTAGE(obj.F_OUT), fanOut); 
             obj.setRegister(obj.R_REGUL, tempRegul);
+            obj.startRegulation;
             obj.controlState = obj.MANUAL;    
         end
         
@@ -708,7 +708,7 @@ classdef Environment < naomi.objects.BaseObject
             voltage = obj.getFanVoltage(obj.F_OUT);
         end
         
-        function temp = obj.getUSBTemp(obj, usbTempId)
+        function temp = getUSBTemp(obj, usbTempId)
             temp = getUSBTemp(usbTempId);
         end
         
