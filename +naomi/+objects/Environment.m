@@ -218,15 +218,17 @@ classdef Environment < naomi.objects.BaseObject
         calibTemperature = 10.0 
         
         % acceptable difference of temperature between 
-        % mirror and embiant                     
+        % mirror and embiant to allow door opening                   
         safeDeltaTemp = 2.0 
         
         % temperature difference forwhich it is acceptable to start calibration
         % abs(e.getTemp(e.MIROR)-e.calibTemperature) < e.calibDeltaTemp               
-        calibDeltaTemp = 0.25 
+        calibDeltaTemp = 0.25 % +/- x 
         
-        % temperature of regulation (this is not the mirror temp but the
-        % peltier cold face) for cooldown
+        % When cooling down (or warming up, depend of the embient temperature)
+        % The laird regulation temperature is set as 
+        %   Tcalib - (Tembian-Tcalib) * correctiveFactor 
+        %goToTempCorrectiveFactor = 1.0;
         cooldown2calibTemperature =  5.0;
         % same thing for warming up the bench to calib temp
         warmup2calibTemperature =  15.0;
@@ -245,6 +247,11 @@ classdef Environment < naomi.objects.BaseObject
         % the fan absolute voltage for witch it is acceptable to start and 
         % or run calibration
         calibFanVoltage = 0.0;
+        calib2maintainTemperature = 10.0;
+        
+        % temperature regulation (no calibration) fan voltage
+        maintainFanVoltage = 24.0;
+        
         % fan voltage when cooling down to calib temperature 
         cooldown2calibFanVoltage = 24.0;
         % fan voltage when warming up to calib temperature 
@@ -279,6 +286,14 @@ classdef Environment < naomi.objects.BaseObject
         R_FAN2_MODE = 24;
         R_FAN2_LSPEED_VOLTAGE = 28;
         R_FAN2_HSPEED_VOLTAGE = 29;
+        
+        R_TEMP1 = 100;
+        R_TEMP2 = 101;
+        R_TEMP3 = 102;
+        
+        R_FAN1 = 107;
+        R_FAN2 = 108;
+        R_CURRENT = 152;
         
         ALWAYSON = 3;
     end
@@ -410,8 +425,31 @@ classdef Environment < naomi.objects.BaseObject
             if embiantTemp<obj.calibTemperature % we are warming up to calib temp
                 obj.warmup2calib;
             else
-                obj.coolddown2calib;
+                obj.cooldown2calib;
             end
+        end
+        
+        function setToCalib(obj)
+            % set the bench to calibration state 
+            %
+            % The fan are turned off but peltier is still on to avoid
+            % temperature leaks
+            
+            obj.setRegister(obj.R_REGUL, obj.calib2maintainTemperature);
+            
+            obj.setRegister(obj.R_FAN1_MODE, obj.ALWAYSON); %always on check the real value !
+
+            obj.setRegister(obj.R_FAN1_HSPEED_VOLTAGE, 0.0); % turn off fan 
+            obj.setRegister(obj.R_FAN1_LSPEED_VOLTAGE, 0.0); % turn off fan 
+
+            obj.setRegister(obj.R_FAN2_MODE, obj.ALWAYSON); %always on check the real value !
+
+            obj.setRegister(obj.R_FAN2_HSPEED_VOLTAGE, 0.0); % turn off fan 
+            obj.setRegister(obj.R_FAN2_LSPEED_VOLTAGE, 0.0); % turn off fan 
+            
+            obj.startRegulation;
+            obj.controlState = obj.CALIB;
+            
         end
         
         function maintainCalibTemperature(obj)
@@ -425,8 +463,8 @@ classdef Environment < naomi.objects.BaseObject
             
             obj.setRegister(obj.R_FAN1_MODE, obj.ALWAYSON); %always on check the real value !
 
-            obj.setRegister(obj.R_FAN1_HSPEED_VOLTAGE, 0.0); % turn off fan 
-            obj.setRegister(obj.R_FAN1_LSPEED_VOLTAGE, 0.0); % turn off fan 
+            obj.setRegister(obj.R_FAN1_HSPEED_VOLTAGE, obj.maintainCalibTemperature); % turn off fan 
+            obj.setRegister(obj.R_FAN1_LSPEED_VOLTAGE, obj.maintainCalibTemperature); % turn off fan 
 
             obj.setRegister(obj.R_FAN2_MODE, obj.ALWAYSON); %always on check the real value !
 
@@ -438,12 +476,17 @@ classdef Environment < naomi.objects.BaseObject
             
         end
         
+        function turnOff(obj)
+            obj.stopRegulation;
+            obj.controlState = obj.OFF;
+        end
+        
         function warmup2calib(obj)
             % start warming the bench in order to reach the calibration 
             % temperature 
             
             
-            obj.setRegister(obj.R_REGUL, obj.calibTemperature); % temperature 
+            obj.setRegister(obj.R_REGUL, obj.warmup2calibTemperature); % temperature 
             obj.setRegister(obj.R_COOLGAIN, 0.0); % cooling gain
             obj.setRegister(obj.R_WARMGAIN, 1.0); % heating gain
             
@@ -467,7 +510,7 @@ classdef Environment < naomi.objects.BaseObject
             % temperature 
             
             
-            obj.setRegister(obj.R_REGUL, obj.calibTemperature); % temperature 
+            obj.setRegister(obj.R_REGUL, obj.cooldown2calibTemperature); % temperature 
             obj.setRegister(obj.R_COOLGAIN, 1.0); % cooling gain
             obj.setRegister(obj.R_WARMGAIN, 0.0); % heating gain
             
@@ -585,47 +628,20 @@ classdef Environment < naomi.objects.BaseObject
         end
         
         function buffer = createBuffer(obj, bufferSize, stepSize, dynamic)
-            if nargin <3
-                stepSize = 1;
-                
-            end
-            if nargin<4
+            if nargin <2
+                bufferSize = 1000; 
+                stepSize = 100;     
+                dynamic = 0;
+            elseif nargin <3
+                stepSize = int32(bufferSize/4);  
+                dynamic = 0;
+            elseif nargin<4
                 dynamic = 0;
             end
-            buffer = naomi.TempBuffer(bufferSize, stepSize, dynamic);
-            
+            buffer = naomi.objects.EnvironmentBuffer(bufferSize, stepSize, dynamic);            
         end
         
-        function updateBuffer(obj, buffer)
-            if (buffer.index+1) > buffer.size
-                fields = {'t1','t2','t3','current', 'time'};
-                nField = length(fields);
-               if buffer.dynamic
-                   for iField=1:nField
-                       field = fields{:};
-                       old = buffer.(field);
-                       new = zeros(buffer.index+buffer.stepSize, 1);
-                       new(1:buffer.index) = old(1:buffer.index);
-                       buffer.(field) = new;
-                   end
-                   
-               else
-                   for iField=1:nField
-                       field = fields{:};
-                       buffer.(field)(1:end-buffer.stepSize) = buffer.(field)(buffer.stepSize+1:end);
-                   end
-                buffer.index = buffer.size - buffer.stepSize;
-               end
-            end
-            
-            i = buffer.index +1;
-            buffer.t1(i) = obj.getTemp(1);
-            buffer.t2(i) = obj.getTemp(2);
-            buffer.t3(i) = obj.getTemp(3);
-            buffer.current(i) = obj.getCurrent();
-            buffer.time(i) = now;
-            buffer.index = i;
-        end
+        
         
         
         
@@ -692,7 +708,7 @@ classdef Environment < naomi.objects.BaseObject
         function current = getCurrent(obj)
             % current = e.getCurrent()
             % get the applied peltier current 
-            current = str2double(obj.askRegister(152));
+            current = str2double(obj.askRegister(obj.R_CURRENT));
         end
         
         function current = current(obj)
@@ -704,7 +720,7 @@ classdef Environment < naomi.objects.BaseObject
             % get the fan voltage. The fan is iddentified by its number:
             % 1. The cold face fan 
             % 2. the hot face fan 
-            fanIds = {107,108};
+            fanIds = {obj.R_FAN1,obj.R_FAN2};
             voltage = str2double(obj.askRegister(fanIds{fanNumber}));
         end
         function voltage=fan1(obj)
@@ -713,7 +729,9 @@ classdef Environment < naomi.objects.BaseObject
         function voltage=fan2(obj)
             voltage = obj.getFanVoltage(2);
         end
-        
+        function temp = obj.getUSBTemp(obj, usbTempId)
+            temp = getUSBTemp(usbTempId);
+        end
         function temp=getTemp(obj, tid)
             % temp = e.getTemp(tid)
             % get the temperature of the sensor defined by its numerical ID
@@ -726,21 +744,24 @@ classdef Environment < naomi.objects.BaseObject
             % 5. USB temp of the mirror
             % 6. USB temp of the QCM mount
             switch tid
-                case obj.REGULTEMP
-                    temp = str2double(obj.askRegister(100));
+                case obj.REGULSENS
+                    temp = str2double(obj.askRegister(obj.R_TEMP1));
                 case obj.HOTFACE
-                    temp = str2double(obj.askRegister(101));
+                    temp = str2double(obj.askRegister(obj.R_TEMP2));
                 case 3
-                    temp = str2double(obj.askRegister(102));
+                    temp = str2double(obj.askRegister(obj.R_TEMP3));
                 case obj.EMBIANT
-                    temp = getUSBTemp(0);
+                    temp = obj.getUSBTemp(0);
                 case obj.MIRROR
-                    temp = getUSBTemp(1);
+                    temp = obj.getUSBTemp(1);
                 case obj.QSM
-                    temp = getUSBTemp(2);
+                    temp = obj.getUSBTemp(2);
                 otherwise
                     error('Temperature sensor number must be from 1 to 6 got %d', tid);
             end
+        end
+        function temp = getRegulTemp(obj)
+            temp = str2double(obj.askRegister(obj.R_REGUL));
         end
         
         function temp=temp1(obj)
