@@ -310,11 +310,65 @@ classdef Environment < naomi.objects.BaseObject
     end
     
     methods (Access = public)
+        %%
+        % Object handling all the read/write environement parameter of the bench
+        % 
+        % - temperatures
+        %     red by the Peltier Laird-ETS-PR-59 (serial link)
+        %     red by the USB-Temp of Measurement Computing (constructor
+        %     library) 
+        % - control and read the fan voltage (Laird) 
+        % - control and read the set point of the Peltier (Laird)
+        %
+        %  To read temperature 
+        %    By their id number 
+        %     >>> e.getTemp(3) 
+        %    By their name 
+        %     >>> e.tmpMirror
+        %  
+        %  To read fan voltage 
+        %     >>> e.getFanVoltage(1) % 1 or 2 
+        %     >>> e.fanIn   % innner fan
+        %     >>> e.fanOut  % outer fan 
+        %
+        %  The conrol of temperature is limited by 4 modes which can be set
+        %  by these commands  
+        %     e.goToCalib()
+        %          go Actively to the calibration temperature the set point
+        %          of the inner face of Peltier is set to a lower value
+        %          than the calibration temperature 
+        %     e.maintain()
+        %          Maintain the temperature to the calibration temperature
+        %          with the Fan On 
+        %     e.calib()
+        %          (try to) Maintain the temperature with the inner fan off
+        %          suitable to start calibration.
+        %     e.goToEmbiant()
+        %          Put the bench to the embiant temperature. Used after
+        %          calibration is finished, before opening the door
+        %     e.manual(setPoint, fan1Voltage, fan2Voltage)
+        %          User can define the setpoint and fan voltages 
+        %     e.turnOff()
+        %          The regulation is off, no peltier, no fan
+        %
+        % 
+        % A command , e.updateControl() , is used to monitor the current 
+        % mode and eventaully switch from one mode to an other : 
+        %         - from goToCalib to maintain  if calib temperature
+        %         reached 
+        %         - from goToEmbiant to off if embiant temperature reached 
+        % 
+        % Use e.isReadyToCalib to check if conditions are ok for
+        % calibration 
+        % Use e.isSafeToOpen to check if conditions are ok to open the door
+        %  
         function obj = Environment(port)
             if nargin<1
                 port = 'com1';
+            end
             fprintf('Init connection to Peltier Controler Laird-ETS-PR-59\n');
             obj.client = serial(port);
+            % take from the lair manual
             set(obj.client,'BaudRate',115200);
             set(obj.client,'Parity','none');
             set(obj.client,'StopBits',1);
@@ -327,7 +381,7 @@ classdef Environment < naomi.objects.BaseObject
             obj.verbose = 1;    
             
             fprintf('Load Temperature Sensor library\n');
-            % TODO put this to calibration file
+            % TODO put this to calibration file in a config instead
             loadlibrary C:\MeasurementComputing\DAQ\cbw64.dll C:\MeasurementComputing\DAQ\C\cbw.h alias mccFuncLib;
             
         end
@@ -351,7 +405,7 @@ classdef Environment < naomi.objects.BaseObject
             switch obj.controlState
                 case obj.GOTOCALIB
                     test = 0;
-                    explanation = 'The bench is still actively trying to reach calibration temperature';
+                    explanation = 'The bench is still actively trying to reach calibration temperature fans are on';
                     return 
                 case obj.MAINTAIN
                     test = 0;
@@ -387,15 +441,24 @@ classdef Environment < naomi.objects.BaseObject
                test = 1;
            else
                test = 0;
-               explanation = sprintf('The difference between bench temperature and embiand temperature is %.2f', dt);
+               explanation = sprintf('The difference between bench temperature and embiand temperature is to high: %.2f', dt);
            end
         end
         
         
-        function updateControl(obj, varargin)
+        function updateControl(obj)
+            % e.updateControl()
+            % 
+            % check the current control mstate (goToCalib, maintain, calib,
+            % goToEmbiant, manual or off) and eventually change the control
+            % state in some conditions : 
+            % 
+            %  - switch from goToCalib to maintain  if calib temperature
+            %     reached 
+            %  - switch from goToEmbiant to off if embiant temperature reached 
             state = obj.controlState;
             
-            temp = obj.getTemp(obj.S_MIRROR);
+            temp = obj.getTemp(obj.S_MIRROR); % temperature of the mirror
             regulTemp = obj.tempRegul;
             embiantTemp = obj.getTemp(obj.S_EMBIANT);
             calibTemp = obj.calibTemperature;
@@ -438,15 +501,21 @@ classdef Environment < naomi.objects.BaseObject
         end
         
         function goTo(obj, refTempName, targetTemp, gain, fanIn, fanOut)
-            % got fast to the calib temperature 
-            % the regul temperature is set as 
-            %  Tregul = Ttarget - (Tbench - Tcalib) * gain
-            
+            % goTo(obj, refTempName, targetTemp, gain, fanIn, fanOut)
+            %
+            % Set the set point temperature as :
+            % regulTemp = targetTemp - (refTemp-targetTemp) * gain;
+            % and the fan voltages 
+            % 
+            % refTempName is the name used to extract the  refTemp 
+            % it can be 'embiant', 'mirror' or 'qsm'
             switch refTempName
                 case 'embiant'
                     refTemp = obj.getTemp(obj.S_EMBIANT);
                 case 'mirror'
                     refTemp = obj.getTemp(obj.S_MIRROR);
+                case 'qsm'
+                    refTemp = obj.getTemp(obj.S_QSM);
                 otherwise
                     error('reference temp not understood');
             end         
@@ -454,43 +523,64 @@ classdef Environment < naomi.objects.BaseObject
             
             obj.setRegister(obj.R_REGUL, regulTemp);
             obj.setRegister(obj.R_FAN_MODE(obj.F_IN), obj.ALLWAYSON); 
-            
-            
-            obj.setRegister(obj.R_FAN_HSPEED_VOLTAGE(obj.F_IN), fanIn); % turn on fan 
-            obj.setRegister(obj.R_FAN_LSPEED_VOLTAGE(obj.F_IN), fanIn); % turn on  fan 
+                        
+            obj.setRegister(obj.R_FAN_HSPEED_VOLTAGE(obj.F_IN), fanIn); 
+            obj.setRegister(obj.R_FAN_LSPEED_VOLTAGE(obj.F_IN), fanIn); 
             
             obj.setRegister(obj.R_FAN_MODE(obj.F_OUT), obj.ALLWAYSON); 
             
-            obj.setRegister(obj.R_FAN_HSPEED_VOLTAGE(obj.F_OUT), fanOut); % turn on fan 
-            obj.setRegister(obj.R_FAN_LSPEED_VOLTAGE(obj.F_OUT), fanOut); % turn on  fan 
+            obj.setRegister(obj.R_FAN_HSPEED_VOLTAGE(obj.F_OUT), fanOut);
+            obj.setRegister(obj.R_FAN_LSPEED_VOLTAGE(obj.F_OUT), fanOut); 
             
             obj.startRegulation;
         end
         
         function goToCalib(obj)
+            % e.goToCalib()
+            % Go to the calibration temperature as fast as possible 
+            % This mode can result in a temperature lower tha the calibration 
+            % temprature. It is expected that user use e.maintain when the
+            % calib temperature is reached or use e.controlUpdate() regulary to do
+            % it manualy. 
             obj.goTo('mirror', obj.calibTemperature, obj.goToCalibCorrectiveFactor, ...
                 obj.goToCalibFanVoltage, 24.0);
             
             obj.controlState = obj.GOTOCALIB;
         end
         function goToEmbiant(obj)
+            % e.goToEmbiant()
+            % Go to the embiant temperature with higher set point 
+            % This mode can result in a higher temperature inside the
+            % bench.
+            % It is expected that user use e.turnOff() or that e.controlUpdate()
+            % is ran regulary. 
             obj.goTo('mirror', obj.getTemp(obj.S_EMBIANT), obj.goToEmbiantCorrectiveFactor, ...
                 obj.goToEmbiantFanVoltage, 24.0);
             obj.controlState = obj.GOTOEMBIANT;
         end
         
         function maintain(obj)
+            % maintain the temperature inside the bench with the fan on 
+            % used by e.controlUpdate() to wait the user to be ready to
+            % change the mode to e.calib
             obj.goTo('embiant', obj.calibTemperature, obj.maintainCorrectiveFactor, ...
                 obj.maintainFanVoltage, 24.0);
             obj.controlState = obj.MAINTAIN;
         end
         function calib(obj)
+            % maintain the temperature inside the bench with the fan OFF 
+            % suitable for DM calibration. 
+            % The temperature of the inside face of the peltier is set
+            % close to the mirror temperature to avoid temp leaks and to 
+            % avoid temperature gradiant (turbulences) 
             obj.goTo('embiant', obj.calibTemperature, obj.calibCorrectiveFactor, ...
                 obj.calibFanVoltage,  obj.calibFanVoltage);
             obj.controlState = obj.CALIB;
         end
         
         function [tempRegul, fanIn, fanOut] = manual(obj, tempRegul, fanIn, fanOut)
+            % turn the control to manual and set the set point regulation temperature 
+            % and fan voltages to the given values
             if nargin<2
                 tempRegul = obj.tempRegul;
             end
@@ -500,8 +590,6 @@ classdef Environment < naomi.objects.BaseObject
             if nargin<4
                 fanOut = obj.fanOut;
             end
-            
-                
             
             
             if fanIn
@@ -524,12 +612,24 @@ classdef Environment < naomi.objects.BaseObject
         end
         
         function turnOff(obj)
+            % turn the laird off : no peltier,  no fans
             obj.stopRegulation;
             obj.controlState = obj.OFF;
         end
         
 
         function buffer = createBuffer(obj, bufferSize, stepSize, dynamic)
+            % create a buffer used to monitorate the enviroment main
+            % parameters.
+            %
+            % Parameters
+            % ----------
+            %  bufferSize : initial length of the buffer (default 1000) 
+            %  stepSize   : the step size to increase or slide the buffer
+            %  (default100)
+            % dynamic : 1/0  1: the buffer increase when it reach the end 
+            %                0: the first stepSize values are removed to
+            %                leave space for the next stepSize values
             if nargin <2
                 bufferSize = 1000; 
                 stepSize = 100;     
@@ -543,11 +643,8 @@ classdef Environment < naomi.objects.BaseObject
             buffer = naomi.objects.EnvironmentBuffer(bufferSize, stepSize, dynamic);            
         end
         
-        
-        
-        
-        
         function stopRegulation(obj)
+            % stop regulation use e.turnOff instead
             fprintf(obj.client, '$Q');
             fscanf(obj.client); % $Q
             if ~strcmp('Stop', strip(fscanf(obj.client)))
@@ -556,6 +653,8 @@ classdef Environment < naomi.objects.BaseObject
         end
         
         function startRegulation(obj)
+            % start regulation use one of e.goToCalib , e.goToEmbiant,
+            % e.maintain, e.calib, e.manual instead
             fprintf(obj.client, '$W');
             fscanf(obj.client); % $W
             if ~strcmp('Run', strip(fscanf(obj.client)))
@@ -601,9 +700,11 @@ classdef Environment < naomi.objects.BaseObject
             voltage = str2double(obj.askRegister(obj.R_FANVOLTAGE(fanNumber)));
         end
         function voltage=fanIn(obj)
+            % inner fan voltage
             voltage = obj.getFanVoltage(obj.F_IN);
         end
         function voltage=fanOut(obj)
+            % outer fan voltage
             voltage = obj.getFanVoltage(obj.F_OUT);
         end
         
@@ -640,18 +741,23 @@ classdef Environment < naomi.objects.BaseObject
             end
         end
         function temp = tempRegul(obj)
+            % regulation temperature set inside the Laird
             temp = str2double(obj.askRegister(obj.R_REGUL));
         end
         function temp=tempIn(obj)
+            % temperature of the inner side of the pletier 
             temp = obj.getTemp(obj.S_IN);
         end
         function temp=tempOut(obj)
+            % temperature of the outer side of the pletier 
             temp = obj.getTemp(obj.S_OUT);
         end
         function temp=tempMirror(obj)
+            % temperature of the mirror 
             temp = obj.getTemp(obj.S_MIRROR);
         end
         function temp=tempQSM(obj)
+            % temperature of the qsm (gimbal base)  
             temp = obj.getTemp(obj.S_QSM);
         end
     end
