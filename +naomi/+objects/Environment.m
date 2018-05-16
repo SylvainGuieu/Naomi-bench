@@ -189,28 +189,25 @@ classdef Environment < naomi.objects.BaseObject
         controlCallback; 
         
         %% control constant definition
-        % setting the bench mirror temperature at embiant when achived 
-        % the state should be OFF
-        WARMUP2EMBIANT = 1; 
-        COOLDOWN2EMBIANT = 2; 
-        
-        % setting the bench at calibration temperature. when embiant 
-        % temperature is above regulation temperature 
-        % After it reaching it the state should be REGUL
-        COOLDOWN2CALIB = 3; 
-        
-        % setting the bench at calibration temperature. when embiant 
-        % temperature is bellow regulation temperature 
-        % After it reaching it the state should be REGUL
-        WARMUP2CALIB = 4; 
+        % GOTOCALIB mode when starting the cooldown (or warmup depending of
+        % the embiant temperature). Shoud result to the MAINTAIN mode 
+        GOTOCALIB = 1; 
+        % GOTOEMBIANT to reach embiant temperature. Show result to OFF
+        GOTOEMBIANT = 2; 
         
         % Maintain the bench temperature by adjusting the peltier cold face
-        % temperature (at about the calib temperature) and the fan 
-        MAINTAIN = 5;
+        % temperature (at about the calib temperature) with the fan on 
+        MAINTAIN = 3;
+        
         % Turn off the fan and put the peltier to the calib temperature for
         % calibration 
-        CALIB = 6;
-        %  matlab temperature control turned off 
+        CALIB = 4;
+        
+        % User is taking control of the set point temperature and the fan
+        % voltage
+        MANUAL = 5;
+        
+        % temperature control turned off (no lair regulation, no fan)
         OFF = 0;
         
         %% temperature setting *OVERWRITTEN BY CONFIG PARAMETERS*
@@ -225,82 +222,97 @@ classdef Environment < naomi.objects.BaseObject
         % abs(e.getTemp(e.MIROR)-e.calibTemperature) < e.calibDeltaTemp               
         calibDeltaTemp = 0.25 % +/- x 
         
+        %% Temperature
         % When cooling down (or warming up, depend of the embient temperature)
         % The laird regulation temperature is set as 
-        %   Tcalib - (Tembian-Tcalib) * correctiveFactor 
-        %goToTempCorrectiveFactor = 1.0;
-        cooldown2calibTemperature =  5.0;
-        % same thing for warming up the bench to calib temp
-        warmup2calibTemperature =  15.0;
+        %   Tregul = Tcalib - (Tbench0 - Tcalib) * correctiveFactor 
+        % Where Tbench0 is the bench (mirror) temperature when starting
+        % cooldwond or warmup.
+        goToCalibCorrectiveFactor = 1.0;
+        goToEmbiantCorrectiveFactor = 1.0;
         
-        % difference of temperature between embiant and regul when cooling
-        % down the bench to embiant
-        cooldown2embiantDeltaTemperature = 1.0;
-        % samething for warming it up 
-        warmup2embiantDeltaTemperature = 1.0;
+        % in the same way, To set the regulation temperature the formulae
+        % is Tregul = Tcalib - (Tembiant - Tcalib) * correctiveFactor
+        maintainCorrectiveFactor = 0.0; 
         
-        % the regul temperature to maintain the bench at calib temperature 
-        % when the calibration is running
-        cooldown2maintainTemperature = 10.0; % when cooling down
-        warmup2maintainTemperature = 10.0; % when warming up 
+        % also when doing a clibration (= fan off) the factor can be set 
+        % Tregul = Tcalib - (Tembiant - Tcalib) * correctiveFactor
+        % however it is recommanded to be 0.0 to avoid strong gradiant
+        % temperature
+        calibCorrectiveFactor = 0.0; 
         
-        % the fan absolute voltage for witch it is acceptable to start and 
-        % or run calibration
-        calibFanVoltage = 0.0;
-        calib2maintainTemperature = 10.0;
-        
-        % temperature regulation (no calibration) fan voltage
+        %% Fan 
+        goToCalibFanVoltage = 24.0;
+        goToEmbiantFanVoltage = 24.0;
         maintainFanVoltage = 24.0;
+        calibFanVoltage = 0.0;
         
-        % fan voltage when cooling down to calib temperature 
-        cooldown2calibFanVoltage = 24.0;
-        % fan voltage when warming up to calib temperature 
-        warmup2calibFanVoltage = 24.0;
         
-        % fan voltage when cooling down to embiant temperature 
-        cooldown2embiantFanVoltage = 24.0;
-        % fan voltage when warming up to embiant temperature 
-        warmup2embiantFanVoltage = 24.0;
+        %%
+        % The delta temperature for which the maintain state will start
+        % over the goToCalib state. 
+        % if Tregul < Tcalib  the Maintain state will start when 
+        % T < (Tcalib + DeltaTemp)
+        % if Tregul > Tcalib the Maintain state will start when 
+        % T > (Tcalib - DeltaTemp)
+        startMaintainDeltaTemp = 0.5; 
         
+        % In the same way, if the maintain cannot maintain the temperature
+        % the startGoToCalibDeltaTemp gives the temperature for witch we
+        % may restart the goToCalib mode
+        % if Tembiant > Tcalib: (cool down)
+        %  T > (Tcalib + DeltaTemp)
+        % if Tembiant < Tcali 
+        %  T < (Tcalib - DeltaTemp)
+        startGoToCalibDeltaTemp = 1.0
+        
+        %% Constants
         % temperature IDs constant 
-        REGULSENS = 1;
-        COLDFACE = 1;
-        HOTFACE = 2;
-        EMBIANT = 4;
-        MIRROR = 5;
-        QSM = 6;
+        % they are the matlab constant id to recognize temperature 
+        S_IN = 1;
+        S_OUT = 2;
+        S_EMBIANT = 4;
+        S_MIRROR = 5;
+        S_QSM = 6;
         
-        % FAN constant 
-        COLDFACEFAN = 1;
-        HOTFACEFAN = 2;
+        
+        % associate peltier temperature to its number
+        P_IN = 1;
+        P_OUT = 2;
+        
+        
+        % FAN number constant 
+        F_IN  = 1;
+        F_OUT = 2;
         
         % some input registration numbers
         R_REGUL = 0;
         R_COOLGAIN = 10;
         R_WARMGAIN = 11;
         
-        R_FAN1_MODE = 16;
-        R_FAN1_LSPEED_VOLTAGE = 20;
-        R_FAN1_HSPEED_VOLTAGE = 21;
+        R_FANVOLTAGE = [107 108];
+        R_FAN_MODE = [16 24];
+        R_FAN_LSPEED_VOLTAGE = [20 28];
+        R_FAN_HSPEED_VOLTAGE = [21 29];
         
-        R_FAN2_MODE = 24;
-        R_FAN2_LSPEED_VOLTAGE = 28;
-        R_FAN2_HSPEED_VOLTAGE = 29;
+
+        R_TEMP = [100 101 102];
         
-        R_TEMP1 = 100;
-        R_TEMP2 = 101;
-        R_TEMP3 = 102;
-        
-        R_FAN1 = 107;
-        R_FAN2 = 108;
         R_CURRENT = 152;
         
-        ALWAYSON = 3;
+        ALLWAYSON = 1;
+        ALLWAYSOFF = 0;
+        
+        % usb temp channels  
+        U_EMBIANT = 0;
+        U_MIRROR = 2;
+        U_QSM = 4;
     end
     
     methods (Access = public)
         function obj = Environment(port)
-            return
+            if nargin<1
+                port = 'com1';
             fprintf('Init connection to Peltier Controler Laird-ETS-PR-59\n');
             obj.client = serial(port);
             set(obj.client,'BaudRate',115200);
@@ -311,8 +323,12 @@ classdef Environment < naomi.objects.BaseObject
             
             fprintf('Open connection to Peltier Controler Laird-ETS-PR-59\n');
             fopen(obj.client);
-            obj.zero = 0.0;
+            
             obj.verbose = 1;    
+            
+            fprintf('Load Temperature Sensor library\n');
+            % TODO put this to calibration file
+            loadlibrary C:\MeasurementComputing\DAQ\cbw64.dll C:\MeasurementComputing\DAQ\C\cbw.h alias mccFuncLib;
             
         end
         
@@ -333,7 +349,7 @@ classdef Environment < naomi.objects.BaseObject
             %          
             explanation = '';
             switch obj.controlState
-                case {obj.COOLDOWN2CALIB, obj.WARMUP2CALIB}
+                case obj.GOTOCALIB
                     test = 0;
                     explanation = 'The bench is still actively trying to reach calibration temperature';
                     return 
@@ -341,20 +357,20 @@ classdef Environment < naomi.objects.BaseObject
                     test = 0;
                     explanation = 'The bench is in regulation state -> fans are on';
                     return 
-                case {obj.COOLDOWN2EMBI, obj.WARMUP2EMBIANT}
+                case obj.GOTOEMBIANT
                     test = 0;
                     explanation = 'The bench is getting to the embiant temperature';
                     return 
             end
             % otherwise check the fan voltage and then the temperature
-            fanVoltage = obj.getFanVoltage(obj.COLDFACEFAN);
-            if abs(fanVotage-obj.calibFanVoltage)>1e-1
+            fanVoltage = obj.getFanVoltage(obj.F_IN);
+            if abs(fanVoltage-obj.calibFanVoltage)>1e-1
                 test = 0;
                 explanation = sprintf('The Fan inside the bench is still on : voltage = %.2f', fanVoltage);
                 return 
             end
             
-            tm = obj.getTemp(obj.MIRROR);
+            tm = obj.getTemp(obj.S_MIRROR);
             dt =  tm - obj.calibTemperature;
            if abs(dt) < obj.calibDeltaTemp
                test = 1;
@@ -366,7 +382,7 @@ classdef Environment < naomi.objects.BaseObject
         
         function [test, explanation] = isSafeToOpen(obj)
            explanation = '';
-           dt = obj.getTemp(obj.EMBIANT) - obj.getTemp(obj.MIRROR);
+           dt = obj.getTemp(obj.S_EMBIANT) - obj.getTemp(obj.S_MIRROR);
            if abs(dt) < obj.safeDeltaTemp
                test = 1;
            else
@@ -379,39 +395,41 @@ classdef Environment < naomi.objects.BaseObject
         function updateControl(obj, varargin)
             state = obj.controlState;
             
-            temp = obj.getTemp(obj.MIRROR);
-            embiantTemp = obj.getTemp(obj.EMBIANT);
+            temp = obj.getTemp(obj.S_MIRROR);
+            regulTemp = obj.tempRegul;
+            embiantTemp = obj.getTemp(obj.S_EMBIANT);
+            calibTemp = obj.calibTemperature;
             switch state
                 case obj.MAINTAIN % regulation to maintain the bench temperature
-                    if embiantTemp<obj.calibTemperature % we are warming up to calib temp
-                        if (obj.calibTemperature-temp) > obj.calibDeltaTemp
-                            obj.goToCalibTemperature()
+                    % We need to change the state when temperature is
+                    % reaching a treshold
+                    if embiantTemp>calibTemp % we are cooling down
+                        if temp > (calibTemp+obj.startGoToCalibDeltaTemp)
+                            obj.goToCalib();
                         end
-                    else
-                        if (temp-obj.calibTemperature) > obj.calibDeltaTemp
-                            obj.goToCalibTemperature()
+                    else % we are warming up
+                        if temp < (calibTemp - obj.startGoToCalibDeltaTemp)
+                            obj.goToCalib();
                         end
                     end
                    
-                case obj.COOLDOWN2CALIB % cooling down to reach calib temperature (bellow embiant)
-                    if temp < (obj.calibTemperature-obj.calibDeltaTemp)
-                        obj.maintainCalibTemperature;
+                case obj.GOTOCALIB 
+                    if regulTemp < calibTemp % we are cooling down 
+                        if temp < (calibTemp+ obj.startMaintainDeltaTemp)
+                            obj.maintain();
+                        end
+                    else % we are warming up
+                        if temp > (calibTemp + obj.startMaintainDeltaTemp)
+                            obj.maintain();
+                        end
                     end
                     
-                case obj.WARMUP2CALIB % warming upto reach calib temperature (above embiant)
-                    if temp > (obj.calibTemperature+obj.calibDeltaTemp)
-                        obj.maintainCalibTemperature;
-                    end   
-                
-                case obj.WARMUP2EMBIANT
-                    if temp > (embiantTemp)
-                        obj.stopRegulation;
+                case obj.GOTOEMBIANT
+                    % turn everything off when the embiant temperature is
+                    % reached.
+                    if temp>= embiantTemp
+                        obj.turnOff();
                     end
-                    
-                case obj.COOLDOWN2EMBIANT
-                    if temp < (embiantTemp)
-                        obj.stopRegulation;
-                    end   
             end
             
             if ~isempty(obj.controlCallback)
@@ -419,61 +437,90 @@ classdef Environment < naomi.objects.BaseObject
             end
         end
         
-        function goToCalibTemperature(obj)
-            temp = obj.getTemp(obj.MIRROR);
-            embiantTemp = obj.getTemp(obj.EMBIANT);
-            if embiantTemp<obj.calibTemperature % we are warming up to calib temp
-                obj.warmup2calib;
-            else
-                obj.cooldown2calib;
-            end
-        end
-        
-        function setToCalib(obj)
-            % set the bench to calibration state 
-            %
-            % The fan are turned off but peltier is still on to avoid
-            % temperature leaks
+        function goTo(obj, refTempName, targetTemp, gain, fanIn, fanOut)
+            % got fast to the calib temperature 
+            % the regul temperature is set as 
+            %  Tregul = Ttarget - (Tbench - Tcalib) * gain
             
-            obj.setRegister(obj.R_REGUL, obj.calib2maintainTemperature);
+            switch refTempName
+                case 'embiant'
+                    refTemp = obj.getTemp(obj.S_EMBIANT);
+                case 'mirror'
+                    refTemp = obj.getTemp(obj.S_MIRROR);
+                otherwise
+                    error('reference temp not understood');
+            end         
+            regulTemp = targetTemp - (refTemp-targetTemp) * gain;
             
-            obj.setRegister(obj.R_FAN1_MODE, obj.ALWAYSON); %always on check the real value !
-
-            obj.setRegister(obj.R_FAN1_HSPEED_VOLTAGE, 0.0); % turn off fan 
-            obj.setRegister(obj.R_FAN1_LSPEED_VOLTAGE, 0.0); % turn off fan 
-
-            obj.setRegister(obj.R_FAN2_MODE, obj.ALWAYSON); %always on check the real value !
-
-            obj.setRegister(obj.R_FAN2_HSPEED_VOLTAGE, 0.0); % turn off fan 
-            obj.setRegister(obj.R_FAN2_LSPEED_VOLTAGE, 0.0); % turn off fan 
-            
-            obj.startRegulation;
-            obj.controlState = obj.CALIB;
-            
-        end
-        
-        function maintainCalibTemperature(obj)
-            embiantTemp = obj.getTemp(obj.EMBIANT);
-            if embiantTemp>obj.calibTemperature                                
-                obj.setRegister(obj.R_REGUL, obj.cooldown2maintainTemperature);
-            else
-                obj.setRegister(obj.R_REGUL, obj.warmup2maintainTemperature);
-            end
+            obj.setRegister(obj.R_REGUL, regulTemp);
+            obj.setRegister(obj.R_FAN_MODE(obj.F_IN), obj.ALLWAYSON); 
             
             
-            obj.setRegister(obj.R_FAN1_MODE, obj.ALWAYSON); %always on check the real value !
-
-            obj.setRegister(obj.R_FAN1_HSPEED_VOLTAGE, obj.maintainCalibTemperature); % turn off fan 
-            obj.setRegister(obj.R_FAN1_LSPEED_VOLTAGE, obj.maintainCalibTemperature); % turn off fan 
-
-            obj.setRegister(obj.R_FAN2_MODE, obj.ALWAYSON); %always on check the real value !
-
-            obj.setRegister(obj.R_FAN2_HSPEED_VOLTAGE, 0.0); % turn off fan 
-            obj.setRegister(obj.R_FAN2_LSPEED_VOLTAGE, 0.0); % turn off fan 
+            obj.setRegister(obj.R_FAN_HSPEED_VOLTAGE(obj.F_IN), fanIn); % turn on fan 
+            obj.setRegister(obj.R_FAN_LSPEED_VOLTAGE(obj.F_IN), fanIn); % turn on  fan 
+            
+            obj.setRegister(obj.R_FAN_MODE(obj.F_OUT), obj.ALLWAYSON); 
+            
+            obj.setRegister(obj.R_FAN_HSPEED_VOLTAGE(obj.F_OUT), fanOut); % turn on fan 
+            obj.setRegister(obj.R_FAN_LSPEED_VOLTAGE(obj.F_OUT), fanOut); % turn on  fan 
             
             obj.startRegulation;
+        end
+        
+        function goToCalib(obj)
+            obj.goTo('mirror', obj.calibTemperature, obj.goToCalibCorrectiveFactor, ...
+                obj.goToCalibFanVoltage, 24.0);
+            
+            obj.controlState = obj.GOTOCALIB;
+        end
+        function goToEmbiant(obj)
+            obj.goTo('mirror', obj.getTemp(obj.S_EMBIANT), obj.goToEmbiantCorrectiveFactor, ...
+                obj.goToEmbiantFanVoltage, 24.0);
+            obj.controlState = obj.GOTOEMBIANT;
+        end
+        
+        function maintain(obj)
+            obj.goTo('embiant', obj.calibTemperature, obj.maintainCorrectiveFactor, ...
+                obj.maintainFanVoltage, 24.0);
             obj.controlState = obj.MAINTAIN;
+        end
+        function calib(obj)
+            obj.goTo('embiant', obj.calibTemperature, obj.calibCorrectiveFactor, ...
+                obj.calibFanVoltage,  obj.calibFanVoltage);
+            obj.controlState = obj.CALIB;
+        end
+        
+        function [tempRegul, fanIn, fanOut] = manual(obj, tempRegul, fanIn, fanOut)
+            if nargin<2
+                tempRegul = obj.tempRegul;
+            end
+            if nargin<3
+                fanIn = obj.fanIn;
+            end
+            if nargin<4
+                fanOut = obj.fanOut;
+            end
             
+                
+            
+            
+            if fanIn
+                obj.setRegister(obj.R_FAN_MODE(obj.F_IN), obj.ALLWAYSON); 
+            else
+                obj.setRegister(obj.R_FAN_MODE(obj.F_IN), obj.ALLWAYSOFF); 
+            end
+            if fanOut
+                obj.setRegister(obj.R_FAN_MODE(obj.F_OUT), obj.ALLWAYSON); 
+            else
+                obj.setRegister(obj.R_FAN_MODE(obj.F_OUT), obj.ALLWAYSOFF); 
+            end
+            
+            obj.setRegister(obj.R_FAN_HSPEED_VOLTAGE(obj.F_IN), fanIn); 
+            obj.setRegister(obj.R_FAN_LSPEED_VOLTAGE(obj.F_IN), fanIn); 
+            obj.setRegister(obj.R_FAN_HSPEED_VOLTAGE(obj.F_OUT), fanOut); 
+            obj.setRegister(obj.R_FAN_LSPEED_VOLTAGE(obj.F_OUT), fanOut); 
+            obj.setRegister(obj.R_REGUL, tempRegul);
+            obj.controlState = obj.MANUAL;    
         end
         
         function turnOff(obj)
@@ -481,152 +528,7 @@ classdef Environment < naomi.objects.BaseObject
             obj.controlState = obj.OFF;
         end
         
-        function warmup2calib(obj)
-            % start warming the bench in order to reach the calibration 
-            % temperature 
-            
-            
-            obj.setRegister(obj.R_REGUL, obj.warmup2calibTemperature); % temperature 
-            obj.setRegister(obj.R_COOLGAIN, 0.0); % cooling gain
-            obj.setRegister(obj.R_WARMGAIN, 1.0); % heating gain
-            
-            obj.setRegister(obj.R_FAN1_MODE, obj.ALWAYSON); %always on check the real value !
-            
-            obj.setRegister(obj.R_FAN1_HSPEED_VOLTAGE, obj.warmup2calibFanVoltage);
-            obj.setRegister(obj.R_FAN1_LSPEED_VOLTAGE, obj.warmup2calibFanVoltage);
 
-            obj.setRegister(obj.R_FAN2_MODE, obj.ALWAYSON); %always on check the real value !
-            obj.setRegister(obj.R_FAN2_HSPEED_VOLTAGE, 24.0); %outside fan always at 24v
-            obj.setRegister(obj.R_FAN2_LSPEED_VOLTAGE, 24.0); %outside fan always at 24v
-            
-            obj.startRegulation;
-            obj.controlState = obj.WARMUP2CALIB;
-            
-            
-        end
-        
-        function cooldown2calib(obj)
-            % start warming the bench in order to reach the calibration 
-            % temperature 
-            
-            
-            obj.setRegister(obj.R_REGUL, obj.cooldown2calibTemperature); % temperature 
-            obj.setRegister(obj.R_COOLGAIN, 1.0); % cooling gain
-            obj.setRegister(obj.R_WARMGAIN, 0.0); % heating gain
-            
-            obj.setRegister(obj.R_FAN1_MODE, obj.ALWAYSON); %always on check the real value !
-            obj.setRegister(obj.R_FAN1_HSPEED_VOLTAGE, obj.cooldown2calibFanVoltage);
-            obj.setRegister(obj.R_FAN1_LSPEED_VOLTAGE, obj.cooldown2calibFanVoltage);
-            
-            obj.setRegister(obj.R_FAN2_MODE, obj.ALWAYSON); %always on check the real value !
-            obj.setRegister(obj.R_FAN2_HSPEED_VOLTAGE, 24.0); %outside fan always at 24v   
-            obj.setRegister(obj.R_FAN2_LSPEED_VOLTAGE, 24.0);
-            
-            obj.startRegulation;
-            obj.controlState = obj.COOLDOWN2CALIB;
-        end
-        
-        
-        function warmup2embient(obj)
-            % start warming the bench in order to reach the calibration 
-            % temperature 
-            
-            embiantTemperature = obj.getTemp(obj.EMBIANT);
-            
-            obj.setRegister(obj.R_REGUL, embiantTemperature+obj.warmup2embiantDeltaTemperature); % temperature 
-            obj.setRegister(obj.R_COOLGAIN, 0.0); % cooling gain
-            obj.setRegister(obj.R_WARMGAIN, 1.0); % heating gain
-            
-            obj.setRegister(obj.R_FAN1_MODE, obj.ALWAYSON); %always on check the real value !
-            
-            obj.setRegister(obj.R_FAN1_HSPEED_VOLTAGE, obj.warmup2embiantFanVoltage);
-            obj.setRegister(obj.R_FAN1_LSPEED_VOLTAGE, obj.warmup2embiantFanVoltage);
-            
-            obj.setRegister(obj.R_FAN2_MODE, obj.ALWAYSON); %always on check the real value !
-            obj.setRegister(obj.R_FAN2_HSPEED_VOLTAGE, 24.0); %outside fan always at 24v
-            obj.setRegister(obj.R_FAN2_LSPEED_VOLTAGE, 24.0);
-            
-            obj.startRegulation;
-            obj.controlState = obj.WARMUP2EMBIANT;
-            
-        end
-        
-        function cooldown2embient(obj)
-            % start warming the bench in order to reach the calibration 
-            % temperature 
-            
-            embiantTemperature = obj.getTemp(obj.EMBIANT);
-            
-            obj.setRegister(obj.R_REGUL, embiantTemperature-obj.cooldown2embiantDeltaTemperature); % temperature 
-            obj.setRegister(obj.R_COOLGAIN, 1.0); % cooling gain
-            obj.setRegister(obj.R_WARMGAIN, 0.0); % heating gain
-            
-            obj.setRegister(obj.R_FAN1_MODE, obj.ALWAYSON); %always on check the real value !
-            
-            obj.setRegister(obj.R_FAN1_HSPEED_VOLTAGE, obj.cooldown2embiantFanVoltage);
-            obj.setRegister(obj.R_FAN1_LSPEED_VOLTAGE, obj.cooldown2embiantFanVoltage);
-            
-            obj.setRegister(obj.R_FAN2_MODE, obj.ALWAYSON); %always on check the real value !
-            obj.setRegister(obj.R_FAN2_HSPEED_VOLTAGE, 24.0); %outside fan always at 24v
-            obj.setRegister(obj.R_FAN2_LSPEED_VOLTAGE, 24.0);
-            
-            obj.startRegulation;
-            obj.controlState = obj.COOLDOWN2EMBIANT;
-        end
-        
-        
-        function startMonitoring(obj)
-            if obj.monitoringIsRunning; return ;end
-            
-            obj.monitoringBuffer = obj.createBuffer(10000, 5000, 1);
-            obj.monitoringTimer = timer('Period',1, 'ExecutionMode','fixedSpacing',...
-                                        'TasksToExecute',24*3600);
-                                        
-            obj.monitoringTimer.TimerFcn = @obj.updateMonitoring;
-            obj.monitoringIsRunning = 1; 
-            
-            start(obj.monitoringTimer);
-            fig = figure(99); clf;
-            fig.Position = [1248 69 670 905];
-            
-        end
-        
-        function updateMonitoring(obj, varargin)
-            
-            obj.updateBuffer(obj.monitoringBuffer);
-            
-           
-            if obj.monitoringBuffer.index<1; return ;end
-            time = obj.monitoringBuffer.get('time');
-            time = (time-time(1))*24*3600;
-            
-            t1 = obj.monitoringBuffer.get('t1');
-            t2 = obj.monitoringBuffer.get('t2');
-            t3 = obj.monitoringBuffer.get('t3');
-            current = obj.monitoringBuffer.get('current');
-            fig = findobj('type','figure','Number',99);
-            if isempty(fig)
-                fig = figure(99);
-                fig.Position = [1248 69 670 905];
-            end
-            plot(subplot(4,1,1), time,t1);
-            ylabel('t1 regul');
-            plot(subplot(4,1,2), time,t2);
-            ylabel('t2 hot face');
-            plot(subplot(4,1,3), time,t3);
-            ylabel('t3 cold face');
-            plot(subplot(4,1,4), time,current);
-            ylabel('current');
-            xlabel('time (s)');
-        end
-        function stopMonitoring(obj)
-            obj.monitoringIsRunning = 0;
-            if isempty(obj.monitoringTimer) return; end;
-            stop(obj.monitoringTimer);
-            delete(obj.monitoringTimer);
-            obj.monitoringTimer = []; 
-        end
-        
         function buffer = createBuffer(obj, bufferSize, stepSize, dynamic)
             if nargin <2
                 bufferSize = 1000; 
@@ -645,44 +547,22 @@ classdef Environment < naomi.objects.BaseObject
         
         
         
-%         function stopRegulation(obj)
-%             fprintf(obj.client, '$Q');
-%             fscanf(obj.client); % $Q
-%             if ~strcmp('Stop', strip(fscanf(obj.client)))
-%                 error('error when stopping regulation');
-%             end
-%         end
-%         
-%         function startRegulation(obj)
-%             fprintf(obj.client, '$W');
-%             fscanf(obj.client); % $W
-%             if ~strcmp('Run', strip(fscanf(obj.client)))
-%                 error('error when starting regulation');
-%             end
-%         end
-%         function startCooling(obj)
-%             % start the bench cooling 
-%             obj.setRegister(0,10.0); % temperature 
-%             obj.setRegister(10,1.0); % cooling gain
-%             obj.setRegister(11,0.0); % heating gain
-%             
-%             obj.startRegulation;
-%         end
-%         function startWarmUp(obj)
-%             % start the warmup of the bench until embiant temperature
-%             embiant = obj.getTemp(obj.EMBIANT);
-%             
-%             if embiant<=0.0 || embiant>30
-%                 % security net, if the embiant temperature is weird set 
-%                 % it to 15 degree celcius
-%                 embiant = 15;
-%             end
-%             obj.setRegister(0,embiant); % temperature 
-%             obj.setRegister(10,0.0); % cooling gain
-%             obj.setRegister(11,0.2); % heating gain
-%             
-%             obj.startRegulation;
-%         end
+        function stopRegulation(obj)
+            fprintf(obj.client, '$Q');
+            fscanf(obj.client); % $Q
+            if ~strcmp('Stop', strip(fscanf(obj.client)))
+                error('error when stopping regulation');
+            end
+        end
+        
+        function startRegulation(obj)
+            fprintf(obj.client, '$W');
+            fscanf(obj.client); % $W
+            if ~strcmp('Run', strip(fscanf(obj.client)))
+                error('error when starting regulation');
+            end
+        end
+        
         function answer = askRegister(obj, registerNumber)
             % stringValue = e.askRegister(num)
             %
@@ -717,21 +597,20 @@ classdef Environment < naomi.objects.BaseObject
         
         function voltage=getFanVoltage(obj, fanNumber)
             % voltage = e.getFanVoltage(number)
-            % get the fan voltage. The fan is iddentified by its number:
-            % 1. The cold face fan 
-            % 2. the hot face fan 
-            fanIds = {obj.R_FAN1,obj.R_FAN2};
-            voltage = str2double(obj.askRegister(fanIds{fanNumber}));
+            % get the fan voltage. The fan is iddentified by its number:            
+            voltage = str2double(obj.askRegister(obj.R_FANVOLTAGE(fanNumber)));
         end
-        function voltage=fan1(obj)
-            voltage = obj.getFanVoltage(1);
+        function voltage=fanIn(obj)
+            voltage = obj.getFanVoltage(obj.F_IN);
         end
-        function voltage=fan2(obj)
-            voltage = obj.getFanVoltage(2);
+        function voltage=fanOut(obj)
+            voltage = obj.getFanVoltage(obj.F_OUT);
         end
+        
         function temp = obj.getUSBTemp(obj, usbTempId)
             temp = getUSBTemp(usbTempId);
         end
+        
         function temp=getTemp(obj, tid)
             % temp = e.getTemp(tid)
             % get the temperature of the sensor defined by its numerical ID
@@ -744,47 +623,37 @@ classdef Environment < naomi.objects.BaseObject
             % 5. USB temp of the mirror
             % 6. USB temp of the QCM mount
             switch tid
-                case obj.REGULSENS
-                    temp = str2double(obj.askRegister(obj.R_TEMP1));
-                case obj.HOTFACE
-                    temp = str2double(obj.askRegister(obj.R_TEMP2));
+                case obj.S_IN
+                    temp = str2double(obj.askRegister(obj.R_TEMP(obj.P_IN)));
+                case obj.S_OUT
+                    temp = str2double(obj.askRegister(obj.R_TEMP(obj.P_OUT)));
                 case 3
-                    temp = str2double(obj.askRegister(obj.R_TEMP3));
-                case obj.EMBIANT
-                    temp = obj.getUSBTemp(0);
-                case obj.MIRROR
-                    temp = obj.getUSBTemp(1);
-                case obj.QSM
-                    temp = obj.getUSBTemp(2);
+                    temp = str2double(obj.askRegister(obj.R_TEMP(3)));
+                case obj.S_EMBIANT
+                    temp = obj.getUSBTemp(obj.U_EMBIANT);
+                case obj.S_MIRROR
+                    temp = obj.getUSBTemp(obj.U_MIRROR);
+                case obj.S_QSM
+                    temp = obj.getUSBTemp(obj.U_QSM);
                 otherwise
                     error('Temperature sensor number must be from 1 to 6 got %d', tid);
             end
         end
-        function temp = getRegulTemp(obj)
+        function temp = tempRegul(obj)
             temp = str2double(obj.askRegister(obj.R_REGUL));
         end
-        
-        function temp=temp1(obj)
-            temp = obj.getTemp(1);
-            
+        function temp=tempIn(obj)
+            temp = obj.getTemp(obj.S_IN);
         end
-        function temp=temp2(obj)
-            temp = obj.getTemp(2);
-           
+        function temp=tempOut(obj)
+            temp = obj.getTemp(obj.S_OUT);
         end
-        function temp=temp3(obj)
-            temp = obj.getTemp(3);
+        function temp=tempMirror(obj)
+            temp = obj.getTemp(obj.S_MIRROR);
         end
-        function temp=temp4(obj)
-            temp = obj.getTemp(4);
+        function temp=tempQSM(obj)
+            temp = obj.getTemp(obj.S_QSM);
         end
-        function temp=temp5(obj)
-            temp = obj.getTemp(5);
-        end
-        function temp=temp6(obj)
-            temp = obj.getTemp(6);
-        end
-        
     end
     
 end

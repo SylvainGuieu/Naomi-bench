@@ -53,6 +53,8 @@ classdef EnvironmentBuffer < handle
                    value = obj.tempArray(1:i,5);
                case 'temp6'
                    value = obj.tempArray(1:i,6);
+               
+                   
                case 'current'
                    value = obj.currentVector(1:i);
                case 'time'
@@ -123,8 +125,8 @@ classdef EnvironmentBuffer < handle
             for iFan=1:2
                 obj.fanArray(i,iFan) = e.getFanVoltage(iFan);
             end  
-            obj.regulTempVector(i) = e.getRegulTemp();
-            obj.currentVector(i) = e.getCurrent();                        
+            obj.regulTempVector(i) = e.tempRegul;
+            obj.currentVector(i) = e.current;                        
         end
     end
 end

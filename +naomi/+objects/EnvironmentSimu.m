@@ -4,7 +4,7 @@ classdef EnvironmentSimu < naomi.objects.Environment
         simuRegul = 0;
         simuTime = 0;
         simuRegister;
-        simuUSBTemp = [20.0 20.0 20.0];
+        simuUSBTemp = [20.0 20.0 20.0 20.0 20.0 20.0];
         
         % simuTimeScale = 100 -> one 'real' computer second is 100 simulated seconde
         simuTimeScale = 1.0;
@@ -17,15 +17,15 @@ classdef EnvironmentSimu < naomi.objects.Environment
             obj.simuRegister = containers.Map('KeyType', 'int32', 'ValueType', 'char');
             
             obj.simuRegister(obj.R_REGUL) = '5.0';
-            obj.simuRegister(obj.R_TEMP1) = '20.0'; % regul = cold peltier
-            obj.simuRegister(obj.R_TEMP2) = '20.0'; % hot  peltier
-            obj.simuRegister(obj.R_TEMP3) = '20.0';
+            obj.simuRegister(obj.R_TEMP(1)) = '20.0'; % regul = cold peltier
+            obj.simuRegister(obj.R_TEMP(2)) = '20.0'; % hot  peltier
+            obj.simuRegister(obj.R_TEMP(3)) = '20.0';
             
-            obj.simuRegister(obj.R_FAN1) = '0.0'; % fan1 voltage
-            obj.simuRegister(obj.R_FAN2) = '0.0'; % fan2 voltage
+            obj.simuRegister(obj.R_FANVOLTAGE(1)) = '0.0'; % fan1 voltage
+            obj.simuRegister(obj.R_FANVOLTAGE(2)) = '0.0'; % fan2 voltage
             
-            obj.simuRegister(obj.R_FAN1_HSPEED_VOLTAGE) = '0.0'; % fan1 voltage
-            obj.simuRegister(obj.R_FAN2_HSPEED_VOLTAGE) = '0.0'; % fan2 voltage
+            obj.simuRegister(obj.R_FAN_HSPEED_VOLTAGE(1)) = '0.0'; % fan1 voltage
+            obj.simuRegister(obj.R_FAN_HSPEED_VOLTAGE(2)) = '0.0'; % fan2 voltage
             
         end
         
@@ -41,7 +41,7 @@ classdef EnvironmentSimu < naomi.objects.Environment
           tErr = 0.2;
           regulTemp = str2double(obj.simuRegister(obj.R_REGUL));
           % peltier cold face
-          t1 = str2double(obj.simuRegister(obj.R_TEMP1));
+          t1 = str2double(obj.simuRegister(obj.R_TEMP(1)));
           t4 = obj.simuUSBTemp(1); % embient
           
           if obj.simuRegul
@@ -57,20 +57,20 @@ classdef EnvironmentSimu < naomi.objects.Environment
           % loose 3 degree every 180 minutes current is negative when
           % cooling 
           t1 = max(5.0, t1 + current*dTime/180 + (t4-t1)*leak*dTime )+tErr*(rand-0.5);
-          obj.setRegister(obj.R_TEMP1, sprintf('%.6f', t1)); 
+          obj.setRegister(obj.R_TEMP(1), sprintf('%.6f', t1)); 
           
           
-          t2 = str2double(obj.simuRegister(obj.R_TEMP2));
+          t2 = str2double(obj.simuRegister(obj.R_TEMP(2)));
           % loose 3 degree every 180 minutes current is negative when
           % cooling 
           t2 = min(40.0, t2 - current*dTime/180  +  (t4-t2)*leak*dTime )+tErr*(rand-0.5);
-          obj.setRegister(obj.R_TEMP2, sprintf('%.6f', t2));
+          obj.setRegister(obj.R_TEMP(2), sprintf('%.6f', t2));
                     
           % fan 
-          fan1 = str2double(obj.simuRegister(obj.R_FAN1_HSPEED_VOLTAGE)) * obj.simuRegul;
-          obj.setRegister(obj.R_FAN1, sprintf('%.6f', fan1));
-          fan2 = str2double(obj.simuRegister(obj.R_FAN2_HSPEED_VOLTAGE)) * obj.simuRegul;
-          obj.setRegister(obj.R_FAN2, sprintf('%.6f', fan2));
+          fan1 = str2double(obj.simuRegister(obj.R_FAN_HSPEED_VOLTAGE(1))) * obj.simuRegul;
+          obj.setRegister(obj.R_FANVOLTAGE(1), sprintf('%.6f', fan1));
+          fan2 = str2double(obj.simuRegister(obj.R_FAN_HSPEED_VOLTAGE(2))) * obj.simuRegul;
+          obj.setRegister(obj.R_FANVOLTAGE(2), sprintf('%.6f', fan2));
           
           obj.simuUSBTemp(2) = max(8.0, obj.simuUSBTemp(2) + current*dTime/360 + (t4-obj.simuUSBTemp(2))*leak*dTime)+tErr*(rand-0.5);
           
