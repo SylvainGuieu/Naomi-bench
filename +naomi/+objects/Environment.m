@@ -756,6 +756,10 @@ classdef Environment < naomi.objects.BaseObject
             % temperature of the mirror 
             temp = obj.getTemp(obj.S_MIRROR);
         end
+        function temp=tempEmbiant(obj)
+            % temperature of the mirror 
+            temp = obj.getTemp(obj.S_EMBIANT);
+        end
         function temp=tempQSM(obj)
             % temperature of the qsm (gimbal base)  
             temp = obj.getTemp(obj.S_QSM);

@@ -1,23 +1,20 @@
 classdef EnvironmentBuffer < handle
     properties 
-        % temperature array Nx6 
-        tempArray;
-        % regulation temperature Nx1
-        regulTempVector;
-        % current vector N 
-        currentVector;
-        % fan Array Nx2
-        fanArray;
-        % time Vector 
-        timeVector;
         
-        % field name and their outer dimension
-        fields = { {'tempArray',6},...
-                   {'currentVector',1}, ...
-                   {'fanArray',2},...
-                   {'timeVector',1}, ...
-                   {'regulTempVector',1}
-                   };
+        data;
+        
+        TIME = 1;
+        CURRENT = 2;
+        FANIN = 3;
+        FANOUT = 4;
+        TEMPREGUL = 5;
+        TEMPIN = 6;
+        TEMPOUT = 7;
+        TEMPMIRROR = 8;
+        TEMPQSM = 9;
+        TEMPEMBIANT = 10;
+        
+        NCOL = 10;
         
         index = 0;
         size;
@@ -27,12 +24,8 @@ classdef EnvironmentBuffer < handle
     methods 
         function obj = EnvironmentBuffer(bufferSize, stepSize, dynamic)
             
-            for iField=1:length(obj.fields)
-                fieldName = obj.fields{iField}{1};
-                fieldLen = obj.fields{iField}{2};
-                obj.(fieldName) = zeros(bufferSize, fieldLen);
-            end
-
+            obj.data = zeros(bufferSize, obj.NCOL);
+            
             obj.index = 0;
             obj.size = bufferSize;
             obj.stepSize = stepSize;
@@ -41,37 +34,75 @@ classdef EnvironmentBuffer < handle
         function value = get(obj, key)
             i = obj.index;
            switch key
-               case 'temp1'
-                   value = obj.tempArray(1:i,1);
-               case 'temp2'
-                   value = obj.tempArray(1:i,2);
-               case 'temp3'
-                   value = obj.tempArray(1:i,3);
-               case 'temp4'
-                   value = obj.tempArray(1:i,4);
-               case 'temp5'
-                   value = obj.tempArray(1:i,5);
-               case 'temp6'
-                   value = obj.tempArray(1:i,6);
+               case 'tempIn'
+                   value = obj.data(1:i,obj.TEMPIN);
+               case 'tempOut'
+                   value = obj.data(1:i,obj.TEMPOUT);
+               case 'tempRegul'
+                   value = obj.data(1:i,obj.TEMPREGUL);
+               case 'tempMirror'
+                   value = obj.data(1:i,obj.TEMPMIRROR);
+               case 'tempQSM'
+                   value = obj.data(1:i,obj.TEMPQSM);
+               case 'tempEmbiant'
+                   value = obj.data(1:i,obj.TEMPEMBIANT);
+               case 'time'
+                   value = obj.data(1:i,obj.TIME);
                
                    
                case 'current'
-                   value = obj.currentVector(1:i);
-               case 'time'
-                   value = obj.timeVector(1:i);
-               case 'fan1'
-                   value = obj.fanArray(1:i,1);
-               case 'fan2'
-                   value = obj.fanArray(1:i,2);
-               case 'regulTemp'
-                   value = obj.regulTempVector(1:i);
+                   value = obj.data(1:i,obj.CURRENT);
+               
+               case 'fanIn'
+                   value = obj.data(1:i,obj.FANIN);
+               case 'fanOut'
+                   value = obj.data(1:i,obj.FANOUT);  
+                   
+               otherwise
+                   error('unknown field "%s"', key);
            end
+           
         end
         function plot(obj, ax, xfield, yfield, varargin)
             plot(ax, obj.get(xfield), obj.get(yfield), varargin{:});
             xlabel(ax, xfield);
             ylabel(ax, yfield);
         end
+        
+        function plotAll(obj, axesList)
+            if nargin<2
+                axesList = {subplot(4,1,1),subplot(4,1,2), subplot(2,1,2)};
+            end
+            
+            time = obj.get('time');
+            time = (time-time(1))*24*3600;
+            
+            plot(axesList{1}, time, obj.get('current'));
+            ylabel(axesList{1}, 'current');
+            
+            plot(axesList{2}, time, obj.get('fanIn'));
+            hold(axesList{2}, 'on')
+            plot(axesList{2}, time, obj.get('fanOut'));
+            ylabel(axesList{2}, 'voltage');
+            
+            plot(axesList{3}, time, obj.get('tempOut'), 'g-',  'DisplayName','peltier out');
+            hold(axesList{3}, 'on');
+            plot(axesList{3}, time, obj.get('tempIn'), 'b-', 'DisplayName','peltier in');
+            plot(axesList{3}, time, obj.get('tempRegul'), 'b:', 'DisplayName','regul setpoint');
+            
+            plot(axesList{3}, time, obj.get('tempEmbiant'), 'k:', 'DisplayName', 'embiant');
+            
+            plot(axesList{3}, time, obj.get('tempMirror'), 'r-', 'DisplayName', 'mirror');
+            plot(axesList{3}, time, obj.get('tempQSM'), 'r:', 'DisplayName', 'qsm');
+            legend(axesList{3}, 'Location','southwest');
+            legend(axesList{3}, 'boxoff');
+            
+            hold(axesList{3}, 'off');
+            ylabel(axesList{3}, 'temp');
+            xlabel(axesList{3}, 'time');
+            
+        end
+            
         
         
         function prepareForNext(obj)
@@ -85,23 +116,16 @@ classdef EnvironmentBuffer < handle
             if (obj.index+1) > obj.size                
                 nField = length(obj.fields);
                if obj.dynamic
-                   for iField=1:nField
-                        
-                        fieldName = obj.fields{iField}{1};
-                        fieldLen = obj.fields{iField}{2};
-                        old = obj.(fieldName);
-                        new = zeros(obj.index+obj.stepSize, fieldLen);
-                        new(1:obj.index) = old(1:obj.index);
-                        obj.(fieldName) = new;
-                        
-                   end
+                   
+                   old = obj.data;
+                   new = zeros(obj.index+obj.stepSize, obj.NCOL);
+                   new(1:obj.index) = old(1:obj.index);
+                   obj.data = new;
+                    
                       
                else
-                   for iField=1:nField                       
-                       fieldName = obj.fields{iField}{1};         
-                       obj.(fieldName)(1:end-obj.stepSize,:) = obj.(fieldName)(obj.stepSize+1:end,:);
-                   end
-                obj.index = obj.size - obj.stepSize;
+                   obj.data(1:end-obj.stepSize,:) = obj.data(obj.stepSize+1:end,:);
+                   obj.index = obj.size - obj.stepSize;
                end
             end
             
@@ -117,16 +141,18 @@ classdef EnvironmentBuffer < handle
             obj.prepareForNext;
             i = obj.index;
             
-            obj.timeVector(i) = now;
+            obj.data(i, obj.TIME) = now;
             
-            for iTemp=1:6
-                obj.tempArray(i,iTemp) = e.getTemp(iTemp);
-            end
-            for iFan=1:2
-                obj.fanArray(i,iFan) = e.getFanVoltage(iFan);
-            end  
-            obj.regulTempVector(i) = e.tempRegul;
-            obj.currentVector(i) = e.current;                        
+            obj.data(i, obj.TEMPREGUL) = e.tempRegul;
+            
+            obj.data(i, obj.TEMPIN) = e.tempIn;
+            obj.data(i, obj.TEMPOUT) = e.tempOut;
+            obj.data(i, obj.TEMPMIRROR) = e.tempMirror;
+            obj.data(i, obj.TEMPQSM) = e.tempQSM;
+            obj.data(i, obj.TEMPEMBIANT) = e.tempEmbiant;
+            obj.data(i, obj.FANIN) = e.fanIn;
+            obj.data(i, obj.FANOUT) = e.fanOut;
+            obj.data(i, obj.CURRENT) = e.current;                  
         end
     end
 end
