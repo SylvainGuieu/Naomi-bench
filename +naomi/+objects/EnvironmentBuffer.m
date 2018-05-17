@@ -137,7 +137,7 @@ classdef EnvironmentBuffer < handle
                    
                    old = obj.buffer;
                    new = zeros(obj.index+obj.stepSize, obj.NCOL);
-                   new(1:obj.index) = old(1:obj.index);
+                   new(1:obj.index, :) = old(1:obj.index, :);
                    obj.buffer = new;
                     
                       
