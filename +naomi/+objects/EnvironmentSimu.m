@@ -1,6 +1,7 @@
 classdef EnvironmentSimu < naomi.objects.Environment
     
     properties
+        simuConnected=0;
         simuRegul = 0;
         simuTime = 0;
         simuRegister;
@@ -12,7 +13,7 @@ classdef EnvironmentSimu < naomi.objects.Environment
     end
     
     methods
-        function obj = EnvironmentSimu(port)
+        function obj = EnvironmentSimu(port, connect)
             obj.simuTime = now;
             obj.simuRegister = containers.Map('KeyType', 'int32', 'ValueType', 'char');
             
@@ -26,7 +27,16 @@ classdef EnvironmentSimu < naomi.objects.Environment
             
             obj.simuRegister(obj.R_FAN_HSPEED_VOLTAGE(1)) = '0.0'; % fan1 voltage
             obj.simuRegister(obj.R_FAN_HSPEED_VOLTAGE(2)) = '0.0'; % fan2 voltage
-            
+            if nargin<2 || connect; obj.connect(); end
+        end
+        function connect(obj)
+            obj.simuConnected = 1;
+        end
+        function disconnect(obj)
+            obj.simuConnected = 0;
+        end
+        function test = isConnected(obj)
+            test = obj.simuConnected;
         end
         
         function simuUpdate(obj)

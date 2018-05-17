@@ -16,14 +16,8 @@ function [dX,dY,dTip,dTilt,dFoc] = missalignment(phaseArray, diameter, orientati
 	[nSubAperture, ~]= size(phaseArray);
 	x0 = nSubAperture/2;
     y0 = nSubAperture/2;
-    
-	% Filter pixel with light 
-	alight = ~isnan(phaseArray);
-
-	[xArray,yArray] = meshgrid(1:nSubAperture, 1:nSubAperture);
-	norm = sum(sum(alight));
-	xTarget = sum(sum(alight.*xArray))./norm;
-	yTarget = sum(sum(alight.*yArray))./norm;
+   
+    [xTarget, yTarget] = naomi.compute.pupillCenter(phaseArray);
     
 	[~,PtZ] = naomi.compute.theoriticalZtP(nSubAperture,xTarget,yTarget,diameter,4, orientation);
     

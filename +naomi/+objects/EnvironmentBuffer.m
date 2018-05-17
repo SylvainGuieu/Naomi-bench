@@ -1,18 +1,18 @@
 classdef EnvironmentBuffer < handle
     properties 
         
-        data;
+        buffer;
         
         TIME = 1;
         CURRENT = 2;
         FANIN = 3;
         FANOUT = 4;
-        TEMPREGUL = 5;
-        TEMPIN = 6;
-        TEMPOUT = 7;
-        TEMPMIRROR = 8;
-        TEMPQSM = 9;
-        TEMPEMBIANT = 10;
+        TREGUL = 5;
+        TIN = 6;
+        TOUT = 7;
+        TMIRROR = 8;
+        TQSM = 9;
+        TEMBIANT = 10;
         
         NCOL = 10;
         
@@ -24,7 +24,7 @@ classdef EnvironmentBuffer < handle
     methods 
         function obj = EnvironmentBuffer(bufferSize, stepSize, dynamic)
             
-            obj.data = zeros(bufferSize, obj.NCOL);
+            obj.buffer = zeros(bufferSize, obj.NCOL);
             
             obj.index = 0;
             obj.size = bufferSize;
@@ -35,33 +35,51 @@ classdef EnvironmentBuffer < handle
             i = obj.index;
            switch key
                case 'tempIn'
-                   value = obj.data(1:i,obj.TEMPIN);
+                   value = obj.buffer(1:i,obj.TIN);
                case 'tempOut'
-                   value = obj.data(1:i,obj.TEMPOUT);
+                   value = obj.buffer(1:i,obj.TOUT);
                case 'tempRegul'
-                   value = obj.data(1:i,obj.TEMPREGUL);
+                   value = obj.buffer(1:i,obj.TREGUL);
                case 'tempMirror'
-                   value = obj.data(1:i,obj.TEMPMIRROR);
+                   value = obj.buffer(1:i,obj.TMIRROR);
                case 'tempQSM'
-                   value = obj.data(1:i,obj.TEMPQSM);
+                   value = obj.buffer(1:i,obj.TQSM);
                case 'tempEmbiant'
-                   value = obj.data(1:i,obj.TEMPEMBIANT);
+                   value = obj.buffer(1:i,obj.TEMBIANT);
                case 'time'
-                   value = obj.data(1:i,obj.TIME);
+                   value = obj.buffer(1:i,obj.TIME);
                
                    
                case 'current'
-                   value = obj.data(1:i,obj.CURRENT);
+                   value = obj.buffer(1:i,obj.CURRENT);
                
                case 'fanIn'
-                   value = obj.data(1:i,obj.FANIN);
+                   value = obj.buffer(1:i,obj.FANIN);
                case 'fanOut'
-                   value = obj.data(1:i,obj.FANOUT);  
+                   value = obj.buffer(1:i,obj.FANOUT);  
                    
                otherwise
                    error('unknown field "%s"', key);
            end
            
+        end
+        function data = data(obj, varargin)
+            data = obj.buffer(1:obj.index, :);
+            data = data(varargin{:}); 
+        end
+        function environmentData = toEnvironmentData(obj)
+            h = {{'TIME', obj.TIME, '[s] time table column number '}, ...
+                 {'CURRENT', obj.CURRENT, '[A] peltier current table column number'}, ...
+                 {'FANIN', obj.FANIN, '[v] inner fan  table column number '},...
+                 {'FANOUT', obj.FANOUT, '[v] outer fan  table column number '},...
+                 {'TREGUL', obj.TREGUL, '[C] regul set point  table column number '},...
+                 {'TIN', obj.TIN, '[C] inner temp. table column number '},...
+                 {'TOUT', obj.TOUT, '[C] outer temp. table column number '},...
+                 {'TMIRROR', obj.TMIRROR, '[C] mirror temp. table column number '},...
+                 {'TQSM', obj.TQSM, '[C] base qsm temp. table column number '},...
+                 {'TEMBIANT', obj.TMIRROR, '[C] embiant temp. table column number '},...
+            };
+            environmentData = naomi.data.Environment(obj.data, h);
         end
         function plot(obj, ax, xfield, yfield, varargin)
             plot(ax, obj.get(xfield), obj.get(yfield), varargin{:});
@@ -81,8 +99,9 @@ classdef EnvironmentBuffer < handle
             ylabel(axesList{1}, 'current');
             
             plot(axesList{2}, time, obj.get('fanIn'));
-            hold(axesList{2}, 'on')
+            hold(axesList{2}, 'on');
             plot(axesList{2}, time, obj.get('fanOut'));
+            hold(axesList{2}, 'off');
             ylabel(axesList{2}, 'voltage');
             
             plot(axesList{3}, time, obj.get('tempOut'), 'g-',  'DisplayName','peltier out');
@@ -114,17 +133,16 @@ classdef EnvironmentBuffer < handle
             % b.stepSize data are copied to the begining of the buffer to
             % leave space for other comming
             if (obj.index+1) > obj.size                
-                nField = length(obj.fields);
                if obj.dynamic
                    
-                   old = obj.data;
+                   old = obj.buffer;
                    new = zeros(obj.index+obj.stepSize, obj.NCOL);
                    new(1:obj.index) = old(1:obj.index);
-                   obj.data = new;
+                   obj.buffer = new;
                     
                       
                else
-                   obj.data(1:end-obj.stepSize,:) = obj.data(obj.stepSize+1:end,:);
+                   obj.buffer(1:end-obj.stepSize,:) = obj.buffer(obj.stepSize+1:end,:);
                    obj.index = obj.size - obj.stepSize;
                end
             end
@@ -137,22 +155,28 @@ classdef EnvironmentBuffer < handle
             %
             % update the buffer with an naomi.objects.Environment object
             % `e`
-            
+            % if e is not connected, e.i `~e.isConnected`, this does
+            % nothing and 
+            %
+            % if environmnet object is note connected do nothing silently
+            if ~e.isConnected
+                return 
+            end
             obj.prepareForNext;
             i = obj.index;
             
-            obj.data(i, obj.TIME) = now;
+            obj.buffer(i, obj.TIME) = now;
             
-            obj.data(i, obj.TEMPREGUL) = e.tempRegul;
+            obj.buffer(i, obj.TREGUL) = e.tempRegul;
             
-            obj.data(i, obj.TEMPIN) = e.tempIn;
-            obj.data(i, obj.TEMPOUT) = e.tempOut;
-            obj.data(i, obj.TEMPMIRROR) = e.tempMirror;
-            obj.data(i, obj.TEMPQSM) = e.tempQSM;
-            obj.data(i, obj.TEMPEMBIANT) = e.tempEmbiant;
-            obj.data(i, obj.FANIN) = e.fanIn;
-            obj.data(i, obj.FANOUT) = e.fanOut;
-            obj.data(i, obj.CURRENT) = e.current;                  
+            obj.buffer(i, obj.TIN) = e.tempIn;
+            obj.buffer(i, obj.TOUT) = e.tempOut;
+            obj.buffer(i, obj.TMIRROR) = e.tempMirror;
+            obj.buffer(i, obj.TQSM) = e.tempQSM;
+            obj.buffer(i, obj.TEMBIANT) = e.tempEmbiant;
+            obj.buffer(i, obj.FANIN) = e.fanIn;
+            obj.buffer(i, obj.FANOUT) = e.fanOut;
+            obj.buffer(i, obj.CURRENT) = e.current;                  
         end
     end
 end

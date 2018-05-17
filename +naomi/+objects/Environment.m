@@ -171,6 +171,7 @@ classdef Environment < naomi.objects.BaseObject
     % temperatures, fan rotation, etc..   
     
     properties
+        port;
         client;
         zero;
         verbose;
@@ -182,7 +183,8 @@ classdef Environment < naomi.objects.BaseObject
         
         controlTimer;
         controlIsRunning = 0;
-        controlState = 0; % one of the state below
+        controlState = 5; % one of the state below start with Manual as we
+                          % do not now the state
         
         % call back function executed after each updateControl 
         % usefull to e.i. plot temperatures in a gui  
@@ -225,10 +227,13 @@ classdef Environment < naomi.objects.BaseObject
         %% Temperature
         % When cooling down (or warming up, depend of the embient temperature)
         % The laird regulation temperature is set as 
-        %   Tregul = Tcalib - (Tbench0 - Tcalib) * correctiveFactor 
+        %   Tregul = Tcalib - (Tembiant - Tcalib) * correctiveFactor 
         % Where Tbench0 is the bench (mirror) temperature when starting
         % cooldwond or warmup.
         goToCalibCorrectiveFactor = 1.0;
+        % For goToEmbient this is the same exccept that the reference
+        % temperature is the bench temperature
+        %   Tregul = Tcalib - (Tbench0 - Tcalib) * correctiveFactor 
         goToEmbiantCorrectiveFactor = 1.0;
         
         % in the same way, To set the regulation temperature the formulae
@@ -362,12 +367,18 @@ classdef Environment < naomi.objects.BaseObject
         % calibration 
         % Use e.isSafeToOpen to check if conditions are ok to open the door
         %  
-        function obj = Environment(port)
+        function obj = Environment(port, connect)
             if nargin<1
                 port = 'com1';
             end
+            obj.port = port;
+            if nargin<2; connect = 0; end
+            
+            if connect; obj.connect(); end
+        end
+        function connect(obj)
             fprintf('Init connection to Peltier Controler Laird-ETS-PR-59\n');
-            obj.client = serial(port);
+            obj.client = serial(obj.port);
             % take from the lair manual
             set(obj.client,'BaudRate',115200);
             set(obj.client,'Parity','none');
@@ -377,19 +388,26 @@ classdef Environment < naomi.objects.BaseObject
             
             fprintf('Open connection to Peltier Controler Laird-ETS-PR-59\n');
             fopen(obj.client);
-            
-            obj.verbose = 1;    
-            
             fprintf('Load Temperature Sensor library\n');
             % TODO put this to calibration file in a config instead
             loadlibrary C:\MeasurementComputing\DAQ\cbw64.dll C:\MeasurementComputing\DAQ\C\cbw.h alias mccFuncLib;
             
         end
-        
+        function disconnect(obj)
+            fclose(obj.client);
+            obj.client = [];
+        end
+        function test = isConnected(obj)
+            test = ~isempty(obj.client);
+        end
         
         function delete(obj)
-            fprintf('Close connection to Peltier Controler Laird-ETS-PR-59\n');
-            fclose(obj.client);
+            if obj.isConnected
+                fprintf('Close connection to Peltier Controler Laird-ETS-PR-59\n');
+                fclose(obj.client);
+            else
+                fprintf('Laird Not connected OK\n');
+            end
             
         end
         
@@ -443,8 +461,30 @@ classdef Environment < naomi.objects.BaseObject
                explanation = sprintf('The difference between bench temperature and embiand temperature is to high: %.2f', dt);
            end
         end
-        
-        
+        function ste = getState(obj)
+            ste = obj.controlState;
+        end
+        function changeState(obj, stateNum)
+            % e.changeState(stateNum)
+            %
+            % change the state to the given state iddentified by its number
+            switch stateNum
+                case obj.GOTOCALIB
+                    obj.goToCalib();
+                case obj.GOTOEMBIANT
+                    obj.goToEmbiant();
+                case obj.CALIB
+                    obj.calib();
+                case obj.MAINTAIN
+                    obj.maintain();
+                case obj.MANUAL
+                    obj.manual();
+                case obj.OFF
+                    obj.turnOff;
+                otherwise
+                    error('state %d is not a valid state number', stateNum);
+            end
+        end
         function updateControl(obj)
             % e.updateControl()
             % 
@@ -517,7 +557,10 @@ classdef Environment < naomi.objects.BaseObject
                     refTemp = obj.getTemp(obj.S_QSM);
                 otherwise
                     error('reference temp not understood');
-            end         
+            end
+            if ~obj.isConnected
+                return 
+            end
             regulTemp = targetTemp - (refTemp-targetTemp) * gain;
             
             obj.setRegister(obj.R_REGUL, regulTemp);
@@ -541,7 +584,7 @@ classdef Environment < naomi.objects.BaseObject
             % temprature. It is expected that user use e.maintain when the
             % calib temperature is reached or use e.controlUpdate() regulary to do
             % it manualy. 
-            obj.goTo('mirror', obj.calibTemperature, obj.goToCalibCorrectiveFactor, ...
+            obj.goTo('embiant', obj.calibTemperature, obj.goToCalibCorrectiveFactor, ...
                 obj.goToCalibFanVoltage, 24.0);
             
             obj.controlState = obj.GOTOCALIB;
@@ -577,40 +620,46 @@ classdef Environment < naomi.objects.BaseObject
             obj.controlState = obj.CALIB;
         end
         
-        function [tempRegul, fanIn, fanOut] = manual(obj, tempRegul, fanIn, fanOut)
-            % turn the control to manual and set the set point regulation temperature 
-            % and fan voltages to the given values
-            if nargin<2
+        function manual(obj)
+            % turn the control to manual 
+            % use method e.manualSet to set parameters      
+            obj.controlState = obj.MANUAL;    
+        end
+        function [tempRegul, fanIn, fanOut] = manualRetrieve(obj)
+            % retrieve the parameters from the laird needed to control with
+            % in manual mode
+            
+            tempRegul = obj.tempRegul;
+            fanIn = obj.fanIn;
+            fanOut = obj.fanOut;
+        end
+        function manualSet(obj, tempRegul, fanIn, fanOut)
+            % set the parameter to the manual mode 
+            % this has no effect if the current state is not manual
+            if ~obj.isConnected
+                return 
+            end
+            if obj.controlState ~= obj.MANUAL
+                return 
+            end
+            
+            if nargin< 2 || isempty(tempRegul)
                 tempRegul = obj.tempRegul;
             end
-            if nargin<3
+            if nargin< 3 || isempty(fanIn)
                 fanIn = obj.fanIn;
             end
-            if nargin<4
+            if nargin< 4 || isempty(fanOut)
                 fanOut = obj.fanOut;
             end
-            
-            
-%             if fanIn
-%                 obj.setRegister(obj.R_FAN_MODE(obj.F_IN), obj.ALLWAYSON); 
-%             else
-%                 obj.setRegister(obj.R_FAN_MODE(obj.F_IN), obj.ALLWAYSOFF); 
-%             end
-%             if fanOut
-%                 obj.setRegister(obj.R_FAN_MODE(obj.F_OUT), obj.ALLWAYSON); 
-%             else
-%                 obj.setRegister(obj.R_FAN_MODE(obj.F_OUT), obj.ALLWAYSOFF); 
-%             end
-            %obj.stopRegulation;
             obj.setRegister(obj.R_FAN_HSPEED_VOLTAGE(obj.F_IN), fanIn); 
             obj.setRegister(obj.R_FAN_LSPEED_VOLTAGE(obj.F_IN), fanIn); 
             obj.setRegister(obj.R_FAN_HSPEED_VOLTAGE(obj.F_OUT), fanOut); 
             obj.setRegister(obj.R_FAN_LSPEED_VOLTAGE(obj.F_OUT), fanOut); 
             obj.setRegister(obj.R_REGUL, tempRegul);
             obj.startRegulation;
-            obj.controlState = obj.MANUAL;    
+            
         end
-        
         function turnOff(obj)
             % turn the laird off : no peltier,  no fans
             obj.stopRegulation;

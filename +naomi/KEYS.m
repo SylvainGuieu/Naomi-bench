@@ -191,6 +191,8 @@ classdef KEYS
        TEMP1 = 'TEMP1'
        TEMP1c = '[deg celcius] temperature on the QSM';
        
+       DATEOB = 'DATE-OB';
+       DATEOBc = 'matlab date of block started';
        
        %% default  for unknown  values in header 
        UNKNOWN_STR = '?';

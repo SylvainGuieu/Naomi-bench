@@ -38,12 +38,16 @@ classdef Bench < naomi.objects.BaseObject
     dTilt;
     dFocus;
 
-    % center of dm in pixel unit has returned by naomi.measure.IFC
-    % unit is in pixel 
+    % center of dm in pixel unit. This is the central actuator position 
+    % as returned by naomi.measure.IFC
     measuredXcenter;
     measuredYcenter;
     
-
+    % The position of the pupill foot print as measued  by
+    % naomi.measure.pupillCenter
+    measuredPupillXcenter;
+    measuredPupillYcenter;
+    
     % the lastPhaseArray recorded by naomi.measure.phase
     lastPhaseArray;
     % incremental counter after each phase measurement 
@@ -233,7 +237,7 @@ classdef Bench < naomi.objects.BaseObject
         end
         function test = isAligned(obj)
             % check if the bench has been aligned
-            test = ~isempty(obj.xCenter);
+            test = ~isempty(obj.measuredXcenter);
         end
 
         
