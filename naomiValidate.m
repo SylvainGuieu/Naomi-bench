@@ -12,7 +12,7 @@ if ~bench.isAligned
 	else
 		naomi.alignManual(bench);
 	end
-	IFCData = naomi.measure.IFC(bench);
+	[~,IFCData] = naomi.measure.IFC(bench);
 	naomi.config.IFC(IFCData); % this will alos set the xCenter,yCenter
 end
 
@@ -39,11 +39,11 @@ ZtPData.saveFromDate(todayDirectory, startDate); % save the Z2P file
 naomi.config.pupillMask(bench); 
 
 % record a flat in open loop and save it 
-openFlatData = naomi.measure.openFlat(bench);
+[~,openFlatData] = naomi.measure.openFlat(bench);
 openFlatData.saveFromDate(todayDirectory, startDate);
 
 % record a flat in close loop and save it
-closeFlatData = naomi.measure.closeFlat(bench);
+[~,closeFlatData] = naomi.measure.closeFlat(bench);
 closeFlatData.saveFromDate(todayDirectory, startDate);
 
 % measure the stroke for the tip and save it 

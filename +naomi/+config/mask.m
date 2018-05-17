@@ -34,5 +34,5 @@ function success = mask(bench, data_or_file)
 		naomi.plot.figure('Phase Mask');
 		bench.maskData.plot();
 	end	
-	bench.config.log('a mask has been configured',2);
+	bench.config.log('a mask has been configured\n',3);
 end

@@ -13,7 +13,7 @@ if ~bench.isAligned
 	else
 		naomi.alignManual(bench);
 	end
-	IFCData = naomi.measure.IFC(bench);
+	[~,IFCData] = naomi.measure.IFC(bench);
 	naomi.config.IFC(IFCData); % this will alos set the xCenter,yCenter
 end
 

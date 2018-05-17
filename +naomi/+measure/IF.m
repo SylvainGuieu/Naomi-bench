@@ -1,12 +1,11 @@
-function IFData = IF(bench,  act, nPushPull, amplitude)
+function [IFArray,IFData] = IF(bench,  act, nPushPull, amplitude)
 %   IF  measure the Influence Function of one actuator 
 % 
-%   IF = measure.IF(bench act, nPushPull, amplitude)
-%
+%   IFArray = measure.IF(bench act, nPushPull, amplitude)
+%   [IFArray,IFData] = measure.IF(bench act, nPushPull, amplitude)
 %   The requested actuator is push-pulled and the difference
 %   is returned as its influence function.
 % 
-%   
 %   
 %   bench: naomi bench structure including wfs and dm object
 %   act: the requested actuator
@@ -43,13 +42,14 @@ function IFData = IF(bench,  act, nPushPull, amplitude)
     naomi.action.cmdZonal(bench, act, ref);
     IFArray = (tppush - tppull) / (2*amplitude*nPushPull);
    	 
-    
-    K = naomi.KEYS;
-    h = {{K.MJDOBS,config.mjd, K.MJDOBSc},...
-         {K.ACTNUM,act,  K.ACTNUMc      },...
-	     {K.IFAMP ,amplitude, K.IFAMPc},...
-         {K.IFNPP,nPushPull,  K.IFNPPc}};
-
-    IFData = naomi.data.IF(IFArray, h, {bench});    
+    if nargout>1
+        K = naomi.KEYS;
+        h = {{K.MJDOBS,config.mjd, K.MJDOBSc},...
+             {K.ACTNUM,act,  K.ACTNUMc      },...
+             {K.IFAMP ,amplitude, K.IFAMPc},...
+             {K.IFNPP,nPushPull,  K.IFNPPc}};
+        
+        IFData = naomi.data.IF(IFArray, h, {bench}); 
+    end
 end
 

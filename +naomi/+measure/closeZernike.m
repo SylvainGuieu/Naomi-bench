@@ -1,4 +1,4 @@
-function [phaseData, phaseResidualData] = closeZernike(bench, zernike, amplitude, gain, nZernike, nStep)
+function [phaseArray, phaseResidualArray, phaseData,phaseResidualData] = closeZernike(bench, zernike, amplitude, gain, nZernike, nStep)
     
 	config = bench.config;
     if nargin<3; amplitude = config.zernikeAmplitude; end
@@ -21,20 +21,20 @@ function [phaseData, phaseResidualData] = closeZernike(bench, zernike, amplitude
 	naomi.action.closeModal(bench,PtZArray, gain, nStep, 2, nZernike, targetPhaseArray);
 	
 	phaseArray = naomi.measure.phase(bench, config.flatNphase);
+    phaseResidualArray = phaseArray - targetPhaseArray;
     
-    K = naomi.KEYS;
-	h = {{K.DPRTYPE, 'ZERNIKE_CLOSED', K.DPRTYPEc}, ...
-         {K.LOOPMODE, 'zonal', K.LOOPMODEc}, ...
-         {K.LOOP,     'CLOSED', K.LOOPc}, ...
-		 {K.NPHASE, nPhase, K.NPHASEc}, ...
-		 {K.LOOPGAIN, gain, K.LOOPGAINc}, ...
-		 {K.LOOPSTEP', nStep, K.LOOPSTEPc}, ...
-		 {K.LOOPNZER, nZernike, K.LOOPNZERc}};
-     
-	phaseData  = naomi.data.Phase(phaseArray, h, {bench});
-    phaseResidualData = naomi.data.PhaseResidual(phaseArray - targetPhaseArray, h , {bench});
-	if config.plotVerbose
-		naomi.plot.figure('Last Phase');
-        naomi.plot.phase(bench);	
-	end
+    % build the data objects 
+    if nargout>2 
+        K = naomi.KEYS;
+        h = {{K.DPRTYPE,   'ZERNIKE_CLOSED', K.DPRTYPEc}, ...
+             {K.LOOPMODE,  'zonal', K.LOOPMODEc}, ...
+             {K.LOOP,      'CLOSED', K.LOOPc}, ...
+             {K.NPHASE,    nPhase, K.NPHASEc}, ...
+             {K.LOOPGAIN,  gain, K.LOOPGAINc}, ...
+             {K.LOOPSTEP', nStep, K.LOOPSTEPc}, ...
+             {K.LOOPNZER,  nZernike, K.LOOPNZERc}};
+
+        phaseData  = naomi.data.Phase(phaseArray, h, {bench});
+        phaseResidualData = naomi.data.PhaseResidual(phaseResidualArray, h , {bench});
+    end
 end

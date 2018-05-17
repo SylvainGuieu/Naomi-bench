@@ -12,16 +12,9 @@ function Rms = rms_tt(phi)
 %   Rms: output rms
 
 % Get size
-[nSubAperture,~] = size(phi);
-[X,Y] = meshgrid(1:nSubAperture,1:nSubAperture);
 
 % Clean tip-tilt
-phic = phi;
-xdelta = diff(phic);
-phic = phic - (X-nSubAperture/2) * median(xdelta(~isnan(xdelta)));
-ydelta = diff(phic');
-phic = phic - (Y-nSubAperture/2) * median(ydelta(~isnan(ydelta)));
-
+phic = naomi.compute.tipTiltCleanedPhase(phi);
 Rms = naomi.compute.nanstd(phic(:));
 % Ptv = max(phic(:)) - min(phic(:));
 end

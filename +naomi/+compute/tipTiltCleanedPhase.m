@@ -8,6 +8,6 @@ function newPhiArray = tipTiltCleanedPhase(phiArray)
     
     newPhiArray = phiArray;
     
-    newPhiArray = newPhiArray + (X-nSubAperture/2) * median(xdelta(~isnan(xdelta)));
-    newPhiArray = newPhiArray + (Y-nSubAperture/2) * median(ydelta(~isnan(ydelta))); 	
+    newPhiArray = newPhiArray - (X-nSubAperture/2) * median(xdelta(~isnan(xdelta)));
+    newPhiArray = newPhiArray - (Y-nSubAperture/2) * median(ydelta(~isnan(ydelta))); 	
 end

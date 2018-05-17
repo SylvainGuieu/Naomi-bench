@@ -115,6 +115,13 @@ classdef KEYS
         NPHASE = 'NPHASE';
         NPHASEc = 'Number of averaged phase';
         
+        PHASEREF = 'PHASEREF';
+        PHASEREFc = '0/1 1 if a phase reference has been substracted';
+        
+        PHASETT = 'PHASETT';
+        PHASETTc = '0/1 1 if main tiptilt has been removed';
+        
+        
         PUSHAMP = 'PUSHAMP';
         PUSHAMPc = '[max] Push (and Pull) amplitude';
         

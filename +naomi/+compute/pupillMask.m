@@ -1,5 +1,6 @@
 function maskArray = pupillMask(nSubAperture,diameterPix,centralObscurtionPix, xCenterPix, yCenterPix)
 	% build a mask array 
+    % 
 	% -nSubAperture number of sub pupill in both direction 
 	% -diameterPix :  mask outer diameter in pixel
 	% -centralObscurtionPix: mask inner diamter in pixel

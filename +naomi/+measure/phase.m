@@ -1,4 +1,4 @@
-function phaseArray = phase(bench, nPhase, filterTipTilt, substractReference)
+function [phaseArray, phaseData] = phase(bench, nPhase, filterTipTilt, substractReference)
 	% phaseArray = phase(bench)
 	% phaseArray = phase(bench, nPhase)
 	% phaseArray = phase(bench, nPhase, filterTipTilt)
@@ -22,16 +22,14 @@ function phaseArray = phase(bench, nPhase, filterTipTilt, substractReference)
 
 	maskArray = bench.maskArray;
 	
-	simulated = bench.config.simulated;
+	
 	for iPhase=1:nPhase
 
-		if simulated
-			rawPhaseArray = bench.simulator.getRawPhase();
-		else
-			rawPhaseArray = bench.wfs.getRawPhase();
-		end
+		
+        rawPhaseArray = bench.wfs.getRawPhase();
+		
 		% Apply the mask 
-		rawPhaseArray(maskArray~=1) = NaN;
+		rawPhaseArray(~maskArray) = NaN;
 		if ~bench.checkPhase(rawPhaseArray)
             bench.config.log('Warning Invalid sup-appertures inside the mask !!\n');
         end
@@ -48,21 +46,32 @@ function phaseArray = phase(bench, nPhase, filterTipTilt, substractReference)
     if substractReference
 	    phaseArray = phaseArray - bench.phaseReferenceArray;
 	end
-	
+	% Remove the tip tilt if needed
 	if filterTipTilt
-		[tip,tilt] = naomi.compute.tipTilt(phaseArray);
-		[xArray,yArray] = meshgrid(1:nSubAperture, 1:nSubAperture);
-      	phaseArray = phaseArray + (xArray-nSubAperture/2) * tip;
-      	phaseArray = phaseArray + (yArray-nSubAperture/2) * tilt;
+        phaseArray = naomi.compute.tipTiltCleanedPhase(phaseArray);
 	end
-	% Remove the mean
+	% Remove the mean a last time
     phaseArray = phaseArray - mean(phaseArray(~isnan(phaseArray)));
 
-
+    % save the phasArray in the bench 
 	bench.lastPhaseArray = phaseArray;
+    % anybody or thing that whatch a new phase can listen to the
+    % phaseCounter of the bench
     bench.phaseCounter = bench.phaseCounter + 1;
+    % If plot verbose is True plot the phase
 	if bench.config.plotVerbose
 		naomi.plot.figure('Last Phase');
 		naomi.plot.phase(bench);
-	end
+    end
+    
+    % if the number of output argument is 2 encapsulate the phase in a
+    % phaseData object.
+    if nargout>1
+        refSubtraced = substractReference && abs(naomi.compute.nansum(bench.phaseReferenceArray(':')))>0.0;
+        K = naomi.KEYS;
+        h = {{K.NPHASE, nPhase, K.NPHASEc}, ...
+             {K.PHASEREF, refSubtraced, K.PHASEREFc}, ...
+             {K.PHASETT, logical(filterTipTilt), K.PHASETTc}};
+        phaseData = naomi.data.Phase(phaseArray, h, {bench});
+    end
 end

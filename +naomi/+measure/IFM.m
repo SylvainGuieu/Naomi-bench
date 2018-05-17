@@ -50,13 +50,18 @@ function [IFMData, IFMcleanData] = IFM(bench, callback, nPushPull, nLoop, amplit
                 return
             end
             fprintf("%d %.3f",iActuator, (start-now)*24*3600);
-            IFData = naomi.measure.IF(bench, iActuator, nPushPull, amplitude);
+            
+            if isempty(callback)
+                IFArray = naomi.measure.IF(bench, iActuator, nPushPull, amplitude);
+            else
+                [IFArray, IFData] = naomi.measure.IF(bench, iActuator, nPushPull, amplitude);
+            end
             fprintf(" %.3f\n",(start-now)*24*3600);
             if ~isempty(callback)
                 callback(IFData);
             end
-	        IFarray = IFData.data;
-	        IFMatrix(iActuator,:,:) = IFMatrix(iActuator,:,:) + reshape(IFarray,1,nSubAperture,nSubAperture) / nLoop;
+	        
+	        IFMatrix(iActuator,:,:) = IFMatrix(iActuator,:,:) + reshape(IFArray,1,nSubAperture,nSubAperture) / nLoop;
 	        pause(ifPause);
             bench.processStep('IFM', iLoop*iActuator);
                 

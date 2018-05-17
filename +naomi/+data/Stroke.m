@@ -14,10 +14,10 @@ classdef Stroke < naomi.data.BaseData
         function plot(obj, axesList)
             if nargin<2; axesList = []; end
             
-        	amplitudeVector = obj.data(:,1);
-        	maxCommandVector =  obj.data(:,2);
-        	ptvVector = obj.data(:,3);
-        	rmsVector = obj.data(:,4);
+        	amplitudeVector = obj.data(':',1);
+        	maxCommandVector =  obj.data(':',2);
+        	ptvVector = obj.data(':',3);
+        	rmsVector = obj.data(':',4);
             
             if axesList; ax = axesList{1};
             else

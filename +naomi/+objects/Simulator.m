@@ -140,7 +140,6 @@ classdef Simulator < naomi.objects.BaseObject
             
             rawPhase = IFMArray'*cmdVector;
             rawPhase = reshape(rawPhase, nSubAperture, nSubAperture);
-            
             if ~isempty(obj.turbuArray)
                 [turbuLength, ~, ~] = size(obj.turbuArray);
                 if obj.turbuIndex>turbuLength; obj.turbuIndex = 1; end;
