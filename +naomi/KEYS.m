@@ -201,6 +201,9 @@ classdef KEYS
        DATEOB = 'DATE-OB';
        DATEOBc = 'matlab date of block started';
        
+       NAMP = 'NAMP';
+       NAMPc = 'Number of mode amplitude played';
+       
        %% default  for unknown  values in header 
        UNKNOWN_STR = '?';
        UNKNOWN_FLOAT = -999.99;

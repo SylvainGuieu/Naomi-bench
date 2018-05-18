@@ -4,54 +4,42 @@ function strokeData = stroke(bench,zernikeMode,amplitudeVector)
 	if nargin<3 || isempty(amplitudeVector)
 		maxAmp = 1./max(abs(bench.ZtCArray(zernikeMode,':')));
 		amplitudeVector = linspace(config.strokeMinAmpFrac*maxAmp, config.strokeMaxAmpFrac*maxAmp, config.strokeNstep);
-	end
-
-	[Nstep,~] = size(amplitudeVector(:));
+    end
+    
+	[nAmp,~] = size(amplitudeVector(:));
     nSubAperture = bench.nSubAperture;
-	outputArray =  zeros(Nstep, 6);
-	outputArray(:,1) = amplitudeVector;
-	allPhiArray = zeros(nSubAperture,nSubAperture,Nstep);
-
+    nActuator = bench.nActuator;
+    
+	allPhiArray = zeros(nAmp,nSubAperture,nSubAperture);
+    allCmdArray = zeros(nAmp, nActuator);
+    
 	naomi.action.resetDm(bench);
 	naomi.action.resetWfs(bench);
 
 	phiRefArray = naomi.measure.phase(bench);
+    K = naomi.KEYS;
 	h = {
-		  {'MJD-OBS', config.mjd, 'MJD at script startup'}, 
-		  {'MODE', zernikeMode, 'Zernike mode used'}
+		  {K.MJDOBS, config.mjd, K.MJDOBSc}, ...
+		  {K.ZERN, zernikeMode, K.ZERNc}, ... 
+          {K.NAMP, nAmp, K.NAMPc}
 		};
-    
-    theoriticalPhase = squeeze(naomi.make.theoriticalPhase(bench, zernikeMode, 1.0));
-	for s=1:Nstep
-	    % Set DM
-	    naomi.action.cmdModal(bench, zernikeMode, amplitudeVector(s) * (1).^(s-1));
-	    outputArray(s,2) = max(abs(bench.biasVector + bench.cmdVector));
-
-
-	    phiArray = naomi.measure.phase(bench) - phiRefArray;
-	    allPhiArray(:,:,s) = phiArray(:,:);
-        
-        residualArray = phiArray - theoriticalPhase.*amplitudeVector(s);
-        figure(6); imagesc(residualArray);title(sprintf('%.3f',naomi.compute.nanstd(phiArray(:))));
-        figure(7); imagesc(phiArray);title(sprintf('%.3f',naomi.compute.nanstd(residualArray(:))));
-		% Get the PtV
-	    outputArray(s,3) = max(phiArray(:)) - min(phiArray(:));
-        outputArray(s,5) = max(residualArray(:)) - min(residualArray(:));
-        
-        
-        % remove the TT only for tip, tilt and piston
-        if zernikeMode < 0
-            outputArray(s,4) = naomi.compute.nanstd(phiArray(:));
-            outputArray(s,6) = naomi.compute.nanstd(residualArray(:));
-        else
-            outputArray(s,4) = naomi.compute.rms_tt(phiArray);
-            outputArray(s,6) = naomi.compute.rms_tt(residualArray);
-        end
-        
-        
+    for iAmp=1:nAmp
+        h{length(h)+1} = {sprintf('AMP%d',iAmp), amplitudeVector(iAmp), sprintf('amplitude %d value', iAmp)};
     end
-    strokeData = naomi.data.Stroke(outputArray, h, {bench});
-
+    for iAmp=1:nAmp
+	    % Set DM
+	    naomi.action.cmdModal(bench, zernikeMode, amplitudeVector(iAmp) * (1).^(iAmp-1));
+        allCmdArray(iAmp,:) = bench.cmdVector;        
+	    phiArray = naomi.measure.phase(bench) - phiRefArray;
+	    allPhiArray(iAmp,:,:) = phiArray(:,:);
+    end
+    
+    strokeData = naomi.data.StrokePhaseCube(allPhiArray, h, {bench});
+    strokeData.dmCommandArray =   allCmdArray;
+    strokeData.biasVector = bench.biasVector;
+    strokeData.amplitudeVector = amplitudeVector;
+    
+    
     if config.plotVerbose
     	naomi.plot.figure('Modal Stroke'); clf;
     	strokeData.plot();

@@ -17,6 +17,7 @@ classdef BaseData < handle
         header;
         context;
         file;
+        filePointer;
     end
     methods
         
@@ -27,7 +28,8 @@ classdef BaseData < handle
             if nargin<3; context = {}; end
             
             if ischar(data) || isstring(data)
-                obj.file = matlab.io.fits.openFile(data);
+                obj.file = data;%matlab.io.fits.openFile(data);
+                
             else
                obj.setData(data);
             end
@@ -49,6 +51,10 @@ classdef BaseData < handle
             
             obj.context = context;
             obj.update();
+            % load the data
+            if ~isempty(obj.file)
+                obj.data;
+            end
         end
         function sh = staticHeader(obj)
             sh = {};
@@ -111,7 +117,12 @@ classdef BaseData < handle
                     val = card{1};
                     comment = card{2};
                 elseif ~isempty(obj.file)
-                     [val, comment] = matlab.io.fits.readKey(obj.file, key);
+                    % open the fits file and keep it open for further
+                    % reference
+                     if isempty(obj.filePointer)
+                         obj.filePointer = matlab.io.fits.openFile(obj.file);
+                     end
+                     [val, comment] = matlab.io.fits.readKey(obj.filePointer, key);
                 else
                     error(strcat('Unknown key ', key));
                 end
@@ -123,8 +134,13 @@ classdef BaseData < handle
                     val = card{1};
                     comment = card{2};
                 elseif ~isempty(obj.file)
+                    % open the fits file and keep it open for further
+                    % reference
+                     if isempty(obj.filePointer)
+                         obj.filePointer = matlab.io.fits.openFile(obj.file);
+                     end
                     try
-                        [val, comment] = matlab.io.fits.readKey(obj.file, key);
+                        [val, comment] = matlab.io.fits.readKey(obj.filePointer, key);
                     catch
                     end
                 end
@@ -155,8 +171,8 @@ classdef BaseData < handle
             end
         end
                 
-        function data = fitsReadData(obj, file)
-            data = matlab.io.fits.readImg(file);
+        function data = fitsReadData(obj, fileName)
+            data = fitsread(fileName);
         end
 
         function fitsWriteData(obj, fileName)
@@ -191,8 +207,8 @@ classdef BaseData < handle
            matlab.io.fits.closeFile(fpr);
         end
         function delete(obj)
-            if ~isempty(obj.file)
-                matlab.io.fits.closeFile(obj.file);
+            if ~isempty(obj.filePointer)
+                matlab.io.fits.closeFile(obj.filePointer);
             end
         end
     end

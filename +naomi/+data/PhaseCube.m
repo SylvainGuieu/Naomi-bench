@@ -1,4 +1,6 @@
 classdef PhaseCube < naomi.data.BaseData
+    % test doc 
+    %   detailed doc test
 	properties
 	
 
@@ -44,7 +46,6 @@ classdef PhaseCube < naomi.data.BaseData
             % compute the Zernike to Command matrix
             % the returned diameter is in pixel
             
-            K = naomi.KEYS;
             diam = obj.fullPupillDiameter;
             xp   = obj.xScale;
             yp   = obj.yScale;
@@ -77,7 +78,7 @@ classdef PhaseCube < naomi.data.BaseData
               
         function yCenter = yCenter(obj)
             % xCenter = phaseData.xCenter
-            % the pixel position of the center (center actuator) as measurd by
+            % the pixel position of the center (center actuator) as measured by
             % the bench. 
             yCenter = obj.getKey(naomi.KEYS.YCENTER, naomi.KEYS.YCENTERd)+...
                       obj.getKey(naomi.KEYS.YOFFSET, 0.0);

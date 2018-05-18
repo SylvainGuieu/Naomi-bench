@@ -25,7 +25,7 @@ classdef ZtC < naomi.data.BaseData
             % for historical reason anc compatibility with sparta 
             % the data is stored with the last dimension beeing 
             % the zernike number
-            data = matlab.io.fits.readImg(file);
+            data = fitsread(file);
             data = double(data)';
         end
         

@@ -3,7 +3,8 @@ classdef DmCommand < naomi.data.BaseData
 	
     % clip the command to +1 -1 in plot
     clipped = true; 
-   
+    
+    biasVector = 0.0;
     end	
         
     
@@ -16,9 +17,23 @@ classdef DmCommand < naomi.data.BaseData
         	sh = {{naomi.KEYS.DPRTYPE, 'DM_VECTOR', naomi.KEYS.DPRTYPEc}};
         end
         
-            
+        function fitsWriteData(obj, fileName)
+            import matlab.io.*
+            fitswrite(obj.data, fileName);
+            % save bias as extention if any 
+            if ~isempty(obj.biasData)
+                naomi.saveExtention(obj.biasVector, fileName,'DMBIAS', 1); 
+            end 
+        end
+        function data = fitsReadData(obj, fileName)
+            data = fitsread(fileName);
+            biasVector = naomi.readExtention( fileName,'DMBIAS', 1);
+            if ~isempty(biasVector)
+                obj.biasVector = biasVector;
+            end
+        end
         function nSaturated = nSaturated(obj)
-           nSaturated = sum(abs(obj.data)>=1);
+           nSaturated = sum(abs(obj.data+obj.biasVector)>=1);
         end
         function plot(obj, axes)
             if nargin<2; axes= gca();end;

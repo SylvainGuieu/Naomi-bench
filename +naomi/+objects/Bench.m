@@ -301,7 +301,7 @@ classdef Bench < naomi.objects.BaseObject
              zernikeVector = zernikeVector(varargin{:});
         end
 
-        function cmdVector = cmdVector(obj, varargin)
+        function [cmdVector, cmdData] = cmdVector(obj, varargin)
             if obj.config.simulated
                 cmdVector = obj.simulator.cmdVector;
             else
@@ -309,6 +309,11 @@ classdef Bench < naomi.objects.BaseObject
             end
             cmdVector = cmdVector(varargin{:});
             
+            if nargout>1
+               h = {};
+               cmdData = naomi.data.DmCommand(cmdVector, h, {obj});
+               cmdData.biasVector = obj.biasVector;
+            end
         end
         function set.ZtCData(obj, ZtCData)
         	obj.config.log('Setting a new Zernique to Command Matrix\n', 1);
