@@ -310,8 +310,8 @@ classdef Environment < naomi.objects.BaseObject
         
         % usb temp channels  
         U_EMBIANT = 0;
-        U_MIRROR = 2;
-        U_QSM = 4;
+        U_MIRROR = 4;
+        U_QSM = 2;
     end
     
     methods (Access = public)
