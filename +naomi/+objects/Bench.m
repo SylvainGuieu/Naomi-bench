@@ -385,22 +385,28 @@ classdef Bench < naomi.objects.BaseObject
         end
 
         function nSubAperture = nSubAperture(obj)
-            if obj.config.simulated
-                nSubAperture = obj.simulator.nSubAperture;
-            else
+            
                 if obj.has('wfs')
                     nSubAperture = obj.wfs.nSubAperture;
                 else
                     nSubAperture = 0;
                 end
-            end
+           
         end
 
         function nZernike = nZernike(obj)
-            nZernike = length(obj.zernikeVector);
+            if obj.has('dm')
+                nZernike = length(obj.zernikeVector);
+            else
+                nZernike = 0;
+            end
         end
         function nActuator = nActuator(obj)
-            nActuator = length(obj.cmdVector);
+            if obj.has('dm')
+                nActuator = length(obj.cmdVector);
+            else
+                nActuator = 0;
+            end
         end
 
 

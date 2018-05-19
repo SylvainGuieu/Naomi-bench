@@ -8,6 +8,7 @@ warning('off', 'MATLAB:subscripting:noSubscriptsSpecified');
 bench = naomi.objects.Bench();
 %%%
 % local config for test purpose
+bench.config.simulated = 0;
 bench.config.useGimbal = false;
 %
 

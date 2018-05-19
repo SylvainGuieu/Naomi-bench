@@ -10,6 +10,7 @@ function wfs = startWfs(config)
            case {config.IPAG, config.BENCH}
                config.log('This is an HASO128 ...',1);
                cFile = 'C:\Program Files (x86)\Imagine Optic\Configuration Files\HASO3_128_GE2_4651 Ebus.dat';
+               cFile = 'C:\Program Files (x86)\Imagine Optic\Configuration Files\HASO3_128_GE2_4651';
                wfs_ = naomi.objects.WfsHASO128();
                wfs_.connect(cFile,'M660FA');
 
