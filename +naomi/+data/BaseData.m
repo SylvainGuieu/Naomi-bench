@@ -2,9 +2,9 @@ classdef BaseData < handle
     % The goal of Data object is to record data (array) and a header
     % 
     % The Data object must have all the necessary function to plot the 
-    % data and to compute basic operation on it as a standalone object.
-    % This way Data object can be updated live when doing a measurement 
-    % or it can be load from a fits or matlab file for offline analysis
+    % data and to compute basic operation.
+    % This way Data object can be created live when doing a measurement 
+    % or it can be loaded from a fits or matlab file for offline analysis.
     % typicaly Data object are created from a measurement. The context property 
     % is a cell array containing all the relevant object related to the 
     % data creation. They will write their information to the header. 

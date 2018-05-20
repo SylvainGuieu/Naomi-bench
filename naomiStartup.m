@@ -1,26 +1,18 @@
 clear all;
-global wfs_;
-global naomiBench;
+% this is necessary to create a global and unique object for the wfs 
+% toherwise it does not work 
+global naomiGlobalWfs;
+global naomiGlobalConfig;
+global naomiGlobalBench;
 % to avoid un wanted warning message  (matlab bug) 
 % https://fr.mathworks.com/matlabcentral/answers/336493-warning-a-value-of-class-appdesigner-internal-service-appmanagementservice-was-indexed-with-no-su
 warning('off', 'MATLAB:subscripting:noSubscriptsSpecified');
 
-bench = naomi.objects.Bench();
-%%%
-% local config for test purpose
-bench.config.simulated = 0;
-bench.config.useGimbal = false;
-%
+% create a new config file (it will be updated by naomiLocalConfig if exists)
+naomiGlobalConfig = naomi.newConfig();
+naomiGlobalBench = naomi.objects.Bench(naomiGlobalConfig);
+% create a copy with the name bench
+bench = naomiGlobalBench;
 
-%bench.startACE();
-bench.startWfs();
-bench.startDm();
-
-if bench.config.useGimbal
-	bench.startGimbal();
-end
-
-% set it to the global variable. 
-naomiBench = bench;
 
 

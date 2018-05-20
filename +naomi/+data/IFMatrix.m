@@ -18,7 +18,7 @@ classdef IFMatrix < naomi.data.PhaseCube
             % for historical reason anc compatibility with sparta 
             % the data is stored with the last dimension beeing 
             % the actuator number
-            data = fitread(file);
+            data = fitsread(file);
             data = permute(data, [3,1,2]);
             data = double(data);
         end

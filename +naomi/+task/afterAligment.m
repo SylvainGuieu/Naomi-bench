@@ -12,11 +12,11 @@ success = 0;
 [x,y] = naomi.measure.pupillCenter(bench);
 naomi.config.pupillCenter(bench, x, y);
 if ~strcmp(bench.config.dmId,  bench.config.DUMMY)
-    [~,IFCData] = naomi.measure.IFC(app.bench);
-    naomi.config.IFC(app.bench,IFCData);
+    [~,IFCData] = naomi.measure.IFC(bench);
+    naomi.config.IFC(bench,IFCData);
     naomi.saveData(IFCData);
-    [xScale, yScale] = naomi.measure.pixelScale(app.bench);
-    naomi.config.pixelScale(app.bench, xScale, yScale);
+    [xScale, yScale] = naomi.measure.pixelScale(bench);
+    naomi.config.pixelScale(bench, xScale, yScale);
 end
 
 

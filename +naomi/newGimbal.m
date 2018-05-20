@@ -1,4 +1,4 @@
-function gimbal = startGimbal(config)
+function gimbal = newGimbal(config)
     % Starting communication with the motors of DM mount 
     % return it as a Gimbal object
     config.log('Starting CO mount gimbal motors ...',1)

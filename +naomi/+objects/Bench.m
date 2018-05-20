@@ -85,9 +85,12 @@ classdef Bench < naomi.objects.BaseObject
 
     end
     methods
-        function obj = Bench(varargin)
-        	obj.config = naomi.Config();
-        	obj.start(varargin{:});
+        function obj = Bench(config)
+            if nargin<1
+                obj.config = naomi.newConfig();
+            else
+                obj.config = config;
+            end
             obj.processes = containers.Map();
         end
 
@@ -102,20 +105,31 @@ classdef Bench < naomi.objects.BaseObject
         end
 
         function start(obj, varargin)
-        	for iArg=1:length(varargin)
-        		switch varargin{iArg}
-        		case 'dm'
-        			obj.startDm();
-        		case 'wfs'
-        			obj.startWfs();
-        		case 'gimbal'
-        			obj.startGimbal();
-        		case 'environmnet'
-        			obj.startEnvironment();
-        		case 'autocol'
-        			obj.startAutocol();
-        		otherwise
-        			error(strcat('unknown subsystem ', varargin{iArg}));
+            if isempty(varargin)
+                if obj.config.isDm
+                    obj.start('dm', 'wfs', 'gimbal', 'environment');
+                else
+                     obj.start('wfs', 'gimbal', 'environment');
+                end
+               
+            else
+                for iArg=1:length(varargin)
+                    switch varargin{iArg}
+                        case 'ace'
+                            obj.starACE();
+                        case 'dm'
+                            obj.startDm();
+                        case 'wfs'
+                            obj.startWfs();
+                        case 'gimbal'
+                            obj.startGimbal();
+                        case 'environment'
+                            obj.startEnvironment();
+                        case 'autocol'
+                            obj.startAutocol();
+                        otherwise
+                            error('unknown subsystem %s', varargin{iArg});
+                    end
                 end
             end
         end
@@ -435,7 +449,7 @@ classdef Bench < naomi.objects.BaseObject
                 obj.wfs = obj.simulator;
             else
                 obj.startACE();
-                if ~obj.has('wfs'); obj.wfs = naomi.startWfs(obj.config); end
+                if ~obj.has('wfs'); obj.wfs = naomi.newWfs(obj.config); end
             end
         end
         function stopWfs(obj)
@@ -452,8 +466,8 @@ classdef Bench < naomi.objects.BaseObject
                obj.dm = obj.simulator;
             else
                 obj.startACE();
-                if ~obj.has('dm'); 
-                    obj.dm = naomi.startDm(obj.config); 
+                if ~obj.has('dm')
+                    obj.dm = naomi.newDm(obj.config); 
                 end
             end
         end
@@ -472,26 +486,31 @@ classdef Bench < naomi.objects.BaseObject
                 obj.startSimulator();
                 obj.gimbal = obj.simulator;
             else
-                obj.gimbal = naomi.startGimbal(obj.config); 
+                obj.gimbal = naomi.newGimbal(obj.config); 
             end
         end
         function stopGimbal(obj)
             obj.gimbal = [];
         end
 		function startAutocol(obj)
-			if ~obj.has('autocol'); obj.autocol = naomi.startAutocol(obj.config); end        	
+			if ~obj.has('autocol'); obj.autocol = naomi.newAutocol(obj.config); end        	
         end
         function stopAutocol(obj)
             obj.autocol = [];
         end
 		function startEnvironment(obj)
-			if ~obj.has('environment'); obj.environment= naomi.startEnvironment(obj.config); end        	
+            if obj.config.simulated 
+                if ~obj.has('environment'); obj.environment= naomi.objects.EnvironmentSimu('simu',1); end
+            else
+                if ~obj.has('environment'); obj.environment= naomi.newEnvironment(obj.config); end   
+            end
         end
         function stopEnvironment(obj)
+            if obj.has('environment'); obj.environment.disconnect; end
 			obj.environment = [];       	
         end
         function startSimulator(obj)
-            if ~obj.has('simulator'); obj.simulator = naomi.startSimulator(obj.config); end  
+            if ~obj.has('simulator'); obj.simulator = naomi.newSimulator(obj.config); end  
         end
         function check = checkPhase(obj, phase)
             % Check the integrity of a phase screen

@@ -30,7 +30,7 @@ function success = IFC(bench, data_or_file)
 	end
 
 	bench.IFCData = data;
-	[xCenter,yCenter] = naomi.compute.IFCenter(data);
+	[xCenter,yCenter] = naomi.compute.IFCenter(data.data);
 	bench.measuredXcenter = xCenter;
 	bench.measuredYcenter = yCenter;
 	success = true;

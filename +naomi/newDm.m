@@ -1,4 +1,4 @@
-function dm = startDm(config)
+function dm = newDm(config)
     % start dm capability for naomi 
     % supositely startACE() has been executed before   	
     config.log('Instantiate DM ...', 1);

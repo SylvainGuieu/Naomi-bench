@@ -6,10 +6,10 @@ c = naomi.Config();
 c.gimbalNumber = 4; 
 c.gimbalRampPoints = 20;
 if isempty(gimbal)
-    naomi.startGimbal(c);
+    gimbal = naomi.newGimbal(c);
 end
 if isempty(autocol)
-    naomi.startAutocol(c);
+    autocol = naomi.newAutocol(c);
 end
 
 stepmovements = {'rx', 'ry', 'rxy'};

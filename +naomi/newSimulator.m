@@ -1,4 +1,4 @@
-function simulator = startSimulator(config)
+function simulator = newSimulator(config)
 %STARTSIMULATOR Summary of this function goes here
 %   Detailed explanation goes here
    IFM =[];

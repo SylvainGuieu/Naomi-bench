@@ -6,7 +6,7 @@ classdef Config < handle
         verbose = 2; % verbose level for NAOMI measurement/action/config ... 
         plotVerbose = true; % standalone plot are ploted or not when doing measurement 
         % turn on/off the simulator 
-        simulated = 1;
+        simulated = 0;
         simulatorIFM = '/Users/guieus/DATA/NAOMI/IFM_direct.fits';
         simulatorZtC = '/Users/guieus/DATA/NAOMI/NTC_2018-04-03T11-19-30.fits';
         simulatorBias;
@@ -18,27 +18,29 @@ classdef Config < handle
         
         % location where the script has been started
         location = 'Bench';
-        % possible loction and their root directory associated
-        locationRoots = {
-            {'IPAG',   'N:\Bench\'},
-            {'Bench',  'N:\Bench\'},
-            {'ESO-HQ', 'C:\Users\NAOMI-IPAG-2\Documents\DM_Testing\'}
-        }
-
-        % tplName as writen in data header products 'TPL_NAME'
+        
+        % default tplName as writen in data header products 'TPL_NAME'
         tplName = 'TEST';
 
-        % these will be filled when location is set 
-        rootDirectory;
-        dataDirectory;
-        configDirectory;
-        reportDirectory;
+        dataDirectory = 'N:\Bench\Data';
+        configDirectory = 'N:\Bench\Config';
+        % the session name is not mendatory to set here
+        % it will be created on the fly when the mirror is selected
+        % the sessionDirectory will be cataDirectory/yyy-mm-dd/sessionName
+        sessionName;
+        
         % ACE root directory 
         ACEROOT =  'C:\AlpaoCoreEngine';
         
         dmIdChoices = {'BAX153','BAX159','BAX199','BAX200', 'BAX201', 'DUMMY'};
         dmId = '';
         
+        % model of the wfs device currently only 'haso128' is accepted
+        wfsModel = 'haso128';
+        % haso 128 configuration file 
+        haso128cFile = 'C:\Program Files (x86)\Imagine Optic\Configuration Files\HASO3_128_GE2_4651';
+        % haso serial needed for connection 
+        haso128Serial = 'M660FA';
         
         % flag for tiptilt removal when measuring phase by
         % naomi.measure.phase
@@ -349,8 +351,6 @@ classdef Config < handle
                 value = varargin{i+1};
                 setfield(obj, key, value);
             end
-            %% this will create the subdirectories
-            obj.location = obj.location;
         end
 
         function log(obj, str, level)
@@ -359,40 +359,28 @@ classdef Config < handle
             end
             naomi.log(str, level, obj.verbose);
         end
-        function set.location(obj, location)
-            found = false;
-            for iLoc=1:length(obj.locationRoots)
-                if strcmp(location, obj.locationRoots{iLoc}{1})
-                    obj.rootDirectory = obj.locationRoots{iLoc}{2};
-                    found = true;
-                end
-            end
-            if ~found
-                error(strcat('unknown location ', location));
-            end
-            obj.dataDirectory   = fullfile(obj.rootDirectory,'Data');
-            obj.configDirectory = fullfile(obj.rootDirectory,'Config');
-            obj.reportDirectory = fullfile(obj.rootDirectory,'Figures');
-            obj.location = location;
-        end
-
-        function locations = locationChoices(obj)
-            locations = {}
-            for iLoc=1:length(obj.locationRoots)
-                locations{iLoc} = obj.locationRoots{iLoc}{1};
-            end
-        end
-        function askLocation(obj)
-            % ask the location from a dialog box             
-            [loc,~] = listdlg('PromptString','Select Location:','SelectionMode','single','ListString',obj.locationChoices);
-            obj.location = char(l(loc));
-        end
-        function location = getLocation(obj)
-            if obj.location; location = obj.location; 
-            else location = obj.askLocation(); end
-        end        
+        
+        
+          
         function dir = todayDirectory(obj);
             dir = fullfile(obj.dataDirectory, datestr(now,'yyyy-mm-dd'));
+        end
+        function dir = sessionDirectory(obj)
+            if isempty(obj.sessionName)
+                dir = obj.todayDirectory;
+            else
+                dir = fullfile(obj.todayDirectory, obj.sessionName);
+            end
+        end
+        
+        function test = isDm(obj)
+            % true if the current configured mirror is a dm otherwise false
+            switch obj.dmId
+                case obj.DUMMY
+                    test = 0;
+                otherwise
+                    test = 1;
+            end
         end
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

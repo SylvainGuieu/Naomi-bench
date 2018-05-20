@@ -5,7 +5,7 @@ function filePath = saveData(data, bench)
         directory = bench.config.dataDirectory;
     end
 
-    dateOb = data.getKey(naomi.KEYS.DATEOB);
+    dateOb = data.getKey(naomi.KEYS.DATEOB, []);
     
     if isempty(dateOb)    
         suffix = datestr(now, 'yyyy-mm-ddThh:MM:SS');
