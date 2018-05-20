@@ -431,7 +431,9 @@ classdef Bench < naomi.objects.BaseObject
             else
                 maskArray = obj.maskData.data;
             end
-            maskArray = maskArray(varargin{:});
+            if ~isempty(varargin)
+                maskArray = maskArray(varargin{:});
+            end
         end
 
         function set.maskData(obj, maskData)

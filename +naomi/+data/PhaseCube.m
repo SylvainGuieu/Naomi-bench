@@ -10,7 +10,7 @@ classdef PhaseCube < naomi.data.BaseData
             obj = obj@naomi.data.BaseData(varargin{:});
         end
         function sh = staticHeader(obj)
-        	sh = {{'DPR_TYPE', 'PHASE_CUBE', ''}};
+        	sh = {{naomi.KEYS.DPRTYPE, 'PHASE_CUBE', naomi.KEYS.DPRTYPEc}};
         end
         
          function nSubAperture = nSubAperture(obj)
@@ -119,9 +119,16 @@ classdef PhaseCube < naomi.data.BaseData
         function phaseCube = phaseCube(obj, varargin)
             phaseCube = obj.data(varargin{:});
         end
-            
+        function rmsVector = rmsVector(obj, varargin)
+            % the rms of all phases in the phase cube with lenght of nPhase
+            rmsVector = naomi.compute.nanstd(reshape(obj.phaseCube, obj.nPhase, []), 2);
+            if ~isempty(varargin)
+                rmsVector = rmsVector(varargin{:});
+            end
+                
+        end
         function gainVector = gainVector(obj, varargin)
-            % the gain (std) over the active pupill for all the phases 
+            % the gain (std) over the active pupill for all the phases with lenght of nPhase
             nPhase = obj.nPhase;
             gainVector = naomi.compute.nanstd(reshape(obj.maskedPhaseCube, nPhase, []), 2);
             %gainVector = naomi.compute.nanstd(reshape(obj.phaseCube, nPhase, []), 2);

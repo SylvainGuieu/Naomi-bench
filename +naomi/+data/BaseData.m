@@ -202,7 +202,12 @@ classdef BaseData < handle
            ks = keys(obj.header);
            for iKey=1:length(ks)
                card = obj.header(ks{iKey});
-               matlab.io.fits.writeKey(fpr,ks{iKey}, card{1}, card{2});
+               if card{2} % to avoid empty comment card 
+                   c = card{2};
+               else
+                   c = card{1};
+               end
+               matlab.io.fits.writeKey(fpr,ks{iKey}, card{1}, c);
            end
            matlab.io.fits.closeFile(fpr);
         end
