@@ -4,7 +4,6 @@ function gimbal = newGimbal(config)
     config.log('Starting CO mount gimbal motors ...',1);
     addpath(config.piMotorDriver);
     gimbal = naomi.objects.Gimbal(config.piControlerSerial);
-    
     gimbal.rX.zero = config.gimbalRxZero;
     gimbal.rY.zero = config.gimbalRyZero;
     gimbal.rX.gain = config.gimbalRxGain;

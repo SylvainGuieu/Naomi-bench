@@ -74,7 +74,7 @@ classdef Gimbal < naomi.objects.BaseObject
                 obj.(axis).moveToZero();
             end
         end
-        function 
+        
           function delete(obj)
                 fprintf('Close connection to PI\n');
                 obj.rX.device.CloseConnection();
