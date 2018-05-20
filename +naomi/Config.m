@@ -42,6 +42,10 @@ classdef Config < handle
         % haso serial needed for connection 
         haso128Serial = 'M660FA';
         
+        % PI motor driver 
+        piMotorDriver = 'C:\Users\Public\PI\PI_MATLAB_Driver_GCS2';
+        piControlerSerial = '0175500223';
+        
         % flag for tiptilt removal when measuring phase by
         % naomi.measure.phase
         filterTipTilt = false;
