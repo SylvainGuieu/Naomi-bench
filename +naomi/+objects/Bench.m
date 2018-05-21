@@ -152,26 +152,40 @@ classdef Bench < naomi.objects.BaseObject
         end
         
         function changeDm(obj, dmId)
-            
+            % bench.changeDm
+            % Change the current dm defined by its Id
+            % this will stop the dm environment
             obj.config.dmId = dmId;
             if obj.config.isDm
                 obj.stopDm; % stop the dm environment 
             end
             sessionNumber =1;
-            while (exist(fullfile(obj.config.todayDirectory, sprintf('%s.%d', dmId, sessionNumber))))
+            while (exist(fullfile(obj.config.todayDirectory, sprintf('%s.%d', dmId, sessionNumber)), 'file'))
                 sessionNumber = sessionNumber +1;
             end
             
             obj.config.sessionName = sprintf('%s.%d', dmId, max( 1,sessionNumber-1)); 
         end
-        function newSession(obj)
-            dmId = obj.config.dmId;
-            sessionNumber =1;
-            while (exist(fullfile(obj.config.todayDirectory, sprintf('%s.%d', dmId, sessionNumber))))
-                sessionNumber = sessionNumber +1;
-            end
+        function newSession(obj, name)
+            % bench.newSession
+            % create a new session. By default this will be the DMID.NUM
+            % NUM is the next available number inside the todayDriectory
+            % for the given dm
+            %
+            % optional argument name allows to custom the session name, the 
+            % data will be writen in todayDriectory/NAME
             
-            obj.config.sessionName = sprintf('%s.%d', dmId, max( 1,sessionNumber));  
+            if nargin<2
+                dmId = obj.config.dmId;
+                sessionNumber =1;
+                while (exist(fullfile(obj.config.todayDirectory, sprintf('%s.%d', dmId, sessionNumber)), 'file'))
+                    sessionNumber = sessionNumber +1;
+                end
+
+                obj.config.sessionName = sprintf('%s.%d', dmId, max( 1,sessionNumber));  
+            else
+                obj.config.sessionName = name;
+            end
         end
         function xPixelScale = xPixelScale(obj)
             % measured or configured xPixelScale 
