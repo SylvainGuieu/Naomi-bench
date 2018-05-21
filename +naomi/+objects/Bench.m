@@ -150,8 +150,29 @@ classdef Bench < naomi.objects.BaseObject
                 end
             end
         end
-                
         
+        function changeDm(obj, dmId)
+            
+            obj.config.dmId = dmId;
+            if obj.config.isDm
+                obj.stopDm; % stop the dm environment 
+            end
+            sessionNumber =1;
+            while (exist(fullfile(obj.config.todayDirectory, sprintf('%s.%d', dmId, sessionNumber))))
+                sessionNumber = sessionNumber +1;
+            end
+            
+            obj.config.sessionName = sprintf('%s.%d', dmId, max( 1,sessionNumber-1)); 
+        end
+        function newSession(obj)
+            dmId = obj.config.dmId;
+            sessionNumber =1;
+            while (exist(fullfile(obj.config.todayDirectory, sprintf('%s.%d', dmId, sessionNumber))))
+                sessionNumber = sessionNumber +1;
+            end
+            
+            obj.config.sessionName = sprintf('%s.%d', dmId, max( 1,sessionNumber));  
+        end
         function xPixelScale = xPixelScale(obj)
             % measured or configured xPixelScale 
             % use isScaled method to check if the value has been measured

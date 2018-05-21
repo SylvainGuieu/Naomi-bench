@@ -1,4 +1,4 @@
-function fig = figure(name)
+function fig = figure(name, bringFront)
     %FIGURE Summary of this function goes here
     %   Detailed explanation goes here
     
@@ -10,7 +10,9 @@ function fig = figure(name)
     %              |     |    |  |  |- h grid resolution
     %              |     |    |  |  |    |- v grid resolution
     screenGrid = [-1,   -1, 0, 0, 100, 100];
-    
+    if nargin<2
+        bringFront = 0;
+    end
     fig = findobj('type','figure','name',name);
 
     if isempty(fig)
@@ -42,7 +44,11 @@ function fig = figure(name)
 %                     case 'Alignment'
             end
     else
-        set(0, 'CurrentFigure', fig); 
+        if bringFront
+            figure(fig);
+        else
+            set(0, 'CurrentFigure', fig); 
+        end
     end
 end
 

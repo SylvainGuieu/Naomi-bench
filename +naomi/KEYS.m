@@ -209,6 +209,13 @@ classdef KEYS
        UNKNOWN_FLOAT = -999.99;
        UNKNOWN_INT = -999;
        
+       %% define names of GUIs here 
+       G_STARTUP = 'Naomi Startup';
+       G_ALIGNMENT = 'Naomi Alignment';
+       G_CALIB = 'Naomi Calibration';
+       G_IFM_MEASUREMENT = 'Naomi IFM Measurement';
+       G_MAIN = 'Naomi Engeneering';
+       G_ENVIRONMENT = 'Naomi Environment Control';
     end
 end
 

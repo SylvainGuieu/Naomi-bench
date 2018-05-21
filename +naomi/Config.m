@@ -368,12 +368,18 @@ classdef Config < handle
           
         function dir = todayDirectory(obj);
             dir = fullfile(obj.dataDirectory, datestr(now,'yyyy-mm-dd'));
+            if ~exist(dir, 'file')
+                mkdir(dir);
+            end
         end
         function dir = sessionDirectory(obj)
             if isempty(obj.sessionName)
                 dir = obj.todayDirectory;
             else
                 dir = fullfile(obj.todayDirectory, obj.sessionName);
+                if ~exist(dir, 'file')
+                    mkdir(dir);
+                end
             end
         end
         
