@@ -24,7 +24,7 @@ function success= phaseReference(bench, data_or_file)
 				clf;
 			end;
 			success  = true;
-			bench.config.log('the Phase reference has been removed',2);
+			bench.log('NOTICE: The phase reference has been removed',2);
 			return 
 	else
 			data = data_or_file;
@@ -37,7 +37,7 @@ function success= phaseReference(bench, data_or_file)
 		naomi.plot.figure('Phase Reference');
 		bench.phaseReferenceData.plot();
 	end	
-	bench.config.log('a Phase reference has been configured',2);
+	bench.log('NOTICE a new Phase reference has been configured',2);
 end
 
 

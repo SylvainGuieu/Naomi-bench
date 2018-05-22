@@ -2,7 +2,17 @@ classdef WfsHASO128 < naomi.objects.Wfs
     properties
         model = 'HASO128';
         nSubAperture = 128;
-        pause = 0.5;
+        % empty the buffer before measuring the phase
+        % by this number 
+        nGetImageBeforePhase = 3;
+        % pause before measuring the phase (after emptying the buffer)
+        pause = 0.1;
+        % if true the phase is rotated by 90 degree
+        rotatePhase = 1;
+        % array off liped axis 
+        % e.g. : [1 2] or  [1] or [] etc ...
+        % !! the flip occure After rotation if any 
+        flippedAxes;
         haso;
     end
     methods
@@ -16,11 +26,44 @@ classdef WfsHASO128 < naomi.objects.Wfs
         function phase = getRawPhase(obj)
             % Read the phase screen from HASO
             obj.haso.SetMask(ones(obj.nSubAperture,obj.nSubAperture));
+            for i=1:obj.nGetImageBeforePhase
+              obj.haso.GetImage;
+            end
             pause(obj.pause);
             phase = obj.haso.GetPhase();
-            phase = double(flip(phase,1));
+            if rotatePhase
+              phase = rot90(phase);
+            end
+            for iAxes=1:length(obj.flippedAxes)
+              phase = double(flip(phase,obj.flippedAxes(iAxes)));
+            end
+            
         end
         
+        function image = getRawImage(obj)
+          image = obj.haso.GetImage;
+          if rotatePhase
+            image = rot90(image);
+          end
+          for iAxes=1:length(obj.flippedAxes)
+            image = double(flip(image,obj.flippedAxes(iAxes)));
+          end
+        end
+        
+        function setDit(obj, dit)
+          % set the haso dit 
+          obj.haso.dit = dit;
+        end
+        
+        function dit = getDit(obj)
+          % get the haso dit 
+          dit = obj.haso.dit;
+        end
+        
+        function populateHeader(obj,h)
+          populateHeader@naomi.objects.Wfs(obj, h);
+          % add more stuff ?? 
+        end
         
         function Off(obj)
             % Disable HASO

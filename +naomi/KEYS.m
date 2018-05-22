@@ -229,6 +229,38 @@ classdef KEYS
        RYGAIN = 'RY_GAIN';
        RYGAINc = '[arcsec mecanical/mm] gain convertion of motor rY';
        
+       TEMPMIRROR = 'TEMPMIR';
+       TEMPMIRRORc = '[C] Temperature of the Mirror';
+       
+       TEMPQSM= 'TEMPQSM';
+       TEMPQSMc = '[C] Temperature of the Qsm';
+       
+       TEMPIN= 'TEMPIN';
+       TEMPINc = '[C] Temperature of the Pletier inner face';
+
+       TEMPOUT= 'TEMPOUT';
+       TEMPOUTc = '[C] Temperature of the Pletier outer face';
+       
+       TEMPEMBIANT= 'TEMPEMBI';
+       TEMPEMBIANTc = '[C] Embiant temperature';
+       
+       TEMPREGUL= 'TEMPREGU';
+       TEMPREGULc = '[C] Set Regulation temperature';
+       
+       PCURRENT = 'PCURRENT';
+       PCURRENTc = '[A] Peltier current';
+       
+       PFANIN = 'PFANIN';
+       PFANINc = '[V] Inner fan voltage';
+       
+       PFANOUT = 'PFANOUT';
+       PFANOUTc = '[V] Outer fan voltage';
+       
+       HUMIDITY = 'HUMIDITY';
+       HUMIDITYc = '[%] Embiant humidity';
+       
+       
+       
        TEMP0 = 'TEMP0'
        TEMP0c = '[deg celcius] temperature on the QSM';
        

@@ -58,6 +58,7 @@ classdef Phase < naomi.data.BaseData
         
         end
         
+				
         function diam = fullPupillDiameter(obj)
             % return the diameter of the full pupill
             % the returned diameter is in meter 

@@ -40,6 +40,9 @@ classdef Environment < naomi.data.BaseData
         function c = TEMBIANT(obj)
             c = obj.getKey('TEMBIANT');
         end
+				function c = HUMIDITY(obj)
+            c = obj.getKey('HUMIDITY');
+        end
         
         
         function value = get(obj, key)
@@ -66,6 +69,8 @@ classdef Environment < naomi.data.BaseData
                    value = obj.data(':',obj.FANIN);
                case 'fanOut'
                    value = obj.data(':',obj.FANOUT);  
+							case 'humidity'
+	                 value = obj.data(':',obj.HUMIDITY);  
                    
                otherwise
                    error('unknown field "%s"', key);

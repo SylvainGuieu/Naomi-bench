@@ -39,5 +39,5 @@ function success = IFC(bench, data_or_file)
 		naomi.plot.figure('IF Central Actuator');% do not modify name for good placement 
 		bench.IFCData.plot();
 	end	
-	bench.config.log(sprintf('IFCenter and xCenter=%.2f, yCenter=%.2f has been configured ', xCenter, yCenter),2);
+	bench.log(sprintf('NOTICE: IFC xCenter=%.2f, yCenter=%.2f has been configured ', xCenter, yCenter),2);
 end

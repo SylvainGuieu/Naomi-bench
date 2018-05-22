@@ -1,8 +1,6 @@
 function environment = newEnvironment(config)
 	% start communication with temperatur sensor and fan control 
-	% and return it as an environment object	
-	config.log('Starting temperature sensors and fan controls ...', 1);
+	% and return it as an environment object		
 	environment = naomi.objects.Environment();
-    environment.connect;
-	config.log('OK\n');
+  environment.connect;
 end

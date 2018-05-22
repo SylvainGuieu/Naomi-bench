@@ -39,7 +39,7 @@ function [xScale,yScale] = pixelScale(bench,  nPushPull, amplitude)
     [~,xf] = max(Xf(1:N/2));
     xS = 5. / (N./xf);
 
-    bench.config.log(sprintf('Measure xscale = %.4fmm/pix\n',xS));
+    bench.log(sprintf('NOTICE: Measured  X pixel scale = %.4fmm/pix',xS), 2);
 
     % Push-pull with Y-waffle
     phase = zeros(nSubAperture,nSubAperture);
@@ -68,7 +68,7 @@ function [xScale,yScale] = pixelScale(bench,  nPushPull, amplitude)
     [~,yf] = max(Yf(1:N/2));
     yS = 5. / (N./yf);
 
-    bench.config.log(sprintf('Measure yscale = %.4fmm/pix\n',yS), 1);    
+    bench.log(sprintf('NOTICE: Measured Y pixel scale = %.4fmm/pix',yS), 2);    
     naomi.action.resetDm(bench);
     
     xScale = xS*1e-3;% stored in m/pix 

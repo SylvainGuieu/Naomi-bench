@@ -17,7 +17,7 @@ function success = mask(bench, data_or_file)
 	elseif isempty(data_or_file)
 			bench.maskData = [];			
 			success = false;
-			bench.config.log('the mask has been removed',2);
+			bench.log('NOTICE: the mask has been removed', 2);
 			if bench.config.plotVerbose
 				naomi.plot.figure('Phase Mask');
 				clf;
@@ -34,5 +34,5 @@ function success = mask(bench, data_or_file)
 		naomi.plot.figure('Phase Mask');
 		bench.maskData.plot();
 	end	
-	bench.config.log('a mask has been configured\n',3);
+	bench.log('NOTICE a new mask has been configured',3);
 end

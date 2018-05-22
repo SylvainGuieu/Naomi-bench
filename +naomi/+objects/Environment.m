@@ -179,7 +179,7 @@ classdef Environment < naomi.objects.BaseObject
         monitoringBuffer;
         monitoringTimer;
         monitoringIsRunning = 0;
-        monitoringAxesList; 
+        
         
         controlTimer;
         controlIsRunning = 0;
@@ -308,10 +308,11 @@ classdef Environment < naomi.objects.BaseObject
         ALLWAYSON = 1;
         ALLWAYSOFF = 0;
         
-        % usb temp channels  
+        % usb temp channels  and humidity channel 
         U_EMBIANT = 0;
         U_MIRROR = 4;
         U_QSM = 2;
+        U_HUMIDITY = 6;
     end
     
     methods (Access = public)
@@ -374,7 +375,7 @@ classdef Environment < naomi.objects.BaseObject
             obj.port = port;
             if nargin<2; connect = 0; end
             
-            if connect; obj.connect(); end
+            if connect; obj.connect(); end    
         end
         function connect(obj)
             fprintf('Init connection to Peltier Controler Laird-ETS-PR-59\n');
@@ -393,22 +394,60 @@ classdef Environment < naomi.objects.BaseObject
             loadlibrary C:\MeasurementComputing\DAQ\cbw64.dll C:\MeasurementComputing\DAQ\C\cbw.h alias mccFuncLib;
             
         end
+        
         function disconnect(obj)
+          % stop the regulation and disconnect the peltier
+          obj.stopMonitoring;
+          if obj.isConnected
+              fprintf('Close connection to Peltier Controler Laird-ETS-PR-59\n');
+              % TODO define we need to stop regulation or not I think we should 
+              obj.stopRegulation;
+              fclose(obj.client);
+          else
+              fprintf('Laird Not connected OK\n');
+          end           
             fclose(obj.client);
             obj.client = [];
         end
+        
         function test = isConnected(obj)
             test = ~isempty(obj.client);
         end
         
         function delete(obj)
-            if obj.isConnected
-                fprintf('Close connection to Peltier Controler Laird-ETS-PR-59\n');
-                fclose(obj.client);
-            else
-                fprintf('Laird Not connected OK\n');
+            obj.disconnect;  
+        end
+        
+        function startMonitoring(obj)
+          obj.stopMonitoring;
+          % make a timer for monitoring
+          obj.monitoringTimer = timer('StartDelay', 0, 'Period', 4, ...
+                                      'ExecutionMode', 'fixedRate');
+          obj.monitoringTimer.TimerFcn = @obj.updateControl;
+          start(obj.monitoringTimer);                    
+        end
+        function stopMonitoring(obj)
+          if ~isempty(obj.monitoringTimer)
+            try
+              stop(obj.monitoringTimer );
+            catch EM
+              
             end
-            
+          end
+          obj.monitoringTimer = [];
+        end
+        
+        function populateHeader(obj, h)
+          % populate an header with the relevant environmnet information
+          K = naomi.KEYS;
+          naomi.addToHeader(h, K.TEMPMIRROR,obj.tempMirror,K.TEMPMIRRORc);
+          naomi.addToHeader(h, K.TEMPQSM,   obj.tempQSM,K.TEMPQSMc);
+          naomi.addToHeader(h, K.TEMPIN,    obj.tempIn, K.TEMPINc);
+          naomi.addToHeader(h, K.TEMPOUT,   obj.tempOut, K.TEMPOUTc);
+          naomi.addToHeader(h, K.TEMPEMBIANT, obj.tempEmbiant, K.TEMPEMBIANTc);
+          naomi.addToHeader(h, K.TEMPREGUL, obj.tempRegul, K.TEMPREGULc);
+          naomi.addToHeader(h, K.HUMIDITY, obj.humidity, K.HUMIDITYc);
+          
         end
         
         function [test, explanation] = isReadyToCalib(obj)
@@ -485,7 +524,7 @@ classdef Environment < naomi.objects.BaseObject
                     error('state %d is not a valid state number', stateNum);
             end
         end
-        function updateControl(obj)
+        function updateControl(obj, varargin)
             % e.updateControl()
             % 
             % check the current control mstate (goToCalib, maintain, calib,
@@ -495,6 +534,7 @@ classdef Environment < naomi.objects.BaseObject
             %  - switch from goToCalib to maintain  if calib temperature
             %     reached 
             %  - switch from goToEmbiant to off if embiant temperature reached 
+            % additional arguments are for timer callback but will be ignored
             state = obj.controlState;
             
             temp = obj.getTemp(obj.S_MIRROR); % temperature of the mirror
@@ -516,11 +556,11 @@ classdef Environment < naomi.objects.BaseObject
                     end
                    
                 case obj.GOTOCALIB 
-                    if regulTemp < calibTemp % we are cooling down 
-                        if temp < (calibTemp+ obj.startMaintainDeltaTemp)
+                    if regulTemp < calibTemp % we are cooling down to calib temp
+                        if temp < (calibTemp - obj.startMaintainDeltaTemp)
                             obj.maintain();
                         end
-                    else % we are warming up
+                    else % we are warming up to calib temperature 
                         if temp > (calibTemp + obj.startMaintainDeltaTemp)
                             obj.maintain();
                         end
@@ -588,6 +628,7 @@ classdef Environment < naomi.objects.BaseObject
                 obj.goToCalibFanVoltage, 24.0);
             
             obj.controlState = obj.GOTOCALIB;
+            obj.startMonitoring;
         end
         function goToEmbiant(obj)
             % e.goToEmbiant()
@@ -599,6 +640,7 @@ classdef Environment < naomi.objects.BaseObject
             obj.goTo('mirror', obj.getTemp(obj.S_EMBIANT), obj.goToEmbiantCorrectiveFactor, ...
                 obj.goToEmbiantFanVoltage, 24.0);
             obj.controlState = obj.GOTOEMBIANT;
+            obj.startMonitoring;
         end
         
         function maintain(obj)
@@ -608,6 +650,7 @@ classdef Environment < naomi.objects.BaseObject
             obj.goTo('embiant', obj.calibTemperature, obj.maintainCorrectiveFactor, ...
                 obj.maintainFanVoltage, 24.0);
             obj.controlState = obj.MAINTAIN;
+            obj.startMonitoring;
         end
         function calib(obj)
             % maintain the temperature inside the bench with the fan OFF 
@@ -618,12 +661,14 @@ classdef Environment < naomi.objects.BaseObject
             obj.goTo('embiant', obj.calibTemperature, obj.calibCorrectiveFactor, ...
                 obj.calibFanVoltage,  obj.calibFanVoltage);
             obj.controlState = obj.CALIB;
+            obj.stopMonitoring;
         end
         
         function manual(obj)
             % turn the control to manual 
             % use method e.manualSet to set parameters      
             obj.controlState = obj.MANUAL;    
+            obj.stopMonitoring;
         end
         function [tempRegul, fanIn, fanOut] = manualRetrieve(obj)
             % retrieve the parameters from the laird needed to control with
@@ -663,6 +708,7 @@ classdef Environment < naomi.objects.BaseObject
         function turnOff(obj)
             % turn the laird off : no peltier,  no fans
             obj.stopRegulation;
+            obj.stopMonitoring;
             obj.controlState = obj.OFF;
         end
         
@@ -741,6 +787,10 @@ classdef Environment < naomi.objects.BaseObject
         
         function current = current(obj)
             current = obj.getCurrent();
+        end
+        
+        function humidity(obj)
+          obj.getUSBTemp(obj.U_HUMIDITY);
         end
         
         function voltage=getFanVoltage(obj, fanNumber)

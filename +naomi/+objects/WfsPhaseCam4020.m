@@ -12,6 +12,11 @@ classdef WfsPhaseCam4020 < naomi.objects.Wfs
                obj.port = port;
         end
         
+        function populateHeader(obj,h)
+          populateHeader@naomi.objects.Wfs(obj, h);
+          % add more stuff ?? 
+        end
+        
         function phase = getRawPhase(obj)
             % Clean buffer and request phase screen
             while obj.tcp.BytesAvailable

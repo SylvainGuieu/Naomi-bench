@@ -68,7 +68,8 @@ classdef Config < handle
         %           |        |         |     |- unit 'm' or 'pixel'      
         maskDef = {
                     {'naomi', 28.0e-3,  0.0, 'm'}, ...
-                    {'full',  99.99e-3, 0.0, 'm'} % big mask = no mask 
+                    {'dm pupill', 36.5e-3, 0.0, 'm'},... 
+                    {'no mask',  999.9e-3, 0.0,  'm'}% big mask = no mask 
         };
         
         
@@ -81,7 +82,7 @@ classdef Config < handle
         ztcDef = {
                   {'naomi',        'naomi', 140, 100},
                   {'naomi-sparta', 'naomi', 140, 21 }, 
-                  {'full',         'full', 220, 100} % make a big mask = no mask 
+                  {'no mask',      'full' , 220, 100} % make a big mask = no mask 
                 };
         % current ztcMode 
         ztcMode = 'naomi';
@@ -95,8 +96,16 @@ classdef Config < handle
         
         % number of Zernique to command matrix for the ZtP measurement
         ztpNzernike = 21;
-
-
+        
+        % the haso wafe front sensor dit at startup
+        wfsDit = 2.0; % this is the min dit
+         
+        % min and max flux, receive by the wfs, tresholds when adjusting
+        bestMinFlux = 0.6;
+        bestMaxFlux = 0.9;
+        % the min flux for which we cannot work 
+        minFlux = 0.1;
+        
         % Assumed aproximative pixel scale for start-up alignment
         % normaly, after measurement this value is not used anymore
         xPixelScale = 0.38e-3; % m / pixel

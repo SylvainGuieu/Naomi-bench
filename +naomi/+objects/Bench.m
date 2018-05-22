@@ -13,6 +13,9 @@ classdef Bench < naomi.objects.BaseObject
     ACEStatus = false; % true/false if ASE has been started
     subsystems = {'config', 'wfs', 'dm', 'environment', 'gimbal', 'autocol'};
     
+    logBuffer; % initialized at startup 
+    productBuffer;
+    
     % processes is a containers.Map object. It is used to check if a process
     % is running or not and allows to kill interactively a process
     processes;
@@ -94,8 +97,10 @@ classdef Bench < naomi.objects.BaseObject
                 obj.config = config;
             end
             obj.processes = containers.Map();
+            obj.logBuffer = naomi.objects.Buffer(1, 400, 200, 1, @strings);
+            obj.productBuffer = naomi.objects.Buffer(1, 50, 20, 1, @strings);
         end
-
+        
         function test = has(obj, name)
         	% check if the subsystem of name 'name' is ready
         	% exemple  
@@ -446,62 +451,45 @@ classdef Bench < naomi.objects.BaseObject
             end
         end
         function set.ZtCData(obj, ZtCData)
-        	obj.config.log('Setting a new Zernique to Command Matrix\n', 1);
-            if obj.config.simulated
-                obj.simulator.zernike2Command = ZtCData.data;
-            else
+        	obj.log('NOTICE: Received a new Zernique to Command Matrix', 2);
              if obj.has('dm')
                 	obj.dm.zernike2Command = ZtCData.data;
              end
-            end
             obj.ZtCData = ZtCData;
         end
-
+        
         function ZtCArray = ZtCArray(obj, varargin)
-            if obj.config.simulated
-                ZtCArray = obj.simulator.zernike2Command;
-            else
-                ZtCArray = obj.dm.zernike2Command;
-            end
+            ZtCArray = obj.dm.zernike2Command;
             if ~isempty(varargin);ZtCArray = ZtCArray(varargin{:});end
         end
 
 
         function set.dmBiasData(obj, dmBiasData)
-            obj.config.log('Setting a new DM bias\n', 1);
-            if obj.config.simulated
-                obj.simulator.biasVector = dmBiasData.data(':');
-            else
+            obj.log('NOTICE: Receive a new DM bias', 2);
              if obj.has('dm')
                     obj.dm.biasVector = dmBiasData.data(':');
              end
-            end
             obj.dmBiasData = dmBiasData;
         end
 
         function biasVector = biasVector(obj, varargin)
-            if obj.config.simulated
-                biasVector = obj.simulator.biasVector;
-            else
-                biasVector = obj.dm.biasVector;
-            end
+            biasVector = obj.dm.biasVector;
             if ~isempty(varargin);biasVector = biasVector(varargin{:});end
         end
-
+        
         function set.phaseReferenceData(obj, PR)
         	if isempty(PR)
-        		obj.config.log('Removing the phase reference ...', 1);
+        		obj.log('NOTICE: Removing the phase reference ', 2);
                 if obj.has('wfs'); obj.phaseReferenceData = []; end;
         	else
-	        	obj.config.log('Setting a new Phase Reference ...', 1);
+	        	obj.log('NOTICE: Setting a new Phase Reference', 2);
                 obj.phaseReferenceData = PR;
-
+                
 	        	if obj.has('wfs');                     
                     %check if it is working 
                     naomi.measure.phase(obj);
-                end;	        					   	
-				obj.config.log('OK\n', 1);
-            end
+            end;	        				
+          end
             
         end
         function phaseReferenceArray = phaseReferenceArray(obj, varargin)
@@ -562,6 +550,7 @@ classdef Bench < naomi.objects.BaseObject
         	end
         end
         function startWfs(obj)
+           obj.log('NOTICE: Starting WaveFront Sensor...', 1);
             if obj.config.simulated
                 obj.startSimulator();
                 obj.wfs = obj.simulator;
@@ -569,16 +558,20 @@ classdef Bench < naomi.objects.BaseObject
                 obj.startACE();
                 if ~obj.has('wfs'); obj.wfs = naomi.newWfs(obj.config); end
             end
+            obj.log('NOTICE: WaveFront Started', 1);
         end
         function stopWfs(obj)
+          obj.log('NOTICE: Stopping WaveFront Sensor...', 1);
             if obj.config.simulated
                 obj.wfs = [];
             else
                 obj.wfs = [];
             end
+            obj.log('NOTICE: WaveFront Stopped', 1);
         end
         
        	function startDm(obj)
+            obj.log('NOTICE: Starting DM ...', 1);
             if obj.config.simulated
                obj.startSimulator();
                obj.dm = obj.simulator;
@@ -588,16 +581,20 @@ classdef Bench < naomi.objects.BaseObject
                     obj.dm = naomi.newDm(obj.config); 
                 end
             end
+            obj.log('NOTICE: DM Started', 1);
         end
         function stopDm(obj)
+            obj.log('NOTICE: Stopping DM ...', 1);
             if obj.config.simulated
                 obj.dm = [];
             else
                 obj.dm = [];
             end
+            obj.log('NOTICE: DM Stopped', 1);
         end
         
         function startGimbal(obj)
+            obj.log('NOTICE: Starting Gimbal ...', 1);
             if obj.has('gimbal'); return ; end
             
             if obj.config.simulated
@@ -606,29 +603,33 @@ classdef Bench < naomi.objects.BaseObject
             else
                 obj.gimbal = naomi.newGimbal(obj.config); 
             end
+            obj.log('NOTICE: Gimbal Started', 1);
         end
         function stopGimbal(obj)
+            obj.log('NOTICE: Stopping Gimbal ...', 1);
             obj.gimbal = [];
+            obj.log('NOTICE: Gimbal Stopped', 1);
         end
-		function startAutocol(obj)
-			if ~obj.has('autocol'); obj.autocol = naomi.newAutocol(obj.config); end        	
-        end
-        function stopAutocol(obj)
-            obj.autocol = [];
-        end
+		
 		function startEnvironment(obj)
+            obj.log('NOTICE: Starting Environment ...', 1);
             if obj.config.simulated 
                 if ~obj.has('environment'); obj.environment= naomi.objects.EnvironmentSimu('simu',1); end
             else
                 if ~obj.has('environment'); obj.environment= naomi.newEnvironment(obj.config); end   
             end
+            obj.log('NOTICE: Environment Started', 1);
         end
         function stopEnvironment(obj)
-            if obj.has('environment'); obj.environment.disconnect; end
-			obj.environment = [];       	
+          obj.log('NOTICE: Stopping Environment ...', 1);
+          if obj.has('environment'); obj.environment.disconnect; end
+			     obj.environment = [];  
+          obj.log('NOTICE: Environment Stopped', 1);
         end
         function startSimulator(obj)
+            obj.log('NOTICE: Stopping Simulator ...', 1);
             if ~obj.has('simulator'); obj.simulator = naomi.newSimulator(obj.config); end  
+            obj.log('NOTICE: Simulator Stopped', 1);
         end
         function check = checkPhase(obj, phase)
             % Check the integrity of a phase screen
@@ -641,7 +642,22 @@ classdef Bench < naomi.objects.BaseObject
             end
         end
         
+        function log(obj, txt, verbose)
+          % add a log line in the buffer and print it 
+          if nargin<3
+            verbose=1;
+          end
+          if verbose<=obj.config.verbose
+            obj.logBuffer.newEntry(string(txt));
+            fprintf(txt);
+          end
+        end
         
+        function logProduct(obj, product)
+          % log a newly created product in the buffer
+          %   the input string is the product path 
+          obj.productBuffer.newEntry(string(product));
+        end
         
         function value = getKey(bench, key, default)
             % define here all the relation between bench parameters and
@@ -693,9 +709,8 @@ classdef Bench < naomi.objects.BaseObject
                     
             end
         end
-        function test(obj)
-            obj.getKey('TEMP1');
-        end
+        
+        
         function h = populateHeader(obj, h)
             % populate a generic fits header for all files a maximum of
             % information is populated here

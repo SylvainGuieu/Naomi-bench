@@ -19,10 +19,10 @@ function  success = bias(bench, data_or_file)
 	elseif isempty(data_or_file)
 		bench.dmBiasData = [];			
 		sucess = false;
-		bench.config.log('DM Bias removed', 2);
+		bench.log('NOTICE: DM Bias removed', 2);
 		if bench.config.plotVerbose
 			naomi.plot.figure('DM Bias'); clf;
-        end
+    end
 		success = true;
 		return 
 	else
@@ -38,5 +38,5 @@ function  success = bias(bench, data_or_file)
 		naomi.plot.figure('DM bias');
 		bench.dmBiasData.plot();
 	end
-	bench.config.log('DM Bias  configured',2);
+	bench.log('NOTICE: DM Bias configured',2);
 end

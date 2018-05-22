@@ -1,7 +1,7 @@
 function [ZtPArray,PtZArray] = theoriticalZtP(nSub,x0,y0,diamPix, centralObscurationPix, nZernike, orientation)
 % theoriticalZtP  Theoretical phase screen for N zernike modes
 %
-%   [ZtPArray,PtZArray] = compute.theoriticalZtP(nSub,x0,y0, diamPix,nZernike, orientation)
+%   [ZtPArray,PtZArray] = compute.theoriticalZtP(nSub,x0,y0, diamPix,centralObscurationPix, nZernike, orientation)
 %   
 %   The phase screen are roughly normalized to RMS=1
 %   The arrangement is the NOLL indexes, and start at

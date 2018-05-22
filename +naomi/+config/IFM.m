@@ -18,7 +18,7 @@ function  success = IFM(bench, data_or_file)
 	elseif isempty(data_or_file)
 		bench.IFMData = [];			
 		success = false;
-		bench.config.log('IFM matrix removed', 2);
+		bench.log('NOTICE: IFM matrix removed\n', 2);
 		if bench.config.plotVerbose
 			naomi.plot.figure('IFM'); clf;
 		end;
@@ -36,5 +36,5 @@ function  success = IFM(bench, data_or_file)
 		naomi.plot.figure('IFM');
 		bench.IFMData.plot();
 	end
-	bench.config.log('IFM matrix configured',2);
+	bench.log('NOTICE: new IFM matrix configured\n',2);
 end

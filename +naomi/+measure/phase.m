@@ -31,7 +31,7 @@ function [phaseArray, phaseData] = phase(bench, nPhase, filterTipTilt, substract
 		% Apply the mask 
 		rawPhaseArray(~maskArray) = NaN;
 		if ~bench.checkPhase(rawPhaseArray)
-            bench.config.log('Warning Invalid sup-appertures inside the mask !!\n');
+            bench.log('WARNING: Invalid sup-appertures inside the mask !!', 3);
         end
 
         % Remove mean

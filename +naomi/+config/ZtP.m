@@ -19,7 +19,7 @@ function  success = ZtP(bench, data_or_file)
 	elseif isempty(data_or_file)
 		bench.ZtPData = [];			
 		sucess = false;
-		bench.config.log('Phase to Zernike matrix removed', 2);
+		bench.log('NOTICE: Phase to Zernike matrix removed', 2);
 		if bench.config.plotVerbose
 			naomi.plot.figure('Phase to Zernike'); clf;
 		end;
@@ -37,5 +37,5 @@ function  success = ZtP(bench, data_or_file)
 		naomi.plot.figure('Phase to Zernike');
 		bench.ZtPData.plot();
 	end
-	bench.config.log('Phase to Zernike matrix configured',2);
+	bench.log('NOTICE: Phase to Zernike matrix configured',2);
 end

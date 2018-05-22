@@ -43,6 +43,10 @@ classdef Wfs < naomi.objects.BaseObject
         function Reset(obj)
            
         end
-        
+        function populateHeader(h)
+          K = naomi.KEYS;
+          naomi.addToHeader(h, K.WFSNSUB, obj.nSubAperture, K.WFSNSUBc);
+          naomi.addToHeader(h, K.WFSNAME, obj.model, K.WFSNAMEc);
+        end
     end    
 end

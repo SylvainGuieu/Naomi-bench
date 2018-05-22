@@ -1,4 +1,4 @@
-classdef EnvironmentBuffer < handle
+classdef EnvironmentBuffer < naomi.Objects.Buffer
     properties 
         
         buffer;
@@ -13,8 +13,9 @@ classdef EnvironmentBuffer < handle
         TMIRROR = 8;
         TQSM = 9;
         TEMBIANT = 10;
+        HUMIDITY = 11;
         
-        NCOL = 10;
+        NCOL = 11;
         
         index = 0;
         size;
@@ -23,13 +24,7 @@ classdef EnvironmentBuffer < handle
     end
     methods 
         function obj = EnvironmentBuffer(bufferSize, stepSize, dynamic)
-            
-            obj.buffer = zeros(bufferSize, obj.NCOL);
-            
-            obj.index = 0;
-            obj.size = bufferSize;
-            obj.stepSize = stepSize;
-            obj.dynamic = dynamic;
+            obj = obj@naomi.objects.Buffer(obj.NCOL, bufferSize, stepSize, dynamic);
         end
         function value = get(obj, key)
             i = obj.index;
@@ -57,28 +52,27 @@ classdef EnvironmentBuffer < handle
                    value = obj.buffer(1:i,obj.FANIN);
                case 'fanOut'
                    value = obj.buffer(1:i,obj.FANOUT);  
+              case 'humidity'
+                   value = obj.buffer(1:i,obj.FANOUT);  
                    
                otherwise
                    error('unknown field "%s"', key);
            end
            
         end
-        function data = data(obj, varargin)
-            data = obj.buffer(1:obj.index, :);
-            
-            if ~isempty(varargin);data = data(varargin{:}); end
-        end
+        
         function environmentData = toEnvironmentData(obj)
-            h = {{'TIME', obj.TIME, '[s] time table column number '}, ...
-                 {'CURRENT', obj.CURRENT, '[A] peltier current table column number'}, ...
-                 {'FANIN', obj.FANIN, '[v] inner fan  table column number '},...
-                 {'FANOUT', obj.FANOUT, '[v] outer fan  table column number '},...
-                 {'TREGUL', obj.TREGUL, '[C] regul set point  table column number '},...
-                 {'TIN', obj.TIN, '[C] inner temp. table column number '},...
-                 {'TOUT', obj.TOUT, '[C] outer temp. table column number '},...
-                 {'TMIRROR', obj.TMIRROR, '[C] mirror temp. table column number '},...
-                 {'TQSM', obj.TQSM, '[C] base qsm temp. table column number '},...
-                 {'TEMBIANT', obj.TEMBIANT, '[C] embiant temp. table column number '},...
+            h = {{'TIME', obj.TIME, 'time table column number '}, ...
+                 {'CURRENT', obj.CURRENT, 'peltier current table column number'}, ...
+                 {'FANIN', obj.FANIN, 'inner fan  table column number '},...
+                 {'FANOUT', obj.FANOUT, 'outer fan  table column number '},...
+                 {'TREGUL', obj.TREGUL, 'regul set point  table column number '},...
+                 {'TIN', obj.TIN, 'inner temp. table column number '},...
+                 {'TOUT', obj.TOUT, 'outer temp. table column number '},...
+                 {'TMIRROR', obj.TMIRROR, 'mirror temp. table column number '},...
+                 {'TQSM', obj.TQSM, 'base qsm temp. table column number '},...
+                 {'TEMBIANT', obj.TEMBIANT, 'embiant temp. table column number '},...
+                 {'HUMIDITY', obj.HUMIDITY, 'humidity table column number '},...
             };
             environmentData = naomi.data.Environment(obj.data, h);
         end
@@ -124,33 +118,6 @@ classdef EnvironmentBuffer < handle
         end
             
         
-        
-        function prepareForNext(obj)
-            % prepare the buffer to receive new entries
-            %
-            % If the buffer is dynamic (b.dynamic) and index reach the end 
-            % the buffer size is increased by b.stepSize
-            % Otherwhise if it is not dynamic and reach the end the last
-            % b.stepSize data are copied to the begining of the buffer to
-            % leave space for other comming
-            if (obj.index+1) > obj.size                
-               if obj.dynamic
-                   
-                   old = obj.buffer;
-                   new = zeros(obj.index+obj.stepSize, obj.NCOL);
-                   new(1:obj.index, :) = old(1:obj.index, :);
-                   obj.buffer = new;
-                    
-                      
-               else
-                   obj.buffer(1:end-obj.stepSize,:) = obj.buffer(obj.stepSize+1:end,:);
-                   obj.index = obj.size - obj.stepSize;
-               end
-            end
-            
-            obj.index = obj.index + 1;
-        end
-        
         function i = update(obj, e)
             % b.update(e)
             %
@@ -177,7 +144,8 @@ classdef EnvironmentBuffer < handle
             obj.buffer(i, obj.TEMBIANT) = e.tempEmbiant;
             obj.buffer(i, obj.FANIN) = e.fanIn;
             obj.buffer(i, obj.FANOUT) = e.fanOut;
-            obj.buffer(i, obj.CURRENT) = e.current;                  
+            obj.buffer(i, obj.CURRENT) = e.current; 
+            obj.buffer(i, obj.HUMIDITY) = e.humidity;                 
         end
     end
 end

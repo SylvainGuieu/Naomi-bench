@@ -13,7 +13,7 @@ function [ZtPData,PtZData] = ZtP(bench, nPushPull, amplitude, nZernike)
 	nSubAperture = bench.nSubAperture;
 	ZtPArray = zeros(nZernike,nSubAperture,nSubAperture);
 
-	config.log('Measure phase for NAOMI modes\n', 1);
+	bench.log('NOTICE: ZtP Start measure phase for NAOMI modes', 1);
     if ~isempty(bench.ZtCData)
         pupillDiameter = bench.ZtCData.getKey(K.ZTCDIAM, 0);
         if pupillDiameter ==0 % assume this is the configured pupill diameter
@@ -38,9 +38,10 @@ function [ZtPData,PtZData] = ZtP(bench, nPushPull, amplitude, nZernike)
 		
 
 	    amp = amplitude ./ max(abs(squeeze(bench.ZtCArray(iZernike,':'))));
-	    config.log(sprintf(' %i',iZernike), 1);  
+	    bench.log(sprintf('NOTICE: ZtP Zernike %i',iZernike), 2);  
 	    for p=1:nPushPull
             if bench.isProcessKilled('ZtP')
+								bench.log(sprintf('NOTICE: ZtP finished before end at %i',iZernike), 1);
                 ZtPData =[];
                 PtZData = [];
                 return 
@@ -76,7 +77,7 @@ function [ZtPData,PtZData] = ZtP(bench, nPushPull, amplitude, nZernike)
 		end
     end
     bench.killProcess('ZtP');
-	config.log('\n', 1); 
+	
 	% Compute the Phase to Naomi matrix (command matrix)
     Tmp = reshape(ZtPArray,nZernike,[]);
     Tmp(isnan(Tmp)) = 0;
@@ -97,5 +98,6 @@ function [ZtPData,PtZData] = ZtP(bench, nPushPull, amplitude, nZernike)
     
 	ZtPData = naomi.data.ZtP(ZtPArray, h, {bench});
 	PtZData = naomi.data.PtZ(PtZArray, h, {bench}); 
-
+	bench.log('NOTICE: ZtP Finished', 1);
+	
 end

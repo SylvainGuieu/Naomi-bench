@@ -7,7 +7,7 @@ function [dTip,dTilt] = alignAutoTipTilt(bench, gain, pupillDiameter, timeout)
     % convert time out in day
     timeout = timeout/(24*3600);
 	tiltThreshold = bench.config.pupillTipTiltThresholdAuto;
-	
+	bench.log('NOTICE: autoalignment started');
 	
 	[~,~,dTip,dTilt,~] = naomi.measure.missalignment(bench);
     startTime = now;
@@ -15,11 +15,11 @@ function [dTip,dTilt] = alignAutoTipTilt(bench, gain, pupillDiameter, timeout)
     
 	while ~checkAlign(dTip,dTilt, tiltThreshold)
 		if bench.isProcessKilled('alignAutoTipTilt')
-            bench.config.log('autoalignment killed');
+            bench.log('NOTICE: autoalignment finished');
             return 
         end
         if (now-startTime) > timeout 
-            bench.config.log('ERROR: autoalignment failed -> timeout');
+            bench.log('ERROR: autoalignment failed -> timeout');
             break
         end
 		
@@ -27,11 +27,19 @@ function [dTip,dTilt] = alignAutoTipTilt(bench, gain, pupillDiameter, timeout)
         
         axisTip = bench.axisMotor('tip');
         sTip = bench.axisSign('tip');
-        bench.gimbal.moveByArcsec(axisTip,  -gain*sTip*dTip * 1e-6 *4/2 / pupillDiameter / 4.8e-6);
+        %                             |- micron to meter
+        %                             |     |- rms to pic-to-valey
+        %                             |     | |- mecanical to optical angle
+        %                             |     | |                    |- rad to arcsec /4.8e-6
+        tipArcsec = -gain*sTip*dTip * 1e-6 *4/2 / pupillDiameter / 4.8e-6;
+        bench.gimbal.moveByArcsec(axisTip, tipArcsec);
+        
         
         axisTilt = bench.axisMotor('tilt');
         sTilt = bench.axisSign('tilt');
-        bench.gimbal.moveByArcsec(axisTilt,  -gain*sTilt*dTilt * 1e-6 *4/2 / pupillDiameter / 4.8e-6);
+        tiltArcsec =  -gain*sTilt*dTilt * 1e-6 *4/2 / pupillDiameter / 4.8e-6;
+        bench.gimbal.moveByArcsec(axisTilt, tiltArcsec);
+        bench.log(sprintf('NOTICE: moving gimbal by %.2f in tip and %.2f arcsec in tilt', tipArcsec, tiltArcsec));
         pause(0.1); % leave a bit of space for graphical process 
     end
     bench.killProcess('alignAutoTipTilt');
