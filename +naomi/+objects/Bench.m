@@ -233,13 +233,18 @@ classdef Bench < naomi.objects.BaseObject
         end
         
         
-        function  sizePix = sizePix(obj, sz)
-        	%return the size in pixel for a given pupill size in mm
-        	% if sz [m] is not given take the default in config.pupillDiameter
+        function  valuePixel = meter2pixel(obj, valueMeter)
+        	%return the size in pixel for a given size in meter
+        	% 
         	% if xScale/yScale [m/pixel] has not been computed look at config.pixelScale
-            sizePix = sz/obj.meanPixelScale;
+            valuePixel = valueMeter/obj.meanPixelScale;
         end
-    
+        
+        function  valueMeter = pixel2meter(obj, valuePixel)
+        	%return the size in meter for a given size inpixel
+          valueMeter = valuePixel*obj.meanPixelScale;
+        end
+        
         function registerProcess(obj, processName, stepSize)
             if nargin<3; stepSize = 0; end
             obj.processes(processName) = {now,0,stepSize};

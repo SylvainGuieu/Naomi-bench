@@ -1,54 +1,87 @@
-function maskData = pupillMask(bench, puppillDiameter, xCenter, yCenter, centralObscurtionDiameter)
+function [maskArray,maskData] = pupillMask(bench, mask, maskCenter)
 	% Make a mask for the WFS
 	% - bench : the bench object 
-	% - pupillDiameter : the Pupill diamter for the mask in [m]
-	%                    if not given takes the bench.config.ztcPupillDiameter
-	% - xCenter, yCenter : position of the pupill center 
-	%                      if not given takes the one defined in bench
-	%                      normaly measure at startup
-	% - centralObscurtionDiameter : central obscurtion in [m]
-    maskName = bench.config.ztcMode;
+  % - mask : can be :
+  %            -a string: name matching a mask defined in config 
+  %                      bench.config.maskChoices gives a list of mask names
+  %            -a 3 cell array defining {diameter, central-obscuration-diameter, unit}
+  %                      unit must be 'm' or 'pixel'
+  %            -a Matrix only the dimention of the matrix is checked, the mask is 
+  %                       then return as is. Or an error is raised. If maskCenter 
+  %                       is given it will be ignored
+  % - maskCenter  (optional) is a 2 array giving the [xCenter yCenter] of the mask in pixel
+  %               if mask center is given, the previously measured (or default) mirror center 
+  %               will be taken 
     
-	if nargin<2
-        pupillDiameter = bench.config.ztcPupillDiameter; maskName = ''; 
-    elseif ischar(puppillDiameter) 
-        
-        if strcmp(puppillDiameter, '')
-            maskData = [];
-            return 
+    
+    [mask, maskName] = bench.config.getMask(mask);
+    
+    if iscell(mask)
+      if length(mask)~=3
+        error('Mask must be a string, a 3 cell array or a matrix');
+      end
+      pupillDiameter = mask{1};
+      centralObscurtionDiameter = mask{2};
+      unit = mask{3};
+      switch unit
+        case 'm'
+          pupillDiameter = bench.sizePix(pupillDiameter);
+        	centralObscurtionDiameter = bench.sizePix(centralObscurtionDiameter);
+        case 'mm'
+          pupillDiameter = bench.sizePix(pupillDiameter/1000.);
+        	centralObscurtionDiameter = bench.sizePix(centralObscurtionDiameter/1000.);
+        case 'cm'
+          pupillDiameter = bench.sizePix(pupillDiameter/100.);
+        	centralObscurtionDiameter = bench.sizePix(centralObscurtionDiameter/100.);
+        case 'mum'
+          pupillDiameter = bench.sizePix(pupillDiameter/1e6);
+        	centralObscurtionDiameter = bench.sizePix(centralObscurtionDiameter/1e6);
+        case 'pixel'
+          % nothing to do 
+        otherwise
+          error('mask unit must be on of m, mm, cm, mum or pixel')
+      end   
+      
+      if nargin<3 || isempty(maskCenter)
+    		xCenter = bench.xCenter;
+    		yCenter = bench.yCenter;
+            
+    		if isempty(xCenter) || isempty(yCenter)
+    			error('WFs center has not been measured');
+    		end
+      else
+        if length(maskCenter)~=2
+          error('maskCenter must be a 2 array');
         end
-        bench.config.ztcMode = puppillDiameter;
-        pupillDiameter = bench.config.ztcPupillDiameter;
-    end
-	if nargin==3; error('config.mask should take 2 or 4 argument not 3');end
-	if nargin<3
-		xCenter = bench.xCenter;
-		yCenter = bench.yCenter;
-        
-		if isempty(xCenter) || isempty(yCenter)
-			error('WFs center has not been measured');
-		end
-	end	
-	if nargin<5; 
-        centralObscurtionDiameter = bench.config.ztcCentralObscurtionDiameter; 
-    end
-    if nargin>1
-        maskName = '';
+        xCenter = maskCenter(1);
+        yCenter = maskCenter(2);
+    	end	
+      
+      maskArray = naomi.compute.pupillMask(bench.nSubAperture, puppillDiameter,centralObscurtionDiameter, xCenter, yCenter);
+      
     else
-        maskName = bench.config.ztcMode;
+      if ~ismatrix(mask)
+        error('Mask must be a string, a 3 cell array or a matrix');
+      end
+      [ny,nx] = size(mask);
+      nSubAperture = bench.nSubAperture;
+      
+      if nx~=nSubAperture || ny~=nSubAperture
+        error('mask does not match the dimension of the wfs');
+      end
+      maskArray = mask;
     end
     
 	
-	diamPix = bench.sizePix(pupillDiameter);
-	obsPix  = bench.sizePix(centralObscurtionDiameter);
-	
-	maskArray = naomi.compute.pupillMask(bench.nSubAperture, diamPix, obsPix, xCenter, yCenter);
-
-    h = {{'PUPDIAM', pupillDiameter, 'Mask pupill diameter in [m]'}, 
-    	 {'XCENTER', xCenter, 'Mask X Center [pixel]'},
-    	 {'YCENTER', xCenter, 'Mask Y Center [pixel]'},
-    	 {'OBSCU', centralObscurtionDiameter, 'Mask central obscurtion diameter [m]'}, 
-         {'MNAME', maskName, 'Mask Name'}
-    	};
-    maskData = naomi.data.Mask(maskArray, h, {bench});
+	 if nargout>1
+     K = nami.KEYS;
+      h = {{'PUPDIAM', pupillDiameter, 'Mask pupill diameter in [m]'}, 
+      	   {'XCENTER', xCenter, 'Mask X Center [pixel]'},
+      	   {'YCENTER', xCenter, 'Mask Y Center [pixel]'},
+      	   {'OBSCU', centralObscurtionDiameter, 'Mask central obscurtion diameter [m]'}, 
+           {'MNAME', maskName, 'Mask Name'}
+      	};
+      maskData = naomi.data.Mask(maskArray, h, {bench});
+  end
+  
 end

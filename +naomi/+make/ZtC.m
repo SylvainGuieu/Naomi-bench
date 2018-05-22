@@ -26,7 +26,7 @@ function ZtCData = ZtC(bench, IFMData)
 	     {'IF_NEXC', IFMData.getKey('IF_NEXC', -9),'number of exclude pixel'},
 	     {'IF_PERC', IFMData.getKey('IF_PERC' , -9.99),'percentil to compute piston'}, 
          {'DIAM', diameter, 'Pupill Diameter in [m]'}, 
-         {'DIAMPIX', bench.sizePix(diameter),'Pupill Diameter in wfs pixel'},
+         {'DIAMPIX', bench.meter2pixel(diameter),'Pupill Diameter in wfs pixel'},
          {'NEIG', nEigenValue, 'Number of Eigen'},
          {'NZER', nZernike, 'Number of Zerniques'}
 	    };

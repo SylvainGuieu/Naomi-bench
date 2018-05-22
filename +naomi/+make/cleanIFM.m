@@ -2,7 +2,7 @@ function IFMCleanData = cleanIFM(bench, IFMData)
 	config = bench.config;
 	Percentil = config.ifmCleanPercentil;
 	% :TODO: check if it is the full pupill or the naomi pupill
-	Nexclude = int32(bench.sizePix(config.fullPupillDiameter) / 4.);
+	Nexclude = int32(bench.meter2pixel(config.fullPupillDiameter) / 4.);
 
 	if nargin<2
 		if isempty(bench.IFMData)

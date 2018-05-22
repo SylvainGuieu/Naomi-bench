@@ -62,9 +62,13 @@ classdef Config < handle
         % define typical mask here in naomi, mask can be called by their name
         % or by a 3xCell array defining the {diameter, central-obscurtion-diameter, unit}
         %  unit can be 'm' (converted in pixel by xPixelScale and yPixelSCale) or 'pixel' 
+        %           |- mask nam 
+        %           |        |- diameter (in given unit)
+        %           |        |         |- central obscuration diameter (in given unit)
+        %           |        |         |     |- unit 'm' or 'pixel'      
         maskDef = {
-          {'naomi', 28.0e-3,  0.0, 'm'}, ...
-          {'full',  99.99e-3, 0.0, 'm'} % big mask = no mask 
+                    {'naomi', 28.0e-3,  0.0, 'm'}, ...
+                    {'full',  99.99e-3, 0.0, 'm'} % big mask = no mask 
         };
         
         
@@ -499,14 +503,16 @@ classdef Config < handle
             mask = masks{gid};
         end
         
-        function mask = getMask(obj, maskInput)
+        function [mask,maskName] = getMask(obj, maskInput)
             % return IfMode or ask 
+            maskName = 'UNKNOWN';
             if nargin<2 || isempty(maskInput)
                 maskInput = obj.askMask()
             end
             
             if isstr(maskInput) || isstring(maskInput)
               found = false;
+              maskName = maskInput;
               for i=1:length(obj.maskDef)
                   def = obj.maskDef{i};
                   
