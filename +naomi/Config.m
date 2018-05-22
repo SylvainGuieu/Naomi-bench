@@ -505,12 +505,12 @@ classdef Config < handle
                 maskInput = obj.askMask()
             end
             
-            if isstr(maskInput)
+            if isstr(maskInput) || isstring(maskInput)
               found = false;
               for i=1:length(obj.maskDef)
                   def = obj.maskDef{i};
                   if strcmp(maskInput,def{1})
-                      mask = def{2:end};
+                      mask = def{2:4};
                       found = true;
                   end
               end
