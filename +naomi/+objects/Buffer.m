@@ -7,22 +7,28 @@ classdef Buffer < handle
       size;
       stepSize;
       dynamic = 0;
-      constructor;
+      arrayType;
   end
   methods 
-      function obj = Buffer(ncol, bufferSize, stepSize, dynamic, constructor)
+      function obj = Buffer(ncol, bufferSize, stepSize, dynamic, arrayType)
           if nargin<5
-            constructor = @zeros;
+            arrayType = 'double';
           end
-          Online@naomi.objects.Wfs(obj);
-          obj = obj@naomi.objects.Buffer();
-          obj.buffer = constructor(bufferSize, ncol);
           
+          switch arrayType
+              case 'double'
+                 
+                obj.buffer = zeros(bufferSize, ncol);
+              case 'string'
+                 obj.buffer = strings(bufferSize, ncol);
+              otherwise
+                error('Buffer accept only double or string for array Type');
+          end
           obj.index = 0;
           obj.size = bufferSize;
           obj.stepSize = stepSize;
           obj.dynamic = dynamic;
-          obj.constructor = @constructor;
+          obj.arrayType = arrayType;
       end
       function data = data(obj, varargin)
           data = obj.buffer(1:obj.index, :);
@@ -46,7 +52,19 @@ classdef Buffer < handle
              if obj.dynamic
                  
                  old = obj.buffer;
-                 new = obj.constructor(obj.index+obj.stepSize, obj.ncol);
+                 %new = obj.arrayConstructor(obj.index+obj.stepSize, obj.ncol);
+                 new = zeros(obj.index+obj.stepSize, obj.ncol);
+                 switch obj.arrayType
+                    case 'double'
+                        new = zeros(obj.index+obj.stepSize, obj.ncol);
+                        
+                    case 'string'
+                        new = strings(obj.index+obj.stepSize, obj.ncol);
+                       
+                     otherwise
+                        error('Buffer accept only double or string for array Type');
+                        
+                 end
                  new(1:obj.index, :) = old(1:obj.index, :);
                  obj.buffer = new;
                   
@@ -58,5 +76,6 @@ classdef Buffer < handle
           end
           
           obj.index = obj.index + 1;
+      end
   end
 end

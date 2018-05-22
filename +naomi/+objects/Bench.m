@@ -97,8 +97,8 @@ classdef Bench < naomi.objects.BaseObject
                 obj.config = config;
             end
             obj.processes = containers.Map();
-            obj.logBuffer = naomi.objects.Buffer(1, 400, 200, 1, @strings);
-            obj.productBuffer = naomi.objects.Buffer(1, 50, 20, 1, @strings);
+            obj.logBuffer = naomi.objects.Buffer(1, 400, 200, 1, 'string');
+            obj.productBuffer = naomi.objects.Buffer(1, 50, 20, 1, 'string');
         end
         
         function test = has(obj, name)

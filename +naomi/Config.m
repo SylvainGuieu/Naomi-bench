@@ -597,7 +597,8 @@ classdef Config < handle
           for iTab=1:length(obj.dmId2gimbalNumber) 
             pair = obj.dmId2gimbalNumber{iTab};
             if strcmp(pair{1},dmId)
-              gimbalNumber = obj.gimbalNumber = pair{2};
+               obj.gimbalNumber = pair{2};
+               gimbalNumber =  pair{2};
             end
           end 
         end

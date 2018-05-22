@@ -1,7 +1,7 @@
-classdef EnvironmentBuffer < naomi.Objects.Buffer
+classdef EnvironmentBuffer < naomi.objects.Buffer
     properties 
         
-        buffer;
+        %buffer;
         
         TIME = 1;
         CURRENT = 2;
@@ -17,14 +17,14 @@ classdef EnvironmentBuffer < naomi.Objects.Buffer
         
         NCOL = 11;
         
-        index = 0;
-        size;
-        stepSize;
-        dynamic = 0;
+        %index = 0;
+        %size;
+        %stepSize;
+        %dynamic = 0;
     end
     methods 
         function obj = EnvironmentBuffer(bufferSize, stepSize, dynamic)
-            obj = obj@naomi.objects.Buffer(obj.NCOL, bufferSize, stepSize, dynamic);
+            %obj = obj@naomi.objects.Buffer(obj.NCOL, bufferSize, stepSize, dynamic);
         end
         function value = get(obj, key)
             i = obj.index;

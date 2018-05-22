@@ -31,7 +31,7 @@ classdef WfsHASO128 < naomi.objects.Wfs
             end
             pause(obj.pause);
             phase = obj.haso.GetPhase();
-            if rotatePhase
+            if obj.rotatePhase
               phase = rot90(phase);
             end
             for iAxes=1:length(obj.flippedAxes)
@@ -42,7 +42,7 @@ classdef WfsHASO128 < naomi.objects.Wfs
         
         function image = getRawImage(obj)
           image = obj.haso.GetImage;
-          if rotatePhase
+          if obj.rotatePhase
             image = rot90(image);
           end
           for iAxes=1:length(obj.flippedAxes)
@@ -110,10 +110,7 @@ classdef WfsHASO128 < naomi.objects.Wfs
                 
             obj.haso.StopRtd();
         end
-        function populateHeader(obj, f)
-                % populate fits header
-                populateHeader@naomi.Wfs(obj, f);
-          end
+    
     end
     
 end
