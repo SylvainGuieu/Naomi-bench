@@ -65,7 +65,8 @@ classdef EnvironmentBuffer < handle
         end
         function data = data(obj, varargin)
             data = obj.buffer(1:obj.index, :);
-            data = data(varargin{:}); 
+            
+            if ~isempty(varargin);data = data(varargin{:}); end
         end
         function environmentData = toEnvironmentData(obj)
             h = {{'TIME', obj.TIME, '[s] time table column number '}, ...

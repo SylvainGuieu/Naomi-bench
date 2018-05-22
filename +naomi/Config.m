@@ -58,7 +58,15 @@ classdef Config < handle
         % this is the physical pupill of the DM on the bench 
         % not the one used for ZtC (see bellow)  
         fullPupillDiameter = 36.5e-3;
-         
+        
+        % define typical mask here in naomi, mask can be called by their name
+        % or by a 3xCell array defining the {diameter, central-obscurtion-diameter, unit}
+        %  unit can be 'm' (converted in pixel by xPixelScale and yPixelSCale) or 'pixel' 
+        maskDef = {
+          {'naomi', 28.0e-3,  0.0, 'm'}, ...
+          {'full',  99.99e-3, 0.0, 'm'} % big mask = no mask 
+        };
+        
         
         % some typical mode to compute the ZtC 
         %           |- config mode for Zernique2Command computation
@@ -422,8 +430,8 @@ classdef Config < handle
         end
         function askIfMode(obj)
             ifModes = obj.ifModeChoices;
-            [gid,~] = listdlg('PromptString','Select IFM measurement mode:','SelectionMode','single','ListString',obj.ifModes);
-            obj.ifMode = str2num(ifModes{gid});
+            [gid,~] = listdlg('PromptString','Select IFM measurement mode:','SelectionMode','single','ListString',ifModes);
+            obj.ifMode = ifModes{gid};
         end
         function ifMode = getIfMode(obj)
             % return IfMode or ask 
@@ -462,8 +470,8 @@ classdef Config < handle
         end
         function askZtcMode(obj)
             ztcModes = obj.ztcModeChoices;
-            [gid,~] = listdlg('PromptString','Select ztcM measurement mode:','SelectionMode','single','ListString',obj.ztcModes);
-            obj.ztcMode = str2num(ztcModes{gid});
+            [gid,~] = listdlg('PromptString','Select ztcM measurement mode:','SelectionMode','single','ListString',ztcModes);
+            obj.ztcMode = ztcModes{gid};
         end
         function ztcMode = getZ2cMode(obj)
             % return IfMode or ask 
@@ -471,6 +479,55 @@ classdef Config < handle
                 obj.askZtcMode()
             end
             ztcMode = obj.ztcMode
+        end
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %
+        %   mask set/ask/get/choices function 
+        %
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        function maskNames = maskChoices(obj)
+            maskNames = {};
+            for i=1:length(obj.maskDef)
+                maskNames{i} = obj.maskDef{i}{1};
+            end
+        end
+        function mask = askMask(obj)
+            masks = obj.maskChoices;
+            [gid,~] = listdlg('PromptString','Select mask :','SelectionMode','single','ListString',masks);
+            mask = masks{gid};
+        end
+        
+        function mask = getMask(obj, maskInput)
+            % return IfMode or ask 
+            if nargin<2 || isempty(maskInput)
+                maskInput = obj.askMask()
+            end
+            
+            if isstr(maskInput)
+              found = false;
+              for i=1:length(obj.maskDef)
+                  def = obj.maskDef{i};
+                  if strcmp(maskInput,def{1})
+                      mask = def{2:end};
+                      found = true;
+                  end
+              end
+              if ~found; error(strcat('unknown mode ',mode)); end 
+            else
+              if iscell(maskInput)
+                if length(maskInput)~=3
+                  error('mask must be a string, a 3xcell array or a Matrix');
+                end
+                mask = maskInput;
+              else
+                if ~ismatrix(maskInput)
+                  error('mask must be a string, a 3xcell array or a Matrix');
+                end
+                 mask = maskInput;                
+              end
+            end
         end
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

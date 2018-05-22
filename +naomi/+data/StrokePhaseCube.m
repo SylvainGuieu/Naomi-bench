@@ -34,7 +34,7 @@ classdef StrokePhaseCube < naomi.data.PhaseCube
         
         function phaseCube = phaseCube(obj, varargin)
             phaseCube = obj.data;
-            phaseCube = phaseCube(varargin{:});
+            if ~isempty(varargin);phaseCube = phaseCube(varargin{:});end
         end
         
         function fitsWriteData(obj, fileName)

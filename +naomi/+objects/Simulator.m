@@ -158,7 +158,7 @@ classdef Simulator < naomi.objects.BaseObject
             phaseArray = IFMArray'*obj.cmdVector;
             
             zernikeVector = naomi.compute.nanzero(phaseArray(:)') * reshape(obj.PtZtheoricArray,[],obj.ztcNzernike);
-            zernikeVector = zernikeVector(varargin{:});
+            if ~isempty(varargin);zernikeVector = zernikeVector(varargin{:});end
         end
         
         function setZernike(obj, zernikeIndex, zernikeVector)

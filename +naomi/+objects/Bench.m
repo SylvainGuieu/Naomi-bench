@@ -347,7 +347,7 @@ classdef Bench < naomi.objects.BaseObject
             else
                 zernikeVector = obj.dm.zernikeVector;
             end
-             zernikeVector = zernikeVector(varargin{:});
+             if ~isempty(varargin);zernikeVector = zernikeVector(varargin{:});end
         end
 
         function [cmdVector, cmdData] = cmdVector(obj, varargin)
@@ -356,7 +356,7 @@ classdef Bench < naomi.objects.BaseObject
             else
                 cmdVector = obj.dm.cmdVector;
             end
-            cmdVector = cmdVector(varargin{:});
+            if ~isempty(varargin);cmdVector = cmdVector(varargin{:});end
             
             if nargout>1
                h = {};
@@ -382,7 +382,7 @@ classdef Bench < naomi.objects.BaseObject
             else
                 ZtCArray = obj.dm.zernike2Command;
             end
-            ZtCArray = ZtCArray(varargin{:});
+            if ~isempty(varargin);ZtCArray = ZtCArray(varargin{:});end
         end
 
 
@@ -404,7 +404,7 @@ classdef Bench < naomi.objects.BaseObject
             else
                 biasVector = obj.dm.biasVector;
             end
-            biasVector = biasVector(varargin{:});
+            if ~isempty(varargin);biasVector = biasVector(varargin{:});end
         end
 
         function set.phaseReferenceData(obj, PR)
@@ -430,7 +430,7 @@ classdef Bench < naomi.objects.BaseObject
             else
                 phaseReferenceArray = obj.phaseReferenceData.data;
             end
-            phaseReferenceArray = phaseReferenceArray(varargin{:});
+            if ~isempty(varargin);phaseReferenceArray = phaseReferenceArray(varargin{:});end
         end
 
         function nSubAperture = nSubAperture(obj)

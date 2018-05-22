@@ -166,7 +166,7 @@ classdef BaseData < handle
         end
         function data = data(obj, varargin)
             data = obj.getData();
-            if nargin>1
+            if ~isempty(varargin)
                 data = data(varargin{:});
             end
         end

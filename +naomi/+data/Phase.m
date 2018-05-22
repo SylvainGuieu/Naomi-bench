@@ -95,7 +95,9 @@ classdef Phase < naomi.data.BaseData
             pupillMaskArray = naomi.compute.pupillMask(obj.nSubAperture, ...
                                             obj.pupillDiameterPix,0.0,...
                                             obj.xCenter, obj.yCenter);
-            pupillMaskArray = pupillMaskArray(varargin{:});                         
+																						
+						if ~isempty(varargin); pupillMaskArray = pupillMaskArray(varargin{:}); end      
+						                   
         end
         
         function maskedPhaseArray = maskedPhaseArray(obj, varargin)
@@ -104,7 +106,7 @@ classdef Phase < naomi.data.BaseData
             phase = obj.data;         
             maskedPhaseArray = phase;            
             maskedPhaseArray(~obj.pupillMaskArray) = nan;
-            maskedPhaseArray = maskedPhaseArray(varargin{:});
+            if ~isempty(varargin); maskedPhaseArray = maskedPhaseArray(varargin{:});end
         end
         
         function maskedPhaseData = maskedPhaseData(obj)
@@ -125,14 +127,14 @@ classdef Phase < naomi.data.BaseData
         function phaseArray = phaseArray(obj, varargin)
             % return the phase Array of this measurement
             phaseArray = obj.data;
-            phaseArray = phaseArray(varargin{:});
+            if ~isempty(varargin);phaseArray = phaseArray(varargin{:});end
         end
         
         function normalizedPhaseArray = normalizedPhaseArray(obj, varargin)
             % return the  phase where the piston has been removed
             % and the gain (the std over the active pupill) is one
             normalizedPhaseArray = (obj.phaseArray - obj.piston)./obj.gain;
-            normalizedPhaseArray = normalizedPhaseArray(varargin{:});
+            if ~isempty(varargin);normalizedPhaseArray = normalizedPhaseArray(varargin{:});end
         end
         
         function piston = piston(obj)

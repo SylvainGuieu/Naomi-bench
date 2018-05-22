@@ -72,7 +72,7 @@ classdef PhaseZernike < naomi.data.Phase
                                                 obj.pupillDiameterPix, ...
                                                 zernike, ...
                                                 obj.orientation);
-            theoreticalPhaseArray = theoreticalPhaseArray(varargin{:});                               
+            if ~isempty(varargin);theoreticalPhaseArray = theoreticalPhaseArray(varargin{:}); end                              
         end
         function theoreticalPhaseData  = theoreticalPhaseData(obj)
                theoreticalPhaseArray = obj.theoreticalPhaseArray;
@@ -93,7 +93,7 @@ classdef PhaseZernike < naomi.data.Phase
             tPhase = obj.theoreticalPhaseArray;
             phase  = obj.normalizedPhaseArray;
             residualArray = phase - tPhase;
-            residualArray = residualArray(varargin{:});
+            if ~isempty(varargin);residualArray = residualArray(varargin{:});end
         end
         
         
