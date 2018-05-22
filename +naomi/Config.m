@@ -509,9 +509,10 @@ classdef Config < handle
               found = false;
               for i=1:length(obj.maskDef)
                   def = obj.maskDef{i};
+                  
                   if strcmp(maskInput,def{1})
-                      mask = def{2:4};
-                      mask
+                      mask = def(2:end);
+                      
                       found = true;
                   end
               end
