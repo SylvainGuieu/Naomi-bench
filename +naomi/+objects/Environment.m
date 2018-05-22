@@ -830,7 +830,7 @@ function temp = getUSBTemp(channelNum)
     else
         tempVal = 0;
         tempPtr = libpointer('singlePtr', tempVal);
-        boardNum = 0 ;% match the board number in InstaCal
+        boardNum = 1 ;% match the board number in InstaCal
         tempScale = 0 ;% 0 = Celsius, 1 = Fahrenheit, 2 = Kelvin, 5 = No Scale
         options = 0; % 0 = Filter, 1024 = No Filter
         

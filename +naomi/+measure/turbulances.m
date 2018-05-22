@@ -1,17 +1,32 @@
 function [phaseCube, phaseCubeData] = turbulances(bench, phaseReference, nPhase)
-  
+    if nargin<2
+        phaseReference = 10;
+    end
+    if nargin<3
+        nPhase = 10;
+    end
     if length(phaseReference)==1 
       % this is the number of phase to be averaged 
-      phaseReference = naomi.measurePhase(bench, phaseReference, 0); 
+      phaseReference = naomi.measure.phase(bench, phaseReference, 0); 
     end
-    nSubaperture = bench.nSubaperture;
-    phaseCube(nPhase, nSubAperture, nSubAperture);
+    nSubAperture = bench.nSubAperture;
+    phaseCube = zeros(nPhase, nSubAperture, nSubAperture);
     for iPhase=1:nPhase
-      phaseCube(iPhase, :,:) = naomi.measurePhase(bench, 1, 0);
+      phaseCube(iPhase, :,:) = naomi.measure.phase(bench, 1, 0) - phaseReference;
     end
       
     if nargout>1
-      h = {{}};
+      h = {{'TEMPMIR',bench.environment.tempMirror, '[C] Mirror temperature'},... 
+           {'TEMPQSM',bench.environment.tempQSM, '[C] QSM temperature'},... 
+           {'TEMPIN',bench.environment.tempIn, '[C] Peltier inner face temperature'},... 
+           {'TEMPOUT',bench.environment.tempOut, '[C] Peltier outer face temperature'}, ...
+           {'TEMPEMBI',bench.environment.tempEmbiant, '[C] Embiant temperature'}, ...
+           {'CURENT',bench.environment.current, '[A] Peltier Current'},... 
+           {'FANIN',bench.environment.fanIn, '[V] Peltier inner fan voltage '},... 
+           {'FANOUT',bench.environment.fanOut, '[V] Peltier outer fan voltage '},...
+           {'TEMPREG',bench.environment.fanOut, '[C] Peltier regulation temperature'},...
+           {'MLDATE', now, 'matlab date when data recorded'}, ...
+           };
       phaseCubeData = naomi.data.PhaseCube(phaseCube, h, {bench});
     end
 end
