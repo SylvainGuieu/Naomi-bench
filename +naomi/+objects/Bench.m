@@ -57,6 +57,8 @@ classdef Bench < naomi.objects.BaseObject
     
     % The mask data as created by naomi.make.pupillMask 
     maskData;
+    % mask can have a name 
+    maskName = 'UNKNOWN';
 
     % phaseReferenceData
     % the phase Reference data, this should be a naomi.data.PhaseReference object 
@@ -244,6 +246,80 @@ classdef Bench < naomi.objects.BaseObject
         	%return the size in meter for a given size inpixel
           valueMeter = valuePixel*obj.meanPixelScale;
         end
+        
+        function [pupillDiameterPix, centralObscurtionDiameterPix] = getMaskInPixel(bench, mask)
+          mask = bench.config.getMask(mask);
+          if iscell(mask)
+            if length(mask)~=3
+              error('Mask must be a string, a 3 cell array or a matrix');
+            end
+            pupillDiameter = mask{1};
+            centralObscurtionDiameter = mask{2};
+            unit = mask{3};
+            switch unit
+              case 'm'
+                pupillDiameterPix = bench.meter2pixel(pupillDiameter);
+              	centralObscurtionDiameterPix = bench.meter2pixel(centralObscurtionDiameter);
+              case 'mm'
+                pupillDiameterPix = bench.meter2pixel(pupillDiameter/1000.);
+              	centralObscurtionDiameterPix = bench.meter2pixel(centralObscurtionDiameter/1000.);
+              case 'cm'
+                pupillDiameterPix = bench.meter2pixel(pupillDiameter/100.);
+              	centralObscurtionDiameterPix = bench.meter2pixel(centralObscurtionDiameter/100.);
+              case 'mum'
+                pupillDiameterPix = bench.meter2pixel(pupillDiameter/1e6);
+              	centralObscurtionDiameterPix = bench.meter2pixel(centralObscurtionDiameter/1e6);
+              case 'pixel'
+                pupillDiameterPix = pupillDiameter;
+                centralObscurtionDiameterPix = centralObscurtionDiameter;
+             
+              otherwise
+                error('mask unit must be on of m, mm, cm, mum or pixel')
+            end   
+          else
+            pupillDiameterPix = nan;
+            centralObscurtionDiameterPix = nan;
+          end
+        end
+        
+        
+        function [pupillDiameterMeter, centralObscurtionDiameterMeter] = getMaskInMeter(bench, mask)
+          mask = bench.config.getMask(mask);
+          if iscell(mask)
+            if length(mask)~=3
+              error('Mask must be a string, a 3 cell array or a matrix');
+            end
+            pupillDiameter = mask{1};
+            centralObscurtionDiameter = mask{2};
+            unit = mask{3};
+            switch unit
+              case 'm'
+                pupillDiameterMeter = pupillDiameter;
+              	centralObscurtionDiameterMeter = centralObscurtionDiameter;
+              case 'mm'
+                pupillDiameterMeter = pupillDiameter/1000.;
+              	centralObscurtionDiameterMeter = centralObscurtionDiameter/1000.;
+              case 'cm'
+                pupillDiameterMeter = pupillDiameter/100.;
+              	centralObscurtionDiameterMeter = centralObscurtionDiameter/100.;
+              case 'mum'
+                pupillDiameterMeter = pupillDiameter/1e6;
+              	centralObscurtionDiameterMeter = centralObscurtionDiameter/1e6;
+              case 'pixel'
+                pupillDiameterMeter = bench.pixel2meter(pupillDiameter);
+                centralObscurtionDiameterMeter = bench.pixel2meter(centralObscurtionDiameter);
+             
+              otherwise
+                error('mask unit must be on of m, mm, cm, mum or pixel')
+            end   
+          else
+            pupillDiameterMeter = nan;
+            centralObscurtionDiameterMeter = nan;
+          end
+        end
+        
+        
+        
         
         function registerProcess(obj, processName, stepSize)
             if nargin<3; stepSize = 0; end
@@ -583,7 +659,7 @@ classdef Bench < naomi.objects.BaseObject
                     end
                     
                 case K.ZTCDIAM
-                    value = bench.config.ztcPupillDiameter;
+                    value = bench.getMaskInMeter(bench.config.ztcMask);
                     
                 case K.FPUPDIAM
                     value = bench.config.fullPupillDiameter;

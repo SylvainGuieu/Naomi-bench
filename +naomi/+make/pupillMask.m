@@ -25,17 +25,17 @@ function [maskArray,maskData] = pupillMask(bench, mask, maskCenter)
       unit = mask{3};
       switch unit
         case 'm'
-          pupillDiameter = bench.sizePix(pupillDiameter);
-        	centralObscurtionDiameter = bench.sizePix(centralObscurtionDiameter);
+          pupillDiameter = bench.meter2pixel(pupillDiameter);
+        	centralObscurtionDiameter = bench.meter2pixel(centralObscurtionDiameter);
         case 'mm'
-          pupillDiameter = bench.sizePix(pupillDiameter/1000.);
-        	centralObscurtionDiameter = bench.sizePix(centralObscurtionDiameter/1000.);
+          pupillDiameter = bench.meter2pixel(pupillDiameter/1000.);
+        	centralObscurtionDiameter = bench.meter2pixel(centralObscurtionDiameter/1000.);
         case 'cm'
-          pupillDiameter = bench.sizePix(pupillDiameter/100.);
-        	centralObscurtionDiameter = bench.sizePix(centralObscurtionDiameter/100.);
+          pupillDiameter = bench.meter2pixel(pupillDiameter/100.);
+        	centralObscurtionDiameter = bench.meter2pixel(centralObscurtionDiameter/100.);
         case 'mum'
-          pupillDiameter = bench.sizePix(pupillDiameter/1e6);
-        	centralObscurtionDiameter = bench.sizePix(centralObscurtionDiameter/1e6);
+          pupillDiameter = bench.meter2pixel(pupillDiameter/1e6);
+        	centralObscurtionDiameter = bench.meter2pixel(centralObscurtionDiameter/1e6);
         case 'pixel'
           % nothing to do 
         otherwise
@@ -58,6 +58,20 @@ function [maskArray,maskData] = pupillMask(bench, mask, maskCenter)
     	end	
       
       maskArray = naomi.compute.pupillMask(bench.nSubAperture, puppillDiameter,centralObscurtionDiameter, xCenter, yCenter);
+      if nargout>1
+        K = nami.KEYS;
+        
+        h = {{K.MPUPDIAM, bench.pixel2meter(pupillDiameter), K.MPUPDIAMc}, ...
+             {K.MPUPDIAMPIX, pupillDiameter, K.MPUPDIAMPIXc}, ...
+         	   {K.XCENTER, xCenter, K.XCENTERc},...
+         	   {K.YCENTER, xCenter, K.YCENTERc},...
+         	   {K.MCOBSDIAMPIX, centralObscurtionDiameter, K.MCOBSDIAMPIXc},...
+             {K.MCOBSDIAM, bench.pixel2meter(centralObscurtionDiameter), K.MCOBSDIAMc},...  
+            {K.MNAME,  maskName, K.MNAMEc}
+         	};
+         maskData = naomi.data.Mask(maskArray, h, {bench});
+    end  
+      
       
     else
       if ~ismatrix(mask)
@@ -70,18 +84,13 @@ function [maskArray,maskData] = pupillMask(bench, mask, maskCenter)
         error('mask does not match the dimension of the wfs');
       end
       maskArray = mask;
-    end
-    
-	
-	 if nargout>1
-     K = nami.KEYS;
-      h = {{'PUPDIAM', pupillDiameter, 'Mask pupill diameter in [m]'}, 
-      	   {'XCENTER', xCenter, 'Mask X Center [pixel]'},
-      	   {'YCENTER', xCenter, 'Mask Y Center [pixel]'},
-      	   {'OBSCU', centralObscurtionDiameter, 'Mask central obscurtion diameter [m]'}, 
-           {'MNAME', maskName, 'Mask Name'}
-      	};
-      maskData = naomi.data.Mask(maskArray, h, {bench});
+      
+      if nargout>1
+        K = nami.KEYS;
+        
+        h = {{K.MNAME,  maskName, K.MNAMEc}};
+        maskData = naomi.data.Mask(maskArray, h, {bench});
+    end	 
   end
   
 end

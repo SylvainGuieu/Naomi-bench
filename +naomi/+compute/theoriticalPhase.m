@@ -1,4 +1,4 @@
-function [phaseArray] = theoriticalPhase(nSub,x0,y0,diamPix, zernikeNumber, orientation)
+function [phaseArray] = theoriticalPhase(nSub,x0,y0,diamPix, centralObscurationPix, zernikeNumber, orientation)
 % theoriticalZtP  Theoretical phase screen for N zernike modes
 %
 %   [phaseArray] = compute.theoriticalPhase(nSub,x0,y0,diamPix, zernikeNumber)
@@ -11,16 +11,18 @@ function [phaseArray] = theoriticalPhase(nSub,x0,y0,diamPix, zernikeNumber, orie
 %   
 %   nSub: size of output phase screen   
 %   x0,y0,diamPix: circle to define the pupil
+%   dimaPix: the diameter of the pupill [pixel]
+%   centralObscurationPix: the central obscuration diameter [pixel]
 %   zernikeNumber: the  zernike number 
 %   
 %   phaseArray(nSub,nSub): phase screen for the given zernike
 %   
 %   
 % Mask to define the phase pupil
-if nargin<6
+if nargin<7
     orientation = 'xy';
 end
-mask = naomi.compute.pupillMask(nSub,diamPix, 0.0, x0, y0);
+mask = naomi.compute.pupillMask(nSub,diamPix, centralObscurationPix, x0, y0);
  
 %[X,Y] = meshgrid(1:nSub,1:nSub);
 [X,Y] = naomi.compute.orientedMeshgrid(1:nSub,orientation); 

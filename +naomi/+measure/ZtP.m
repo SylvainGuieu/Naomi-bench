@@ -17,11 +17,11 @@ function [ZtPData,PtZData] = ZtP(bench, nPushPull, amplitude, nZernike)
     if ~isempty(bench.ZtCData)
         pupillDiameter = bench.ZtCData.getKey(K.ZTCDIAM, 0);
         if pupillDiameter ==0 % assume this is the configured pupill diameter
-            pupillDiameter = bench.config.ztcPupillDiameter;
+            pupillDiameter = bench.getMaskInMeter(bench.config.ztcMask);
         end
         
     else % assume this is the configured pupill diameter
-        pupillDiameter = bench.config.ztcPupillDiameter;
+			pupillDiameter = bench.getMaskInMeter(bench.config.ztcMask);
     end
     xPscale =  bench.xPixelScale;
     yPscale =  bench.yPixelScale;

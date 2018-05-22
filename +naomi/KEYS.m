@@ -35,9 +35,28 @@ classdef KEYS
         MJDOBS = 'MJD-OBS';
         MJDOBSc = 'Modified Julian Date of writing header';
         
+        
+        MPUPDIAM = 'MPUPDIAM';
+        MPUPDIAMc = 'Masked Pupill Diamter [m]';
+        
+        MPUPDIAMPIX = 'MPUPDIAMP';
+        MPUPDIAMPIXc = 'Masked Pupill Diamter [pixel]';
+        
+        MCOBSDIAM = 'MCODIAM';
+        MCOBSDIAMc = 'Mask Central obscuration Diameter [m]';
+        
+        MCOBSDIAMPIX = 'MCODIAMP';
+        MCOBSDIAMPIXc = 'Mask Central obscuration Diameter [pixel]';
+        
+        MNAME = 'MNAME';
+        MNAMEc = 'Mask name or UNKNOWN';
+        MNAMEd = 'UNKNOWN';
+        
         FPUPDIAM = 'FPUPDIAM';
         FPUPDIAMc = 'Full DM Pupill Diamter [m]';
         FPUPDIAMd = 36.5e-3;
+        
+        
         
         CENTACT = 'CENTACT';
         CENTACTc = 'DM center actuator number';
@@ -51,6 +70,21 @@ classdef KEYS
         
         IFNPP =  'IF_NPP';
         IFNPPc = 'number of push-pull';
+        
+        IFNEXC = 'IF_NEXC';
+        IFNEXCc = 'number of exclude pixel when/if cleaned';
+        
+        IFPERC= 'IF_PERC';
+        IFPERCc = 'percentil to compute piston';
+        
+        
+        
+        
+        IFMLOOP = 'IF_LOOP';
+        IFMLOOPc = 'Number of cycle to compute the IFM';
+        
+        IFMPAUSE = 'IF_LOOP';
+        IFMPAUSEc = '[s] between actuator';
         
         RXORDER = 'RXORDER';
         RXORDERc = 'tip or tilt movement of the rx motor';
@@ -106,7 +140,7 @@ classdef KEYS
         YPSCALEd = 0.38e-3;
         
         ZTCDIAM = 'ZTCDIAM';
-        ZTCDIAMc = 'Pupill diameter used in [m]';
+        ZTCDIAMc = '[m] Pupill diameter used for ZtC';
         ZTCDIAMd = 28.0e-3; % default is the naomi one
         
         NPP = 'NPP';
@@ -145,6 +179,9 @@ classdef KEYS
         
         ZTCNEIG= 'ZTC_NEIG';
         ZTCNEIGc =  'accepted Eigenvalues';
+        
+        ZTCNZERN= 'ZTC_NZER';
+        ZTCNZERNc = 'number of zernikes kep for ZtC';
         
         WFSNSUB = 'WFS_NSUB';
         WFSNSUBc = 'Number of subapperture of wavefront sensor';

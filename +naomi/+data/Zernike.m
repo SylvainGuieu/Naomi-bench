@@ -40,7 +40,7 @@ classdef Zernike < naomi.data.BaseData
             n = obj.nSubAperture;
             orientation = obj.getKey(naomi.KEYS.ORIENT,naomi.KEYS.ORIENTd);
             
-            theoriticalPhase = naomi.compute.theoriticalPhase(n, n/2, n/2, n, zernike, orientation);
+            theoriticalPhase = naomi.compute.theoriticalPhase(n, n/2, n/2, n, 0.0, zernike, orientation);
             cla(axes);
             imagesc(axes, theoriticalPhase);
             xlim(axes, [0,512]);

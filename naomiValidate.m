@@ -34,9 +34,8 @@ ZtPData = naomi.measure.ZtP(bench); % measure the Zernique to Phase for NAOMI
 ZtPData.saveFromDate(todayDirectory, startDate); % save the Z2P file 
 
 % set the Naomi pupill mask as described in config
-% see parameters ztcPupillDiameter = 28.0e-3;
-% ztcCentralObscurtionDiameter = 0.0; ztcNeigenValue = 140; ztcNzernike = 100;
-naomi.config.pupillMask(bench); 
+% ztcNeigenValue = 140; ztcNzernike = 100;
+naomi.config.pupillMask(bench, bench.config.ztcMask); 
 
 % record a flat in open loop and save it 
 [~,openFlatData] = naomi.measure.openFlat(bench);

@@ -74,21 +74,20 @@ classdef Config < handle
         
         % some typical mode to compute the ZtC 
         %           |- config mode for Zernique2Command computation
-        %           |               |- diameter used for ZtC
-        %           |               |        |- central obscurtion used in [m]
-        %           |               |        |    |- n Eigen Value value 
-        %           |               |        |    |   |- nZernike number of Zernique to keep 
+        %           |               |- mask name or definition 
+        %           |               |        
+        %           |               |       |- n Eigen Value value 
+        %           |               |       |   |- nZernike number of Zernique to keep 
         ztcDef = {
-                  {'naomi',        28.0e-3, 0.0, 140, 100},
-                  {'naomi-sparta', 28.0e-3, 0.0, 140, 21 }, 
-                  {'full',        99.99e-3, 0.0, 220, 100} % make a big mask = no mask 
+                  {'naomi',        'naomi', 140, 100},
+                  {'naomi-sparta', 'naomi', 140, 21 }, 
+                  {'full',         'full', 220, 100} % make a big mask = no mask 
                 };
         % current ztcMode 
         ztcMode = 'naomi';
-        % ZtC pupill size used for computation in m 
-        ztcPupillDiameter = 28.0e-3;
-        % The central obstruction used for ZtC computation 
-        ztcCentralObscurtionDiameter = 0.0; 
+        % current ztcMask 
+        ztcMask = 'naomi';
+        
         % number of eigen value for Zernique to command matrix 
         ztcNeigenValue = 140;
         % number of Zernique to command matrix 
@@ -455,10 +454,10 @@ classdef Config < handle
             for i=1:length(obj.ztcDef)
                 def = obj.ztcDef{i};
                 if strcmp(mode,def{1})
-                    obj.ztcPupillDiameter = def{2};
-                    obj.ztcCentralObscurtionDiameter = def{3};
-                    obj.ztcNeigenValue = def{4};
-                    obj.ztcNzernike = def{5};
+                    obj.ztcMask = def{2};
+                    
+                    obj.ztcNeigenValue = def{3};
+                    obj.ztcNzernike = def{4};
                     found = true;
                 end
             end

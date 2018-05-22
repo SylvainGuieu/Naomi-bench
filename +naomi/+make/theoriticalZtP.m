@@ -5,6 +5,8 @@ function [ZtPArray,PtZArray] = theoriticalZtP(bench)
 
 	x0 = bench.xCenter;
 	y0 = bench.yCenter;
-	diamPix = bench.meter2pixel(bench.config.ztcPupillDiameter);
-	[ZtPArray,PtZArray] = naomi.compute.theoriticalZtP(nSubAperture,x0,y0,diamPix, nZernike);
+	[pupillDiameterPix, centralObscurationPix] = bench.getMaskInPixel(bench.config.ztcMask);
+	
+	
+	[ZtPArray,PtZArray] = naomi.compute.theoriticalZtP(nSubAperture,x0,y0,pupillDiameterPix, centralObscurationPix, nZernike);
 end

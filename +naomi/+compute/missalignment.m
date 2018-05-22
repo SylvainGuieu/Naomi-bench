@@ -19,7 +19,7 @@ function [dX,dY,dTip,dTilt,dFoc] = missalignment(phaseArray, diameter, orientati
    
     [xTarget, yTarget] = naomi.compute.pupillCenter(phaseArray);
     
-	[~,PtZ] = naomi.compute.theoriticalZtP(nSubAperture,xTarget,yTarget,diameter,4, orientation);
+	[~,PtZ] = naomi.compute.theoriticalZtP(nSubAperture,xTarget,yTarget,diameter,0.0,4, orientation);
     
 	zer = naomi.compute.nanzero(phaseArray(:)') * reshape(PtZ,[],4);
 	dX = (xTarget-x0);

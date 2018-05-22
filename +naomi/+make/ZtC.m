@@ -2,6 +2,7 @@ function ZtCData = ZtC(bench, IFMData)
 	% Compute the ZtC Matrix 
 	% The only required parameter is bench all others are taken from 
 	% measurement stored inside bench or inside config.  
+	% the given IFMdata is preferably cleaned 
 
 	config = bench.config
 	if nargin<2
@@ -9,30 +10,34 @@ function ZtCData = ZtC(bench, IFMData)
 	end
 	
 	
-	diameter = config.ztcPupillDiameter;	
-	centralObscurtionDiameter = config.ztcCentralObscurtionDiameter; 
+	[pupillDiameter, centralObscurtionDiameter] = bench.getMaskInMeter(config.ztcMask);
+	
 	nEigenValue = config.ztcNeigenValue;
 	nZernike = config.ztcNzernike;
-    
+  
 	
 	
-	ZtCArray = naomi.compute.ZtC(IFMData.data,  diameter,  centralObscurtionDiameter, config.dmCentralActuator, nEigenValue, nZernike);
-
-	h = {{'MJD-OBS', IFMData.getKey('MJD-OBS',0.0), 'modified julian when IFM measured'},
-	     {'IF_AMP' , IFMData.getKey('AMP',   -9.99),  '[Cmax] amplitude of push-pull'},
-	     {'IF_NPP'  ,IFMData.getKey('IF_NPP',  -9), 'number of push-pull'},
-	     {'IF_LOOP' ,IFMData.getKey('IF_LOOP', -9),'number of push-pull'},
-	     {'IF_PAUSE',IFMData.getKey('IF_PAUSE', -9.99),'pause between actioneu'}, 
-	     {'IF_NEXC', IFMData.getKey('IF_NEXC', -9),'number of exclude pixel'},
-	     {'IF_PERC', IFMData.getKey('IF_PERC' , -9.99),'percentil to compute piston'}, 
-         {'DIAM', diameter, 'Pupill Diameter in [m]'}, 
-         {'DIAMPIX', bench.meter2pixel(diameter),'Pupill Diameter in wfs pixel'},
-         {'NEIG', nEigenValue, 'Number of Eigen'},
-         {'NZER', nZernike, 'Number of Zerniques'}
+	ZtCArray = naomi.compute.ZtC(IFMData.data,  pupillDiameter, centralObscurtionDiameter, config.dmCentralActuator, nEigenValue, nZernike);
+	
+	K = naomi.KEYS;
+	
+	h = {{K.MJDOBS,  IFMData.getKey(K.MJDOBS,0.0), K.MJDOBSc},...
+	     {K.IFAMP ,  IFMData.getKey('AMP',   -9.99),  K.IFAMPc},...
+	     {IFNPP  ,   IFMData.getKey(K.IFNPP,  -9), K.IFNPPc},...
+	     {K.IFMLOOP ,IFMData.getKey(K.IFMLOOP, -9),K.IFMLOOP},...
+	     {K.IFMPAUSE,IFMData.getKey(K.IFMPAUSE, -9.99), K.IFMPAUSEc},... 
+	     {K.IFNEXC,  IFMData.getKey(K.IFNEXC, -9),K.IFNEXCc},...
+	     {K.IFPERC,  IFMData.getKey(K.IFPERC , -9.99), K.IFPERCc},... 
+       {K.MPUPDIAM,   pupillDiameter, K.MPUPDIAMc},... 
+			 {K.ZTCDIAM,    pupillDiameter, K.ZTCDIAMc},... 
+       {K.MPUPDIAMPIX, bench.meter2pixel(pupillDiameter),K.MPUPDIAMPIXc},...
+       {K.ZTCNEIG, nEigenValue, K.ZTCNEIGc},...
+       {K.NZERN, nZernike, K.NZERN},... 
+			 {K.ZTCNZERN, nZernike, K.ZTCNZERN} 
 	    };
 	
 	if strcmp(config.ztcMode, 'naomi')
-		h{length(h)} = {'DPR_TYPE', 'ZTC_MATRIX', ''};
+		h{length(h)} = {K.DPRTYPE, 'ZTC_MATRIX', K.DPRTYPEc};
 	end
 	ZtCData = naomi.data.ZtC(ZtCArray, h, {bench});			
 end
