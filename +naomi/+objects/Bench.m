@@ -165,6 +165,7 @@ classdef Bench < naomi.objects.BaseObject
             obj.config.dmId = dmId;
             if obj.config.isDm
                 obj.stopDm; % stop the dm environment 
+                obj.stopGimbal; % stop the gimbal mount 
             end
             sessionNumber =1;
             while (exist(fullfile(obj.config.todayDirectory, sprintf('%s.%d', dmId, sessionNumber)), 'file'))
@@ -208,11 +209,11 @@ classdef Bench < naomi.objects.BaseObject
         function meanPixelScale = meanPixelScale(obj)
             meanPixelScale = (obj.xPixelScale + obj.yPixelScale)/2.0;
         end
+        
         function test = isScaled(obj)
             % check if the pixel scale has been measured or not 
             test = ~isempty(obj.measuredXpixelScale);
         end
-        
         
         function xCenter = xCenter(obj)
             % measured or configured xCenter 
@@ -580,6 +581,12 @@ classdef Bench < naomi.objects.BaseObject
                 if ~obj.has('dm')
                     obj.dm = naomi.newDm(obj.config); 
                 end
+            end
+            if ~obj.has('gimbal')
+              
+              if obj.config.assignGimbal>=0 % assign the right gimbal number 
+                obj.log(sprintf('NOTICE: Gimbal number associated to dm is now %i', obj.config.gimbalNumber), 2);
+              end
             end
             obj.log('NOTICE: DM Started', 1);
         end

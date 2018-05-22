@@ -35,6 +35,10 @@ classdef Config < handle
         dmIdChoices = {'BAX153','BAX159','BAX199','BAX200', 'BAX201', 'DUMMY'};
         dmId = '';
         
+        % the dm id 2 gimbal assignment loockup table
+        dmId2gimbalNumber = {{'BAX153',1},{'BAX159',2},{'BAX199',3},...
+                             {'BAX200',4},{'BAX201',5}};
+        
         % model of the wfs device currently only 'haso128' is accepted
         wfsModel = 'haso128';
         % haso 128 configuration file 
@@ -291,7 +295,8 @@ classdef Config < handle
         gimbalsDef =   {{1,14.5,15.7, 3300, 5000}, 
                         {2,14.5,15.7, 3300, 5000},
                         {3,14.5,15.7, 3300, 5000},
-                        {4,14.5,15.7, 3300, 5000}
+                        {4,14.5,15.7, 3300, 5000},
+                        {5,14.5,15.7, 3300, 5000}
                        };
         % these parameters are modified when the gimbalNumber is set 
         gimbalRxZero = 14.3963; % as aligned in IPAG 
@@ -582,7 +587,20 @@ classdef Config < handle
             end
             gimbalNumber = obj.gimbalNumber
         end
-
+        function gimbalNumber = assignGimbal(obj)
+          % assign the gimbal with the given dmId 
+          % if dmId is not in the lookup table dmId2gimbalNumber
+          % the configuration is left has is.
+          % the gimbal number is returned and is -9 if no match found
+          dmId = obj.dmId;
+          gimbalNumber = -9;
+          for iTab=1:length(obj.dmId2gimbalNumber) 
+            pair = obj.dmId2gimbalNumber{iTab};
+            if strcmp(pair{1},dmId)
+              gimbalNumber = obj.gimbalNumber = pair{2};
+            end
+          end 
+        end
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %
