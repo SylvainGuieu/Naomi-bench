@@ -511,6 +511,7 @@ classdef Config < handle
                   def = obj.maskDef{i};
                   if strcmp(maskInput,def{1})
                       mask = def{2:4};
+                      mask
                       found = true;
                   end
               end
