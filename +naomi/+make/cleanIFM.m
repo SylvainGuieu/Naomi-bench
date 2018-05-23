@@ -27,4 +27,5 @@ function IFMCleanData = cleanIFM(bench, IFMData)
 	IFMCleanData = naomi.data.IFM(IFCleanMatrix, h);
 	IFMCleanData.environmentData = IFMData.environmentData;
 	naomi.copyHeaderKeys(IFMData, IFMCleanData, naomi.benchKeyList);
+    IFMCleanData.setKey(K.DPRTYPE, 'IFMc', K.DPRTYPEc);
 end

@@ -6,6 +6,6 @@ function success = pixelScale(bench, xScale, yScale)
 	
 	bench.measuredXpixelScale = xScale;
 	bench.measuredYpixelScale = yScale;
-	bench.log(sprintf('NOTICE Pixel scale configured as xS=%.2f yX=%.2f ', xScale, yScale), 2);
+	bench.log(sprintf('NOTICE Pixel scale configured as xS=%.4fmm/pix yS=%.4fmm/pix', xScale*1000, yScale*1000), 2);
 	success = true;
 end

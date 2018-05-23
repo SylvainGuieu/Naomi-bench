@@ -2,6 +2,7 @@ clear all;
 % this is necessary to create a global and unique object for the wfs 
 % toherwise it does not work 
 global naomiGlobalWfs;
+global naomiGlobalDm;
 global naomiGlobalConfig;
 global naomiGlobalBench;
 % to avoid un wanted warning message  (matlab bug) 

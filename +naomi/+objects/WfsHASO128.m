@@ -60,10 +60,10 @@ classdef WfsHASO128 < naomi.objects.Wfs
           dit = obj.haso.dit;
         end
         
-        function populateHeader(obj,h)
-          populateHeader@naomi.objects.Wfs(obj, h);
-          % add more stuff ?? 
-        end
+%         function populateHeader(obj,h)
+%           populateHeader@naomi.objects.Wfs(obj, h);
+%           % add more stuff ?? 
+%         end
         
         function Off(obj)
             % Disable HASO

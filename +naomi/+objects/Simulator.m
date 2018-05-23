@@ -48,6 +48,8 @@ classdef Simulator < naomi.objects.BaseObject
         rXSign = -1;
         rYSign = -1;
         
+        pause = 0.2;
+        
     end
     
     methods
@@ -77,7 +79,7 @@ classdef Simulator < naomi.objects.BaseObject
                         obj.nSubAperture,...
                         obj.xCenter,obj.yCenter, ... 
                         obj.fullPupillDiameter/obj.pixelScale, ...
-                        0.0, 
+                        0.0, ...
                         obj.ztcNzernike, ...
                         obj.orientation);
                     
@@ -86,8 +88,11 @@ classdef Simulator < naomi.objects.BaseObject
         function Reset(obj);
             obj.cmdVector = zeros(obj.nActuator, 1);
         end
+        function img = getRawImage(obj)
+            img = ones(10,10)*0.8;
+        end
         function rawPhase = getRawPhase(obj)
-            
+            pause(obj.pause);
             
             cmdVector = obj.cmdVector - obj.biasVector;
             nActuator = obj.nActuator;

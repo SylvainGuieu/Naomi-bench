@@ -44,7 +44,7 @@ classdef Gimbal < naomi.objects.BaseObject
             obj.(axis).moveBy(relPos);
         end
         function moveByArcsec(obj, axis, arcsec)
-            obj.(axis).moveBy(arcsec);
+            obj.(axis).moveByArcsec(arcsec);
         end
         
         function init(obj, axis)

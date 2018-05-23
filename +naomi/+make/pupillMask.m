@@ -13,9 +13,11 @@ function [maskArray,maskData] = pupillMask(bench, mask, maskCenter)
   %               if mask center is given, the previously measured (or default) mirror center 
   %               will be taken 
     
-    
-    [mask, maskName] = bench.config.getMask(mask);
-    
+    if nargin<2
+        [mask, maskName] = bench.config.getMask(bench.config.ztcMask);
+    else
+        [mask, maskName] = bench.config.getMask(mask);
+    end
     if iscell(mask)
       if length(mask)~=3
         error('Mask must be a string, a 3 cell array or a matrix');
@@ -57,9 +59,9 @@ function [maskArray,maskData] = pupillMask(bench, mask, maskCenter)
         yCenter = maskCenter(2);
     	end	
       
-      maskArray = naomi.compute.pupillMask(bench.nSubAperture, puppillDiameter,centralObscurtionDiameter, xCenter, yCenter);
+      maskArray = naomi.compute.pupillMask(bench.nSubAperture, pupillDiameter,centralObscurtionDiameter, xCenter, yCenter);
       if nargout>1
-        K = nami.KEYS;
+        K = naomi.KEYS;
         
         h = {{K.MPUPDIAM, bench.pixel2meter(pupillDiameter), K.MPUPDIAMc}, ...
              {K.MPUPDIAMPIX, pupillDiameter, K.MPUPDIAMPIXc}, ...

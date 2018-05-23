@@ -36,8 +36,8 @@ classdef Config < handle
         dmId = '';
         
         % the dm id 2 gimbal assignment loockup table
-        dmId2gimbalNumber = {{'BAX153',1},{'BAX159',2},{'BAX199',3},...
-                             {'BAX200',4},{'BAX201',5}};
+        dmId2gimbalNumber = {{'BAX153',4},{'BAX159',2},{'BAX199',3},...
+                             {'BAX200',1},{'BAX201',5}};
         
         % model of the wfs device currently only 'haso128' is accepted
         wfsModel = 'haso128';
@@ -86,7 +86,8 @@ classdef Config < handle
         ztcDef = {
                   {'naomi',        'naomi', 140, 100},
                   {'naomi-sparta', 'naomi', 140, 21 }, 
-                  {'no mask',      'full' , 220, 100} % make a big mask = no mask 
+                  {'full dm',      'dm pupill', 140, 100}
+                  {'no mask',      'no mask', 220, 100} % make a big mask = no mask 
                 };
         % current ztcMode 
         ztcMode = 'naomi';
@@ -284,11 +285,11 @@ classdef Config < handle
         % Specify if the gimbal is used on the bench and motorized
         useGimbal = true;
         % Which order correspond to rX and rY motor movement tip or tilt 
-        rXOrder = 'tip';  %tip
-        rYOrder = 'tilt'; % not used just for consistancy
+        rXOrder = 'tilt';  %tip
+        rYOrder = 'tip'; % not used just for consistancy
         % Sign of rX movement regarding to zernic order 
-        rXSign = -1;
-        rYSign = -1;
+        rXSign = 1;
+        rYSign = 1;
         
         % set gimbalNumber to negative value will force to ask user  
         gimbalNumber = -9; 
@@ -298,10 +299,10 @@ classdef Config < handle
         %                | |    |- rY zero position  
         %                | |    |     |- rX gain in arcsec/mm  
         %                | |    |     |     |- rY gain in arcsec/mm
-        gimbalsDef =   {{1,14.5,15.7, 3300, 5000}, 
-                        {2,14.5,15.7, 3300, 5000},
-                        {3,14.5,15.7, 3300, 5000},
-                        {4,14.5,15.7, 3300, 5000},
+        gimbalsDef =   {{1,14.5,15.7, 3300, 5000},...
+                        {2,14.5,15.7, 3300, 5000},...
+                        {3,14.5,15.7, 3300, 5000},...
+                        {4,14.4405,15.8042, 3300, 5000},...%measure @ipag with wave view
                         {5,14.5,15.7, 3300, 5000}
                        };
         % these parameters are modified when the gimbalNumber is set 

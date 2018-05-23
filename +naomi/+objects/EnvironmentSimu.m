@@ -5,7 +5,7 @@ classdef EnvironmentSimu < naomi.objects.Environment
         simuRegul = 0;
         simuTime = 0;
         simuRegister;
-        simuUSBTemp = [20.0 20.0 20.0 20.0 20.0 50.0];
+        simuUSBTemp = [20.0 20.0 20.0 20.0 20.0 50.0 50.0];
         
         % simuTimeScale = 100 -> one 'real' computer second is 100 simulated seconde
         simuTimeScale = 1.0;

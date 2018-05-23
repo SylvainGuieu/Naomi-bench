@@ -134,7 +134,8 @@ function fitResult = fittedIFprofile(img, fitType, sigmaGuess, amplitudeGuess)
         otherwise
             error('Fit Type must be gaussR, gauss or lorentz');
     end
-    [args,resnorm,residual,exitFlag] = lsqcurvefit(func,args0,data,Z,lb,ub);
+    opts = optimset('Display','off');
+    [args,resnorm,residual,exitFlag] = lsqcurvefit(func,args0,data,Z,lb,ub, opts);
     
     fitResult = [];
     fitResult.args = args;

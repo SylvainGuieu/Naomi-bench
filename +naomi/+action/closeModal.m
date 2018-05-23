@@ -19,7 +19,7 @@ wfs = bench.wfs;
 dm = bench.dm;
 config = bench.config;
 
-bench.log(sprintf('NOTICE: Close modal loop in %i steps:\n',nStep));
+bench.log(sprintf('NOTICE: Close modal loop in %i steps:',nStep));
 
 [~,~,nZernike] = size(PtZArray);
 iZernike = minMode:maxMode;
@@ -39,7 +39,7 @@ if nargin < 7; trgPhi = 0.0; end;
         % print 
         rmsc = naomi.compute.rms_tt(phir);
         cmd = dm.cmdVector + dm.biasVector;
-        bench.log( sprintf('NOTICE: %2i/%i rms = %.3f rmsc = %.3f ptv = %.3f cmax = %.3f cmean = %.3f\n', ...
+        bench.log( sprintf('NOTICE: %2i/%i rms = %.3f rmsc = %.3f ptv = %.3f cmax = %.3f cmean = %.3f', ...
                                    step,nStep,naomi.compute.nanstd(phir(:)),rmsc,...
                                    max(phir(:)) - min(phir(:)),...
                                    max(abs(cmd(:))),mean(cmd(:))), 2);

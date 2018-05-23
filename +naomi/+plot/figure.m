@@ -28,7 +28,7 @@ function fig = figure(name, bringFront)
                 case 'Last Phase'
                      set(fig, 'Position', grid2screen(screenGrid, [-20,-28,20,28]));
                 case 'IFM QC'
-                    set(fig, 'Position',  grid2screen(screenGrid, [-1, -10, 25,90]));
+                    set(fig, 'Position',  [11 204 499 787]);%grid2screen(screenGrid, [-1, -10, 25,90]));
 %                     case 'Influence Function'
 %                     %% figure related to measurement 
 %                     case 'Last Phase'

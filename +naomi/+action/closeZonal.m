@@ -15,7 +15,7 @@ wfs = bench.wfs;
 dm = bench.dm;
 config = bench.config;
 
-bench.log(sprintf('NOTICE: Close zonal loop in %i step:\n',nStep), 1);
+bench.log(sprintf('NOTICE: Close zonal loop in %i step:',nStep), 1);
 
 [~,~,nActuator] = size(PtC);
 if nargin < 6; trgPhi = 0.0; end;
@@ -33,7 +33,7 @@ if nargin < 6; trgPhi = 0.0; end;
         % Print    
         cmd = dm.cmdVector + dm.biasVector;
         bench.log(sprintf('NOTICE %2i/%i rms = %.3f rmsc = %.3f ptv = %.3f '...
-                 'cmax = %.3f cmean = %.3f\n',...
+                 'cmax = %.3f cmean = %.3f',...
                 step, nStep, naomi.compute.nanstd(phir(:)), ...
                 naomi.compute.rms_tt(phir),max(phir(:)) - min(phir(:)),...
                 max(abs(cmd(:))),mean(cmd(:))), 2);

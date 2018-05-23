@@ -38,9 +38,9 @@ function [IFMData, IFMcleanData] = IFM(bench, callback, nPushPull, nLoop, amplit
     naomi.action.resetDm(bench);
     naomi.config.mask(bench, []); % remove the mask
     start = now;
-		environmentBuffer = naomi.object.EnvironmentBuffer(nLoop*nActuator, nLoop*nActuator, 0);
+	environmentBuffer = naomi.objects.EnvironmentBuffer(nLoop*nActuator, nLoop*nActuator, 0);
 		
-		bench.log(sprintf('NOTICE: Starting IFM measurement for DM %s', bench.dmId),1);
+	bench.log(sprintf('NOTICE: Starting IFM measurement for DM %s', bench.dmId),1);
 	for iLoop=1:nLoop
 	    
 	    % Loop on actuators
@@ -49,18 +49,22 @@ function [IFMData, IFMcleanData] = IFM(bench, callback, nPushPull, nLoop, amplit
                 % the process has been killed 
                 IFMData = [];
                 IFMcleanData = [];
-								bench.log(sprintf('WARNING: IFM measurement of DM %s killed before finished', bench.dmId), 1); 
+				bench.log(sprintf('WARNING: IFM measurement of DM %s killed before finished', bench.dmId), 1); 
                 return
             end
-						bench.log(sprintf('NOTICE: IFM Loop=%d/%d Actuator=%d/%d', iLoop, nLoop, iActuator, nActuator),2);
-						
-            if isempty(callback)
-                IFArray = naomi.measure.IF(bench, iActuator, nPushPull, amplitude);
+            if (iActuator*iLoop)>1
+                remainingTime = (now-start)*24*3600 / (iActuator*iLoop) * (nActuator*nLoop-iActuator*iLoop);
+                bench.log(sprintf('NOTICE: IFM Loop=%d/%d Actuator=%d/%d Time=%0.3fs remainingTime=%0.3fs', iLoop, nLoop, iActuator, nActuator, (now-start)*24*3600, remainingTime),2);
+                
             else
-                [IFArray, IFData] = naomi.measure.IF(bench, iActuator, nPushPull, amplitude);
-            end
+                bench.log(sprintf('NOTICE: IFM Loop=%d/%d Actuator=%d/%d Time=%0.3fs', iLoop, nLoop, iActuator, nActuator, (now-start)*24*3600),2);
+            end		
+            
+           IFArray = naomi.measure.IF(bench, iActuator, nPushPull, amplitude);
+            
             
             if ~isempty(callback)
+                IFData = naomi.data.IF(IFArray, {{naomi.KEYS.ACTNUM,iActuator,naomi.KEYS.ACTNUMc}});
                 callback(IFData);
             end
 	        

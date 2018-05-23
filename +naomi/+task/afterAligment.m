@@ -11,7 +11,7 @@ function success = afterAligment(bench)
 success = 0;
 [x,y] = naomi.measure.pupillCenter(bench);
 naomi.config.pupillCenter(bench, x, y);
-if ~strcmp(bench.config.dmId,  bench.config.DUMMY)
+if ~strcmp(bench.config.dmId,  bench.config.DUMMY) && bench.has('dm')
     [~,IFCData] = naomi.measure.IFC(bench);
     naomi.config.IFC(bench,IFCData);
     naomi.saveData(IFCData);

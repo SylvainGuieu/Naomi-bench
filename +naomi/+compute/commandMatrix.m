@@ -18,6 +18,9 @@ function [PtC,ZtC,ZtP] = commandMatrix(IFM, x0, y0, diamPix, centralObscurtionPi
 %   ZtC(nZernike,nActuator): modal zernike to command matrix
 %   ZtP(nZernike,nSubAperture,nSubAperture): requested zernikes
 
+if nargin<8
+    zeroMean = 1;
+end
 
 [nActuator,nSubAperture,~] = size(IFM);
 

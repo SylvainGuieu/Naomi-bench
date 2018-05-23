@@ -8,7 +8,7 @@ classdef ZtC < naomi.data.BaseData
             obj = obj@naomi.data.BaseData(varargin{:});
         end
         function sh = staticHeader(obj)
-        	sh = {{'DPR_TYPE', 'ZTC_MATRIX', ''}};
+        	sh = {{naomi.KEYS.DPRTYPE, 'ZTC', naomi.KEYS.DPRTYPEc}};
         end 
         function idx = zernike2index(obj, zernike)
             % convert the given zernike number to the table index
@@ -80,6 +80,7 @@ classdef ZtC < naomi.data.BaseData
             % SPARTA does not contains the piston and is limited to 20
             % thernikes
             ZtCSpartaData = naomi.data.ZtCSparta(obj.data(2:21,':'), obj.header);
+            ZtCSpartaData.setKey(naomi.KEYS.DPRTYPE, 'ZTC_SPARTA',naomi.KEYS.DPRTYPEc);
         end
         
         function gui(obj)

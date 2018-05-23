@@ -20,7 +20,7 @@ classdef Environment < naomi.data.BaseData
             c = obj.getKey(naomi.KEYS.PFANIN, 3);
         end
         function c = FANOUT(obj)
-            c = obj.getKey(naomi.KEYS..PFANOUT, 4);
+            c = obj.getKey(naomi.KEYS.PFANOUT, 4);
         end
         function c = TREGUL(obj)
             c = obj.getKey(naomi.KEYS.TEMPREGUL, 5);

@@ -11,6 +11,13 @@ classdef DmBias < naomi.data.DmCommand
         function sh = staticHeader(obj)
         	sh = {{naomi.KEYS.DPRTYPE, 'DM_BIAS', naomi.KEYS.DPRTYPEc}};
         end
+        function fitsWriteData(obj, fileName)
+            fitswrite(obj.data, fileName);
+            % save bias as extention if any 
+        end
+        function data = fitsReadData(obj, fileName)
+            data = fitsread(fileName);
+        end
         function plotContour(obj, axes)
             if nargin<2; axes= gca();end;
             

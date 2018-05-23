@@ -443,7 +443,7 @@ classdef Bench < naomi.objects.BaseObject
                         case obj.config.TIP
                             mSign = obj.config.rXSign;
                         otherwise
-                            mSign = obj.config.rYUSign;
+                            mSign = obj.config.rYSign;
                     end
                 case obj.config.TILT
                     switch obj.config.rXOrder
@@ -614,6 +614,12 @@ classdef Bench < naomi.objects.BaseObject
                 obj.startACE();
                 if ~obj.has('dm')
                     obj.dm = naomi.newDm(obj.config); 
+                    if ~isempty(obj.ZtCData)
+                        obj.dm.zernike2Command = obj.ZtCData.data;
+                    end
+                    if ~isempty(obj.dmBiasData)
+                        obj.dm.biasVector = obj.dmBiasData.data(':');
+                    end
                 end
             end
             if ~obj.has('gimbal')
@@ -668,9 +674,9 @@ classdef Bench < naomi.objects.BaseObject
           obj.log('NOTICE: Environment Stopped', 1);
         end
         function startSimulator(obj)
-            obj.log('NOTICE: Stopping Simulator ...', 1);
+            obj.log('NOTICE: Starting Simulator ...', 1);
             if ~obj.has('simulator'); obj.simulator = naomi.newSimulator(obj.config); end  
-            obj.log('NOTICE: Simulator Stopped', 1);
+            obj.log('NOTICE: Simulator Started', 1);
         end
         function check = checkPhase(obj, phase)
             % Check the integrity of a phase screen
@@ -765,7 +771,7 @@ classdef Bench < naomi.objects.BaseObject
                 disp(getReport(err,'extended'));
               end
             end
-            if obj.has('envirnomnet');
+            if obj.has('environment');
               try
                 obj.environment.populateHeader(h);
               catch err
@@ -800,7 +806,7 @@ classdef Bench < naomi.objects.BaseObject
                 naomi.addToHeader(h, K.YCENTER, obj.yCenter, K.YCENTERc);
             end
             if obj.isAligned
-                naomi.addToHeader(h, K.XPCENTER, obj.x, K.XPCENTERc);
+                naomi.addToHeader(h, K.XPCENTER, obj.xCenter, K.XPCENTERc);
                 naomi.addToHeader(h, K.YPCENTER, obj.yCenter, K.YPCENTERc);
             end
             

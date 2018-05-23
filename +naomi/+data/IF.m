@@ -11,8 +11,8 @@ classdef IF < naomi.data.Phase
         	sh = {{'DPR_TYPE', 'IF', ''}};
         end
         
-        function plotProfile(obj, axes)
-            if nargin<2; axes = gca; end
+        function plotProfileModel(obj, axes)
+            if nargin<2; axes = gca; figure(get(gcf, 'Number'));end
             data =  obj.data;
             [nSubAperture,~] = size(data);
             [X,Y] = meshgrid(1:nSubAperture);
@@ -30,7 +30,7 @@ classdef IF < naomi.data.Phase
         end
         
         function plotProfileResidual(obj, axes)
-            if nargin<2; axes = gca; end
+            if nargin<2; axes = gca;figure(get(gcf, 'Number'));end
             data =  obj.data;
             [nSubAperture,~] = size(data);
             [X,Y] = meshgrid(1:nSubAperture);
@@ -53,7 +53,7 @@ classdef IF < naomi.data.Phase
             
         function plotScreenPhase(obj, axes)
         
-            if nargin<2; axes = gca; end
+            if nargin<2; axes = gca;figure(get(gcf, 'Number'));end
             data =  obj.data;
             [nSubAperture,~] = size(data);
             cla(axes); imagesc(axes, squeeze(data(:,:)));
@@ -85,7 +85,7 @@ classdef IF < naomi.data.Phase
            end
            
            obj.plotScreenPhase(axesList{1});
-           obj.plotProfile(axesList{2});
+           obj.plotProfileModel(axesList{2});
            obj.plotProfileResidual( axesList{3}); 
            obj.plotProfiles( axesList(4:5));
            

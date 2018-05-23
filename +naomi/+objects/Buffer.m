@@ -2,7 +2,7 @@ classdef Buffer < handle
   properties 
       
       buffer;
-      ncol;
+      ncol = 1;
       index = 0;
       size;
       stepSize;
@@ -29,6 +29,7 @@ classdef Buffer < handle
           obj.stepSize = stepSize;
           obj.dynamic = dynamic;
           obj.arrayType = arrayType;
+          obj.ncol = ncol;
       end
       function data = data(obj, varargin)
           data = obj.buffer(1:obj.index, :);

@@ -12,9 +12,9 @@ function cmdRelativeModal(bench, zernikeNum, amplitudeOffset)
 		end
 	else		
 		if nargin<3
-			bench.dm.zerniqueVector = bench.dm.zernikeVector + zernikeNum;
+			bench.dm.zernikeVector = bench.dm.zernikeVector + zernikeNum;
 		else		
-			bench.dm.zerniqueVector(zernikeNum) = bench.dm.zernikeVector(zernikeNum) + amplitudeOffset;
+			bench.dm.zernikeVector(zernikeNum) = bench.dm.zernikeVector(zernikeNum) + amplitudeOffset;
 		end
     end
     bench.dmCounter = bench.dmCounter + 1;

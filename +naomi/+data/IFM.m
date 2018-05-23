@@ -23,7 +23,7 @@ classdef IFM < naomi.data.PhaseCube
             data = fitsread(file);
             data = permute(data, [3,1,2]);
             data = double(data);
-						environmentArray = naomi.readExtention( fileName,'ENVIRONMENT', 1);
+						environmentArray = naomi.readExtention( file,'ENVIRONMENT', 1);
             if ~isempty(environmentArray)
                 obj.environmentData = naomi.data.Environment(environmentArray);
             end

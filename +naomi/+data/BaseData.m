@@ -42,7 +42,6 @@ classdef BaseData < handle
             obj.addHeader(header);
             
             
-            obj.update();
             % load the data
             if ~isempty(obj.file)
                 obj.data;
