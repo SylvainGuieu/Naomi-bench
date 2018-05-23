@@ -405,8 +405,14 @@ classdef Environment < naomi.objects.BaseObject
               fclose(obj.client);
           else
               fprintf('Laird Not connected OK\n');
-          end           
-            fclose(obj.client);
+          end      
+            if ~isempty(obj.client)
+            try
+                fclose(obj.client);
+            catch EM
+            end
+            end
+                
             obj.client = [];
         end
         

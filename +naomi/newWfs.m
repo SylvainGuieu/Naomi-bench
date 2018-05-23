@@ -11,7 +11,7 @@ function wfs = newWfs(config)
                
                naomiGlobalWfs = naomi.objects.WfsHASO128();
                naomiGlobalWfs.connect(config.haso128cFile,config.haso128Serial);
-               naomiGlobalWfs.setDit(config.wfsDit);
+               
            case 'phasecam'
                naomi.log('This is a PhaseCam \n', 1, config.verbose);
                naomiGlobalWfs = naomi.objects.WfsPhaseCam4020('PhaseCam4020','134.171.36.241',15555);
@@ -21,5 +21,6 @@ function wfs = newWfs(config)
        end
    end
    naomiGlobalWfs.Online();
+   naomiGlobalWfs.setDit(config.wfsDit);
    wfs = naomiGlobalWfs; 
 end

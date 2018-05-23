@@ -162,10 +162,13 @@ classdef Bench < naomi.objects.BaseObject
             % bench.changeDm
             % Change the current dm defined by its Id
             % this will stop the dm environment
+            obj.log(sprintf('NOTICE: changing dm from %s to %s',obj.config.dmId, dmId));
             obj.config.dmId = dmId;
             if obj.config.isDm
                 obj.stopDm; % stop the dm environment 
-                obj.stopGimbal; % stop the gimbal mount 
+                if obj.has('gimbal')
+                    obj.stopGimbal; % stop the gimbal mount 
+                end
             end
             sessionNumber =1;
             while (exist(fullfile(obj.config.todayDirectory, sprintf('%s.%d', dmId, sessionNumber)), 'file'))
@@ -173,6 +176,8 @@ classdef Bench < naomi.objects.BaseObject
             end
             
             obj.config.sessionName = sprintf('%s.%d', dmId, max( 1,sessionNumber-1)); 
+            obj.log(sprintf('NOTICE: dm chenged  to %s',obj.config.dmId));
+            obj.log(sprintf('NOTICE: session name is now %s ',obj.config.sessionName));
         end
         function newSession(obj, name)
             % bench.newSession
@@ -650,13 +655,14 @@ classdef Bench < naomi.objects.BaseObject
         end
         
         function log(obj, txt, verbose)
-          % add a log line in the buffer and print it 
+          % add a log line in the buffer and print it
+          date = datestr(now, 'yyyy-mm-ddTHH:MM:SS');
           if nargin<3
             verbose=1;
           end
           if verbose<=obj.config.verbose
-            obj.logBuffer.newEntry(string(txt));
-            fprintf(txt);
+            obj.logBuffer.newEntry(string(sprintf('%s %s',date, txt)));
+            fprintf('%s %s\n',date, txt);
           end
         end
         
