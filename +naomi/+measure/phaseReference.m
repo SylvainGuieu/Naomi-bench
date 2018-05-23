@@ -6,8 +6,9 @@ function [phaseArray,phaseData] = phaseReference(bench, nPhase)
     if nargout>1
         K = naomi.KEYS;
         h = {{K.NPHASE, nPhase, K.NPHASEc}, ...
-             {K.PHASEREF, 0, K.PHASEREFc}, ...
-             {K.PHASETT, 0, K.PHASETTc}};
-        phaseData = naomi.data.PhaseReference(phaseArray, h, {bench});
+             {K.PHASEREF, 0,    K.PHASEREFc}, ...
+             {K.PHASETT, 0,     K.PHASETTc}};
+        phaseData = naomi.data.PhaseReference(phaseArray, h);
+				bench.populateHeader(phaseData);
     end
 end

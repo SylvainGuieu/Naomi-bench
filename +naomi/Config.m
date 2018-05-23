@@ -115,10 +115,16 @@ classdef Config < handle
         xPixelScale = 0.38e-3; % m / pixel
         yPixelScale = 0.38e-3; % m / pixel
         
+        %% 
         % Assumed aproximative x,y center for start-up alignment
         % normaly, after measurement this value is not used anymore
+        % For the central actuator position:
         xCenter = 64.0; % pixel 
         yCenter = 64.0; % pixel
+        % For the pupill circle trace on the wave front:
+        xPupillCenter = 64.0; % pixel 
+        yPupillCenter = 64.0; % pixel
+        
         
         % orientation is used to determine the correspondance between the 
         % receive phase / dm position and conventional zernike definition

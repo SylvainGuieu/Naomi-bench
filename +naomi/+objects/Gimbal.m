@@ -8,8 +8,7 @@ classdef Gimbal < naomi.objects.BaseObject
         rY;
         N;
         serialNumber = -99;
-            
-        
+    
     end 
     
     methods       
@@ -74,7 +73,7 @@ classdef Gimbal < naomi.objects.BaseObject
                 obj.(axis).moveToZero();
             end
         end
-        
+          
           function delete(obj)
                 fprintf('Close connection to PI\n');
                 obj.rX.device.CloseConnection();

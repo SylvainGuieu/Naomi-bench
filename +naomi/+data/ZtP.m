@@ -12,7 +12,7 @@ classdef ZtP < naomi.data.PhaseCube
         	sh = {{naomi.KEYS.DPRTYPE, 'ZTP_MATRIX', naomi.KEYS.DPRTYPEc}};
         end
         function ZtPSpartaData = toSparta(obj)
-            ZtPSpartaData = naomi.data.ZtPSpartaData(obj.data, obj.header, obj.context);
+            ZtPSpartaData = naomi.data.ZtPSpartaData(obj.data, obj.header);
         end
         
         function idx = zernike2index(obj, zernike)
@@ -32,7 +32,7 @@ classdef ZtP < naomi.data.PhaseCube
              
             phaseArray = squeeze(obj.phaseArray(obj.zernike2index(zernike)));
             
-            phaseZernikeData = naomi.data.PhaseZernike(phaseArray, obj.header, obj.context);             
+            phaseZernikeData = naomi.data.PhaseZernike(phaseArray, obj.header);             
             phaseZernikeData.setKey(naomi.KEYS.ZERN, zernike, naomi.KEYS.ZERNc);
             phaseZernikeData.setKey(naomi.KEYS.GAIN, median(obj.gainVector), naomi.KEYS.GAINc);
         end

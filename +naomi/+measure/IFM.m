@@ -18,11 +18,10 @@ function [IFMData, IFMcleanData] = IFM(bench, callback, nPushPull, nLoop, amplit
 %   IFMData : the influence functions data object
 %   IFMCleanData : the cleaned influence functions object   
 % 
-
 	config = bench.config;
 	mjd =  config.mjd;
     
-    if nargin<2; callback = [];end
+  if nargin<2; callback = []; end
     
 	if nargin<3; nPushPull = config.ifNpushPull; end
 	if nargin<4; nLoop = config.ifmNloop; end
@@ -31,7 +30,7 @@ function [IFMData, IFMcleanData] = IFM(bench, callback, nPushPull, nLoop, amplit
 
 	nActuator = bench.nActuator;
 	nSubAperture = bench.nSubAperture;
-	IFMatrix = zeros(nActuator,nSubAperture,nSubAperture);
+	IFM = zeros(nActuator,nSubAperture,nSubAperture);
 
 	% Loop
     bench.registerProcess('IFM', nLoop*nActuator);
@@ -39,6 +38,9 @@ function [IFMData, IFMcleanData] = IFM(bench, callback, nPushPull, nLoop, amplit
     naomi.action.resetDm(bench);
     naomi.config.mask(bench, []); % remove the mask
     start = now;
+		environmentBuffer = naomi.object.EnvironmentBuffer(nLoop*nActuator, nLoop*nActuator, 0);
+		
+		bench.log(sprintf('NOTICE: Starting IFM measurement for DM %s', bench.dmId),1);
 	for iLoop=1:nLoop
 	    
 	    % Loop on actuators
@@ -47,37 +49,50 @@ function [IFMData, IFMcleanData] = IFM(bench, callback, nPushPull, nLoop, amplit
                 % the process has been killed 
                 IFMData = [];
                 IFMcleanData = [];
+								bench.log(sprintf('WARNING: IFM measurement of DM %s killed before finished', bench.dmId), 1); 
                 return
             end
-            fprintf("%d %.3f",iActuator, (start-now)*24*3600);
-            
+						bench.log(sprintf('NOTICE: IFM Loop=%d/%d Actuator=%d/%d', iLoop, nLoop, iActuator, nActuator),2);
+						
             if isempty(callback)
                 IFArray = naomi.measure.IF(bench, iActuator, nPushPull, amplitude);
             else
                 [IFArray, IFData] = naomi.measure.IF(bench, iActuator, nPushPull, amplitude);
             end
-            fprintf(" %.3f\n",(start-now)*24*3600);
+            
             if ~isempty(callback)
                 callback(IFData);
             end
 	        
-	        IFMatrix(iActuator,:,:) = IFMatrix(iActuator,:,:) + reshape(IFArray,1,nSubAperture,nSubAperture) / nLoop;
-	        pause(ifPause);
+	        	IFM(iActuator,:,:) = IFM(iActuator,:,:) + reshape(IFArray,1,nSubAperture,nSubAperture) / nLoop;
+						
+	        	pause(ifPause);
+						if bench.has('environment')
+							environmentBuffer.update(bench.environment);
+						end
             bench.processStep('IFM', iLoop*iActuator);
-                
+						        
 	    end
 	    
 	    % Reverse amplitude (push-pull -> pull-push)
 	    amplitude = -amplitude;
     end
     bench.killProcess('IFM');
-	h = {{'MJD-OBS' ,mjd, 'modified julian when script started'},
-		 {'IF_AMP'  ,amplitude,'[Cmax] amplitude of push-pull'},
-	     {'IF_NPP'  ,nPushPull,'number of push-pull'},
-	     {'IF_LOOP' ,nLoop,'number of push-pull'},
-	     {'IF_PAUSE',ifPause,'pause between actioneu'}};
+		bench.log(sprintf('NOTICE: IFM measurement for DM %s finished', bench.dmId),1);
+		
+		K = naomi.KEYS;
+		h = {{K.MJDOBS ,mjd, K.MJDOBSc},  ...
+		   	{K.IFAMP  ,amplitude, K.IFAMPc }, ...
+	     	{K.IFNPP  ,nPushPull, K.IFNPPc }, ...
+	     	{K.IFMLOOP , nLoop, K.IFMLOOPc }, ...
+	     	{K.IFMPAUSE,ifPause,K.IFMPAUSEc}, ... 
+				{K.PHASEREF, bench.isPhaseReferenced, K.PHASEREFc}, ... 
+				{K.PHASETT,  bench.config.filterTipTilt, K.PHASETTc}};
 
-	IFMData = naomi.data.IFMatrix(IFMatrix, h , {bench});
+	IFMData = naomi.data.IFM(IFM, h);
+	bench.populateHeader(IFMData.header);
+	IFMData.environmentData = environmentBuffer.toEnvironmentData;
+	
 	IFMcleanData = naomi.make.cleanIFM(bench, IFMData);
-    bench.killProcess('IFM');
+  bench.killProcess('IFM');
 end

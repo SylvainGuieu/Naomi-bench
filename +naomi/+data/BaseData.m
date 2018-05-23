@@ -5,27 +5,19 @@ classdef BaseData < handle
     % data and to compute basic operation.
     % This way Data object can be created live when doing a measurement 
     % or it can be loaded from a fits or matlab file for offline analysis.
-    % typicaly Data object are created from a measurement. The context property 
-    % is a cell array containing all the relevant object related to the 
-    % data creation. They will write their information to the header. 
-    % Exemple of context  {config,bench,wfs,gimbal} will populate the header
-    % with configuration keyword, bench information (temperatures, etc ... ), 
-    % wave front sensor information (number of sub-aperture, ...) gimbal position.
-    
+    % typicaly Data object are created from a measurement.
     properties
         dataCash;
         header;
-        context;
         file;
         filePointer;
     end
     methods
         
-        function obj = BaseData(data, header, context)
+        function obj = BaseData(data, header)
             import matlab.io.*
             if nargin<1; return; end
             if nargin<2; header = {}; end
-            if nargin<3; context = {}; end
             
             if ischar(data) || isstring(data)
                 obj.file = data;%matlab.io.fits.openFile(data);
@@ -49,7 +41,7 @@ classdef BaseData < handle
             
             obj.addHeader(header);
             
-            obj.context = context;
+            
             obj.update();
             % load the data
             if ~isempty(obj.file)
@@ -98,15 +90,8 @@ classdef BaseData < handle
         end
 
         function update(obj, data)
-            % update the header of the object with the context objects
-            % if data is given it will replace the curent data
-            if nargin>1
-                obj.data = data;
-            end
-            for i=1:length(obj.context)
-                    obj.context{i}.populateHeader(obj.header);
-            end
-            
+            % update the data
+            obj.dataCash = data;            
         end
         
         function [val,comment] = getKey(obj, key, default)

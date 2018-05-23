@@ -1,10 +1,14 @@
-function [ZtPData,PtZData] = ZtP(bench, nPushPull, amplitude, nZernike)
+function [ZtPData,PtZData] = ZtP(bench, nPushPull, amplitude, nZernike, callback)
 	config = bench.config;
 	K = naomi.KEYS;
     
-	if nargin<2; nPushPull = config.ztpNpushPull; end
-	if nargin<3; amplitude = config.ztpAmplitude; end
-	if nargin<4; nZernike  = config.ztpNzernike; end
+	if nargin<2 || isempty(nPushPull); nPushPull = config.ztpNpushPull; end
+	if nargin<3 || isempty(amplitude); amplitude = config.ztpAmplitude; end
+	if nargin<4 || isempty(nZernike); nZernike  = config.ztpNzernike; end
+	if nargin<5
+		callback = [];
+	end
+	
 
 	if nPushPull<0
 		[nZernike,~] = size(bench.ZtCArray);
@@ -19,24 +23,31 @@ function [ZtPData,PtZData] = ZtP(bench, nPushPull, amplitude, nZernike)
         if pupillDiameter ==0 % assume this is the configured pupill diameter
             pupillDiameter = bench.getMaskInMeter(bench.config.ztcMask);
         end
-        
+				      
     else % assume this is the configured pupill diameter
 			pupillDiameter = bench.getMaskInMeter(bench.config.ztcMask);
     end
-    xPscale =  bench.xPixelScale;
-    yPscale =  bench.yPixelScale;
     
-    xCenter = bench.xCenter;
-    yCenter = bench.yCenter;
     
-	% setup dm and wfs 
-	naomi.action.resetDm(bench);
-	naomi.action.resetWfs(bench);
+		% setup dm and wfs 
+		naomi.action.resetDm(bench);
+		naomi.action.resetWfs(bench);
 		
     bench.registerProcess('ZtP', nZernike*nPushPull);
-	for iZernike=1:nZernike
 		
-
+		% header need to create callbakc phaseZernike
+		
+		if ~isempty(callback)
+			K  = naomi.KEYS;
+			phaseData = naomi.data.PhaseData();
+			if ~isempty(bench.ZtCData)				
+				naomi.copyHeaderKeys(bench.ZtCData, phaseData, naomi.benchKeyList);
+			else
+				bench.populateHeader(phaseData);
+			end
+		end
+		
+		for iZernike=1:nZernike
 	    amp = amplitude ./ max(abs(squeeze(bench.ZtCArray(iZernike,':'))));
 	    bench.log(sprintf('NOTICE: ZtP Zernike %i',iZernike), 2);  
 	    for p=1:nPushPull
@@ -57,7 +68,14 @@ function [ZtPData,PtZData] = ZtP(bench, nPushPull, amplitude, nZernike)
 	        ZtPArray(iZernike,:,:) = ZtPArray(iZernike,:,:) + reshape((push - pull)/(2*amp*nPushPull),1,nSubAperture,nSubAperture);
 	        % put back the zernike vector as it was
 	        naomi.action.cmdModal(bench, iZernike, ref);
-            bench.processStep('ZtP', p*iZernike);
+					if ~isempty(callback)
+						% send a phaseZernike to the callback
+						phaseData.dataCash = squeeze(ZtPArray(iZernike,:,:));
+						phaseData.setKey(K.ZERN,iZernike,K.ZERNc);
+						callback(phaseData);
+					end
+					
+          bench.processStep('ZtP', p*iZernike);
 	    end   
 	    
 	    % Cleanup piston
@@ -85,19 +103,18 @@ function [ZtPData,PtZData] = ZtP(bench, nPushPull, amplitude, nZernike)
     
     % Set back
     PtZArray = reshape(Tmp,nSubAperture,nSubAperture,nZernike);
-    h = {{K.MJDOBS,   config.mjd,    K.MJDOBSc},...
-	     {K.NPP  ,    nPushPull,     K.NPPc}, ...
-		 {K.PUSHAMP,  amplitude,     K.PUSHAMPc}, ...     
-		 {K.NZERN,    nZernike,       K.NZERNc}, ...  
+    h = {{K.MJDOBS,   config.mjd,     K.MJDOBSc},...
+	       {K.NPP  ,    nPushPull,      K.NPPc}, ...
+		     {K.PUSHAMP,  amplitude,      K.PUSHAMPc}, ...     
+		     {K.NZERN,    nZernike,       K.NZERNc}, ...  
          {K.ZTCDIAM,  pupillDiameter, K.ZTCDIAMc}, ...
-         {K.XPSCALE,  xPscale,        K.XPSCALEc}, ...
-         {K.YPSCALE,  yPscale,        K.YPSCALEc}, ...
-         {K.XCENTER,  xCenter,        K.XCENTERc}, ...
-         {K.YCENTER,  yCenter,        K.YCENTERc}
-		 };
+				 {K.PHASEREF, bench.isPhaseReferenced, K.PHASEREFc}, ... 
+ 				 {K.PHASETT,  bench.config.filterTipTilt, K.PHASETTc}};
     
-	ZtPData = naomi.data.ZtP(ZtPArray, h, {bench});
-	PtZData = naomi.data.PtZ(PtZArray, h, {bench}); 
+	ZtPData = naomi.data.ZtP(ZtPArray, h);
+	bench.populateHeader(ZtPData.header);
+	PtZData = naomi.data.PtZ(PtZArray, h);
+	naomi.copyHeaderKeys(ZtPData, PtZData, naomi.benchKeyList); 
 	bench.log('NOTICE: ZtP Finished', 1);
 	
 end

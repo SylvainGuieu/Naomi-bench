@@ -10,10 +10,10 @@ function  success = IFM(bench, data_or_file)
 		[file, path] = naomi.askFitsFile('Select a Zernique to commande file ZTC_*');
 		if isequal(file, 0); return; end;
 		fullPath = fullfile(path, file);
-		data = naomi.data.IFMatrix(fullPath);	
+		data = naomi.data.IFM(fullPath);	
 	
 	elseif ischar(data_or_file)
-			data =  naomi.data.IFMatrix(data_or_file);
+			data =  naomi.data.IFM(data_or_file);
 	
 	elseif isempty(data_or_file)
 		bench.IFMData = [];			

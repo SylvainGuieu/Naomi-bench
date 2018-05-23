@@ -49,7 +49,8 @@ function [IFArray,IFData] = IF(bench,  act, nPushPull, amplitude)
              {K.IFAMP ,amplitude, K.IFAMPc},...
              {K.IFNPP,nPushPull,  K.IFNPPc}};
         
-        IFData = naomi.data.IF(IFArray, h, {bench}); 
+        IFData = naomi.data.IF(IFArray, h);
+				bench.populateHeader(IFData.header); 
     end
 end
 

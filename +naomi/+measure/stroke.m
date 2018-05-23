@@ -34,8 +34,9 @@ function strokeData = stroke(bench,zernikeMode,amplitudeVector)
 	    allPhiArray(iAmp,:,:) = phiArray(:,:);
     end
     
-    strokeData = naomi.data.StrokePhaseCube(allPhiArray, h, {bench});
-    strokeData.dmCommandArray =   allCmdArray;
+    strokeData = naomi.data.StrokePhaseCube(allPhiArray, h);
+		bench.populateHeader(strokeData);
+    strokeData.dmCommandArray = allCmdArray;
     strokeData.biasVector = bench.biasVector;
     strokeData.amplitudeVector = amplitudeVector;
     

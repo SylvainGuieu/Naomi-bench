@@ -67,9 +67,11 @@ function [maskArray,maskData] = pupillMask(bench, mask, maskCenter)
          	   {K.YCENTER, xCenter, K.YCENTERc},...
          	   {K.MCOBSDIAMPIX, centralObscurtionDiameter, K.MCOBSDIAMPIXc},...
              {K.MCOBSDIAM, bench.pixel2meter(centralObscurtionDiameter), K.MCOBSDIAMc},...  
-            {K.MNAME,  maskName, K.MNAMEc}
-         	};
-         maskData = naomi.data.Mask(maskArray, h, {bench});
+             {K.MNAME,  maskName, K.MNAMEc}};
+         maskData = naomi.data.Mask(maskArray, h);
+         % just put haso information in the mask header
+         bench.wfs.populateHeader(maskData.header);
+         
     end  
       
       
@@ -89,7 +91,8 @@ function [maskArray,maskData] = pupillMask(bench, mask, maskCenter)
         K = nami.KEYS;
         
         h = {{K.MNAME,  maskName, K.MNAMEc}};
-        maskData = naomi.data.Mask(maskArray, h, {bench});
+        maskData = naomi.data.Mask(maskArray, h);
+        bench.wfs.populateHeader(maskData.header);
     end	 
   end
   

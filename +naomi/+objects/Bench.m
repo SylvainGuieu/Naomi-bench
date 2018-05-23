@@ -48,8 +48,8 @@ classdef Bench < naomi.objects.BaseObject
     
     % The position of the pupill foot print as measued  by
     % naomi.measure.pupillCenter
-    measuredPupillXcenter;
-    measuredPupillYcenter;
+    measuredXpupillCenter;
+    measuredYpupillCenter;
     
     % the lastPhaseArray recorded by naomi.measure.phase
     lastPhaseArray;
@@ -222,19 +222,45 @@ classdef Bench < naomi.objects.BaseObject
         
         function xCenter = xCenter(obj)
             % measured or configured xCenter 
+            % this is the position of the central actuator as measured by 
+            % naomi.measure.IFC
             % use isCentered method to check if the value has been measured
             xCenter = obj.getMeasuredParam('measuredXcenter', 'xCenter');
         end
+        
         function yCenter = yCenter(obj)
             % measured or configured xCenter 
+            % this is the position of the central actuator as measured by 
+            % naomi.measure.IFC
             % use isCentered method to check if the value has been measured
             yCenter = obj.getMeasuredParam('measuredYcenter', 'yCenter');
         end
+        
+        function xPupillCenter = xPupillCenter(obj)
+            % measured or configured xPupillCenter 
+            % This is the center of the pupill as returned by naomi.measure.pupillCenter
+            % use isAligned method to check if the value has been measured or is default 
+            xPupillCenter = obj.getMeasuredParam('measuredXpupillCenter', 'xPupillCenter');
+        end
+        
+        function yPupillCenter = yPupillCenter(obj)
+            % measured or configured yPupillCenter 
+            % This is the center of the pupill as returned by naomi.measure.pupillCenter
+            % use isAligned method to check if the value has been measured or is default 
+            yPupillCenter = obj.getMeasuredParam('measuredYpupillCenter', 'yPupillCenter');
+        end
+        
+        
+        
         function test = isCentered(obj)
-            % check is the centers has been measured 
+            % check is the centers has been measured on the DM with the central actuator
             test = ~isempty(obj.measuredXcenter);
         end
-            
+        
+        function test = isAligned(obj)
+            % check if the bench has been aligned (with the trace of pupill on the wfs)
+            test = ~isempty(obj.measuredXpupillCenter);
+        end
         
         function orientation = orientation(obj)
             % the mirror vs dm orientation has measured or configured
@@ -376,10 +402,7 @@ classdef Bench < naomi.objects.BaseObject
                 obj.processes(processName) = {-1,def{2},def{3}};
             end
         end
-        function test = isAligned(obj)
-            % check if the bench has been aligned
-            test = ~isempty(obj.measuredXcenter);
-        end
+        
 
         
 
@@ -532,7 +555,13 @@ classdef Bench < naomi.objects.BaseObject
                 nActuator = 0;
             end
         end
-
+        function dmId = dmId(obj)
+            if obj.has('dm')
+                dmId = obj.dm.sSerialName;
+            else
+                dmId = obj.config.dmId;
+            end
+        end
 
         function maskArray = maskArray(obj, varargin)
             if isempty(obj.maskData)
@@ -727,26 +756,60 @@ classdef Bench < naomi.objects.BaseObject
         function h = populateHeader(obj, h)
             % populate a generic fits header for all files a maximum of
             % information is populated here
-            h = naomi.addToHeader(h, 'TEST', 1, 'THIS IS A TEZT'); 
-            return 
-            if isempty(obj.phaseReferenceData)
-              naomi.addToHeader(h, 'PHASEREF', 'NO', 'YES/NO subtracted reference');
-            else
-              naomi.addToHeader(h, 'PHASEREF', 'YES', 'YES/NO subtracted reference');
-            end           
-
+            % catch a maximum of Error to avoid that files writing fail
+            if obj.has('wfs');
+              try
+                obj.wfs.populateHeader(h);
+              catch err
+                obj.log('WARNING: problem when populating error from wfs')
+                disp(getReport(err,'extended'));
+              end
+            end
+            if obj.has('envirnomnet');
+              try
+                obj.environment.populateHeader(h);
+              catch err
+                obj.log('WARNING: problem when populating error from environmnent')
+                disp(getReport(err,'extended'));
+              end
+            end
+            if obj.has('gimbal');
+              try
+                obj.gimbal.populateHeader(h);
+              catch err
+                obj.log('WARNING: problem when populating error from gimbal')
+                disp(getReport(err,'extended'));
+              end
+            end
+            
+            K = naomi.KEYS;
+            
+            if obj.has('dm');
+              try
+                naomi.addToHeader(h, K.DMID, obj.dm.sSerialName, K.DMIDc);
+              catch err
+                obj.log('WARNING: problem when populating error from dm')
+                disp(getReport(err,'extended'));
+              end
+            end
+            
+            
+            
+            if obj.isCentered
+               	naomi.addToHeader(h, K.XCENTER, obj.xCenter, K.XCENTERc);
+                naomi.addToHeader(h, K.YCENTER, obj.yCenter, K.YCENTERc);
+            end
             if obj.isAligned
-               	naomi.addToHeader(h, obj.xCenter, 'XCENTER', 'X position of pupill [pix]');
-                naomi.addToHeader(h, obj.yCenter, 'YCENTER', 'Y position of pupill [pix]');
+                naomi.addToHeader(h, K.XPCENTER, obj.x, K.XPCENTERc);
+                naomi.addToHeader(h, K.YPCENTER, obj.yCenter, K.YPCENTERc);
             end
+            
             if obj.isScaled
-                naomi.addToHeader(h, obj.xPixelScale, 'XPSCALE', 'X pixel scale [m/pix]');
-                naomi.addToHeader(h, obj.yPixelScale, 'YPSCALE', 'X pixel scale [m/pix]');
+                naomi.addToHeader(h, K.XPSCALE, obj.xPixelScale, K.XPSCALEc)
+                naomi.addToHeader(h, K.YPSCALE, obj.yPixelScale, K.YPSCALEc)
             end
-           	for iSys=1:length(obj.subsystems)
-           		s = obj.subsystems{iSys};
-           		if obj.has(s); obj.(s).populateHeader(h); end
-            end
+            naomi.addToHeader(h, K.ORIENT, obj.orientation, K.ORIENTc);
+            
         end
     end
 end
