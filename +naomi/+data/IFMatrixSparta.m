@@ -1,10 +1,10 @@
-classdef IFMatrixSparta < naomi.data.IFMatrix
+classdef IFMSparta < naomi.data.IFM
 	properties
 		
 	end	
 	methods
-        function obj = IFMatrixSparta(varargin)
-            obj = obj@naomi.data.IFMatrix(varargin{:});
+        function obj = IFMSparta(varargin)
+            obj = obj@naomi.data.IFM(varargin{:});
         end
         function sh = staticHeader(obj)
         	sh = {{'DPR_TYPE', 'IFM_SPARTA', ''}};

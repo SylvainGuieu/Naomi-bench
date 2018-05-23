@@ -6,7 +6,7 @@ function simulator = newSimulator(config)
    biasVector = [];
    turbuArray = [];
    
-   IFM = naomi.data.IFMatrix(config.simulatorIFM).data;
+   IFM = naomi.data.IFM(config.simulatorIFM).data;
    if ~isempty(config.simulatorZtC) && strlength(config.simulatorZtC)
        ZtC = naomi.data.ZtC(config.simulatorZtC).data;
    end

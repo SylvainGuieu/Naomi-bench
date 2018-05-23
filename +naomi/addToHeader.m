@@ -10,6 +10,15 @@ function h = addToHeader(h, key, value, comment)
         else
             h{length(h)+1} = {key, value, comment};
         end
+    elseif isa(h, 'naomi.data.BaseData')
+      if nargin<3 % this is a Nx3 cell array 
+          for iKey=1:length(key)
+              c = key{iKey};
+              h.setKey(c{1}, c{2}, c{3});
+          end            
+      else
+        h.setKey(key, value, comment);
+    end
     elseif isa(h,'containers.Map')
     	
         if nargin<3 % this is a Nx3 cell array 

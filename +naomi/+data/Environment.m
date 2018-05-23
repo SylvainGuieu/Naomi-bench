@@ -11,37 +11,37 @@ classdef Environment < naomi.data.BaseData
         	sh = {{'DPR_TYPE', 'ENVIRONMENT', ''}};
         end
         function c = TIME(obj)
-            c = obj.getKey('TIME');
+            c = obj.getKey('TIME', 1);
         end
         function c = CURRENT(obj)
-            c = obj.getKey('CURRENT');
+            c = obj.getKey('CURRENT', 2);
         end
         function c = FANIN(obj)
-            c = obj.getKey('FANIN');
+            c = obj.getKey('FANIN', 3);
         end
         function c = FANOUT(obj)
-            c = obj.getKey('FANOUT');
+            c = obj.getKey('FANOUT', 4);
         end
         function c = TREGUL(obj)
-            c = obj.getKey('TREGUL');
+            c = obj.getKey('TREGUL', 5);
         end
         function c = TIN(obj)
-            c = obj.getKey('TIN');
+            c = obj.getKey('TIN', 6);
         end
         function c = TOUT(obj)
-            c = obj.getKey('TOUT');
+            c = obj.getKey('TOUT', 7);
         end
         function c = TMIRROR(obj)
-            c = obj.getKey('TMIRROR');
+            c = obj.getKey('TMIRROR', 8);
         end
         function c = TQSM(obj)
-            c = obj.getKey('TQSM');
+            c = obj.getKey('TQSM', 9);
         end
         function c = TEMBIANT(obj)
-            c = obj.getKey('TEMBIANT');
+            c = obj.getKey('TEMBIANT', 10);
         end
 				function c = HUMIDITY(obj)
-            c = obj.getKey('HUMIDITY');
+            c = obj.getKey('HUMIDITY', 11);
         end
         
         

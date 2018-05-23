@@ -43,7 +43,7 @@ function [phaseArray, phaseData] = phase(bench, nPhase, filterTipTilt, substract
 
 
     % Remove the reference
-    if substractReference
+  if substractReference
 	    phaseArray = phaseArray - bench.phaseReferenceArray;
 	end
 	% Remove the tip tilt if needed
@@ -72,6 +72,7 @@ function [phaseArray, phaseData] = phase(bench, nPhase, filterTipTilt, substract
         h = {{K.NPHASE, nPhase, K.NPHASEc}, ...
              {K.PHASEREF, refSubtraced, K.PHASEREFc}, ...
              {K.PHASETT, logical(filterTipTilt), K.PHASETTc}};
-        phaseData = naomi.data.Phase(phaseArray, h, {bench});
+        phaseData = naomi.data.Phase(phaseArray, h);
+				bench.populateHeader(phaseData.header);
     end
 end

@@ -126,7 +126,7 @@ classdef EnvironmentBuffer < naomi.objects.Buffer
             % if e is not connected, e.i `~e.isConnected`, this does
             % nothing and 
             %
-            % if environmnet object is note connected do nothing silently
+            % if environment object is note connected do nothing silently
             if ~e.isConnected
                 return 
             end

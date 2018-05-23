@@ -1,15 +1,15 @@
-function [xS,yS] = IFMScale(IFMatrix)
-	% IFMatrixScale  Copute the scale of IFMatrix
+function [xS,yS] = IFMScale(IFM)
+	% IFMScale  Copute the scale of IFM
 	%
 	%   The scale in mm/pix assuming 2.5mm between
 	%   consecutive actuators.
 	%
-	%   IFMatrix:     Input matrix of Influence Function (nActuator,nSubAperture,nSubAperture)
+	%   IFM:     Input matrix of Influence Function (nActuator,nSubAperture,nSubAperture)
 	%   [xS,yS]: output scale in x and y direction. 
 
-	% Collapse IFMatrix in x and y
-	IfXArray = squeeze(naomi.compute.nansum(IFMatrix,3));
-	IfYArray = squeeze(naomi.compute.nansum(IFMatrix,2));
+	% Collapse IFM in x and y
+	IfXArray = squeeze(naomi.compute.nansum(IFM,3));
+	IfYArray = squeeze(naomi.compute.nansum(IFM,2));
 
 	% Parameters
 	[i,j,~] = naomi.compute.actuatorPosition();

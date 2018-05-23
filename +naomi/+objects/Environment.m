@@ -444,7 +444,7 @@ classdef Environment < naomi.objects.BaseObject
         end
         
         function populateHeader(obj, h)
-          % populate an header with the relevant environmnet information
+          % populate an header with the relevant environment information
           K = naomi.KEYS;
           naomi.addToHeader(h, K.TEMPMIRROR,obj.tempMirror,K.TEMPMIRRORc);
           naomi.addToHeader(h, K.TEMPQSM,   obj.tempQSM,K.TEMPQSMc);
@@ -453,7 +453,6 @@ classdef Environment < naomi.objects.BaseObject
           naomi.addToHeader(h, K.TEMPEMBIANT, obj.tempEmbiant, K.TEMPEMBIANTc);
           naomi.addToHeader(h, K.TEMPREGUL, obj.tempRegul, K.TEMPREGULc);
           naomi.addToHeader(h, K.HUMIDITY, obj.humidity, K.HUMIDITYc);
-          
         end
         
         function [test, explanation] = isReadyToCalib(obj)
@@ -720,7 +719,7 @@ classdef Environment < naomi.objects.BaseObject
         
 
         function buffer = createBuffer(obj, bufferSize, stepSize, dynamic)
-            % create a buffer used to monitorate the enviroment main
+            % create a buffer used to monitorate the environment main
             % parameters.
             %
             % Parameters
@@ -795,8 +794,8 @@ classdef Environment < naomi.objects.BaseObject
             current = obj.getCurrent();
         end
         
-        function humidity(obj)
-          obj.getUSBTemp(obj.U_HUMIDITY);
+        function humidity = humidity(obj)
+          humidity = obj.getUSBTemp(obj.U_HUMIDITY);
         end
         
         function voltage=getFanVoltage(obj, fanNumber)

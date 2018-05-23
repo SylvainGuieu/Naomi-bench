@@ -1,19 +1,21 @@
-classdef IFMatrix < naomi.data.PhaseCube
+classdef IFM < naomi.data.PhaseCube
 	properties
         profileResult; % store the result of a fitted profile
         fitType = 'naomi' % the type of fitting
+				environmentData;
 	end	
 	methods
-        function obj = IFMatrix(varargin)
+        function obj = IFM(varargin)
             obj = obj@naomi.data.PhaseCube(varargin{:});
         end
         function sh = staticHeader(obj)
-        	sh = {{'DPR_TYPE', 'IFM', ''}};
+        	sh = {{naomi.KEYS.DPRTYPE, 'IFM', naomi.KEYS.DPRTYPEc}};
         end
         function setData(obj, data)
             setData@naomi.data.PhaseCube(obj, data);
             obj.profileResult = []; % empty profiles since data has changed 
         end
+				
         function data = fitsReadData(obj, file)
             % for historical reason anc compatibility with sparta 
             % the data is stored with the last dimension beeing 
@@ -21,9 +23,16 @@ classdef IFMatrix < naomi.data.PhaseCube
             data = fitsread(file);
             data = permute(data, [3,1,2]);
             data = double(data);
+						environmentArray = naomi.readExtention( fileName,'ENVIRONMENT', 1);
+            if ~isempty(environmentArray)
+                obj.environmentData = naomi.data.Environment(environmentArray);
+            end
         end
         function fitsWriteData(obj, fileName)
             fitswrite(single(permute(obj.data, [2,3,1])),fileName);
+						if ~isempty(obj.environmentData)
+							naomi.saveExtention(obj.environmentData.data, fileName, 'ENVIRONMENT', 1);
+						end
             %matlab.io.fits.writeImg(.file, obj.getData());
         end
         
@@ -36,8 +45,8 @@ classdef IFMatrix < naomi.data.PhaseCube
         function [xS,yS] = computeScale(obj)
             naomi.compute.IFMScale(obj.data);            
         end        
-        function IFMatrixSpartaData = toSparta(obj)
-            IFMatrixSpartaData = naomi.data.IFMatrixSpartaData(obj.data, obj.header, obj.context);
+        function IFMSpartaData = toSparta(obj)
+            IFMSpartaData = naomi.data.IFMSpartaData(obj.data, obj.header);
         end
         function IFData = IF(obj, actNumnber)
             data = obj.data;

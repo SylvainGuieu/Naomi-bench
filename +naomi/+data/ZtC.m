@@ -51,7 +51,12 @@ classdef ZtC < naomi.data.BaseData
         end
         function zernikeData = zernike(obj,zernike)
             K = naomi.KEYS;
-            zernikeData = naomi.data.Zernike(zernike, {{K.ORIENT,obj.getKey(K.ORIENT, K.ORIENTd)}}, obj.context);
+						K = naomi.KEYS;
+						keys = {K.ZERN, 
+										K.XCENTER, K.YCENTER, ...
+										K.XPSCALE, K.YPSCALE, K.ZTCDIAM, K.FPUPDIAM, K.ORIENT};
+            zernikeData = naomi.data.Zernike(zernike);
+						naomi.copyHeaderKeys(obj, zernikeData, keys);
         end
     	function plot(obj, axes)
             if nargin <2; axes = gca; end;
@@ -74,7 +79,7 @@ classdef ZtC < naomi.data.BaseData
         function ZtCSpartaData = toSparta(obj)
             % SPARTA does not contains the piston and is limited to 20
             % thernikes
-            ZtCSpartaData = naomi.data.ZtCSparta(obj.data(2:21,':'), obj.header, obj.context);
+            ZtCSpartaData = naomi.data.ZtCSparta(obj.data(2:21,':'), obj.header);
         end
         
         function gui(obj)

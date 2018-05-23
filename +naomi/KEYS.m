@@ -114,12 +114,21 @@ classdef KEYS
         ORIENTd = 'yx';
         
         XCENTER = 'XCENTER';
-        XCENTERc = 'phase x center position in pixel';
+        XCENTERc = '[pix] X central actuator position';
         XCENTERd = 64;
         
         YCENTER = 'YCENTER';
-        YCENTERc = 'phase y center position in pixel';
+        YCENTERc = '[pix] Y central actuator position';
         YCENTERd = 64;
+        
+        XPCENTER = 'XPCENTER';
+        XPCENTERc = '[pix] Pupill trace center';
+        XPCENTERd = 64;
+        
+        YPCENTER = 'YPCENTER';
+        YPCENTERc = '[pix] Pupill trace center';
+        YPCENTERd = 64;
+        
         
         %%
         % these are normaly not writen in header but allow user to modify 
@@ -272,6 +281,13 @@ classdef KEYS
        
        NAMP = 'NAMP';
        NAMPc = 'Number of mode amplitude played';
+       
+       %% Some other constant
+       % For loop mode 
+       CLOSED = 'CLOSED'; % loop mode
+       OPENED = 'OPEN'; 
+       MODAL = 'modal';
+       ZONAL = 'zonal';
        
        %% default  for unknown  values in header 
        UNKNOWN_STR = '?';
