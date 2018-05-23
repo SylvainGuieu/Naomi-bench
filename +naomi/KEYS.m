@@ -238,6 +238,9 @@ classdef KEYS
        RYGAIN = 'RY_GAIN';
        RYGAINc = '[arcsec mecanical/mm] gain convertion of motor rY';
        
+       TIME = 'TIME';
+       TIMEc = 'matlab time';
+       
        TEMPMIRROR = 'TEMPMIR';
        TEMPMIRRORc = '[C] Temperature of the Mirror';
        
