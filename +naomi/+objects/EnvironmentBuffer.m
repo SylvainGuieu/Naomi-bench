@@ -24,7 +24,7 @@ classdef EnvironmentBuffer < naomi.objects.Buffer
     end
     methods 
         function obj = EnvironmentBuffer(bufferSize, stepSize, dynamic)
-            %obj = obj@naomi.objects.Buffer(obj.NCOL, bufferSize, stepSize, dynamic);
+            obj = obj@naomi.objects.Buffer(11, bufferSize, stepSize, dynamic);
         end
         function value = get(obj, key)
             i = obj.index;
