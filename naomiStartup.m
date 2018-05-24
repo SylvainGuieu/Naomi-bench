@@ -15,5 +15,7 @@ naomiGlobalBench = naomi.objects.Bench(naomiGlobalConfig);
 % create a copy with the name bench
 bench = naomiGlobalBench;
 
-
+if isempty(naomi.findGui('Naomi Startup'))
+    startupGui(bench);
+end
 
