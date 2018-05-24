@@ -191,11 +191,11 @@ classdef KEYS
         ZTCYSCALE= 'ZTCYSCAL';
         ZTCYSCALEc = '[m/pixel] Y pixel scale used for ZtC coputation';
         
-        ZTCXSCENTER= 'ZTCXCENT';
-        ZTCXSCENTER = '[pixel] X center used for ZtC coputation';
+        ZTCXCENTER= 'ZTCXCENT';
+        ZTCXCENTERc = '[pixel] X center used for ZtC coputation';
         
-        ZTCYSCENTER= 'ZTCYCENT';
-        ZTCYSCENTER = '[pixel] Y center used for ZtC coputation';
+        ZTCYCENTER= 'ZTCYCENT';
+        ZTCYCENTERc = '[pixel] Y center used for ZtC coputation';
         
         ZTCNAME = 'ZTCNAME';
         ZTCNAMEc = 'Name of the ZtC parameters';

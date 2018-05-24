@@ -51,12 +51,12 @@ classdef ZtC < naomi.data.BaseData
         end
         function zernikeData = zernike(obj,zernike)
             K = naomi.KEYS;
-						K = naomi.KEYS;
-						keys = {K.ZERN, 
-										K.XCENTER, K.YCENTER, ...
-										K.XPSCALE, K.YPSCALE, K.ZTCDIAM, K.FPUPDIAM, K.ORIENT};
-            zernikeData = naomi.data.Zernike(zernike);
-						naomi.copyHeaderKeys(obj, zernikeData, keys);
+						
+			keys = {K.ZTCXCENTER, K.ZTCYCENTER, ...
+			        K.ZTCXSCALE, K.ZTCYSCALE, K.ZTCDIAM, K.FPUPDIAM, K.ORIENT}; 
+										
+            zernikeData = naomi.data.Zernike(zernike, {{K.ZERN, zernike, K.ZERNc}});
+		    naomi.copyHeaderKeys(obj, zernikeData, keys);
         end
     	function plot(obj, axes)
             if nargin <2; axes = gca; end;
@@ -86,7 +86,7 @@ classdef ZtC < naomi.data.BaseData
 						else
 							dprVer = 'SPARTA';
 						end
-            ZtCSpartaData.setKey(naomi.KEYS.DPRVER, sprVer, naomi.KEYS.DPRVERc);
+            ZtCSpartaData.setKey(naomi.KEYS.DPRVER, dprVer, naomi.KEYS.DPRVERc);
         end
         
         function gui(obj)

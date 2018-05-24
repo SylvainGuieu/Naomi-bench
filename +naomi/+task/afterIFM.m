@@ -6,12 +6,14 @@ function afterIFM(bench, IFMData)
 %   save IFM, IFM cleaned and ZtC and ZtC for Sparta
     IFMCleanData = naomi.make.cleanIFM(bench, IFMData);
     naomi.config.IFM(bench,IFMCleanData);
-    ZtCData = naomi.make.ZtC(bench, IFMCleanData);
+    ZtCData = naomi.make.ZtC(bench, IFMCleanData, 'naomi-pup');
+    ZtCDmData = naomi.make.ZtC(bench, IFMCleanData, 'dm-pup');
     naomi.config.ZtC(bench, ZtCData);
     
     naomi.saveData(IFMData, bench);
     naomi.saveData(IFMCleanData, bench);
     naomi.saveData(ZtCData,bench);
+    naomi.saveData(ZtCDmData,bench);
     naomi.saveData(ZtCData.toSparta, bench);
     
     [~, dmBiasData] = naomi.measure.dmBias(bench);
