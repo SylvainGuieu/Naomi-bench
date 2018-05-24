@@ -11,16 +11,17 @@ function [PtCArray, ZtCArray, ZtPArray, PtCAData, ZtCData, ZtPData] = commandMat
   if nargin<3
     ztcMode = bench.config.ztcMode;
   end
-	
-  IFC = squeeze(IFM(dmCenterAct,:,:));
+  IFMArray = IFMData.data;
+  
+  IFC = squeeze(IFMArray(bench.config.dmCentralActuator,:,:));
+  
 	[xCenter,yCenter] = naomi.compute.IFCenter(IFC);
-  [mask, nEigenValue, nZernike, zeroMean] = bench.config.ZtCParameters(ztcMode);
-	[pupillDiameter, centralObscurtionDiameter] = bench.getMaskInMeter(mask);
-  
+    [mask, nEigenValue, nZernike, zeroMean] = bench.config.ZtCParameters(ztcMode);
+	[pupillDiameter, centralObscurtionDiameter] = bench.getMaskInPixel(mask);
   
 	
 	
-	[PtCArray, ZtCArray, ZtPArray] = naomi.compute.commandMatrix(IFMData.data,xCenter, yCenter,  pupillDiameter, centralObscurtionDiameter, nEigenValue, nZernike, zeroMean);
+	[PtCArray, ZtCArray, ZtPArray] = naomi.compute.commandMatrix(IFMArray,xCenter, yCenter,  pupillDiameter, centralObscurtionDiameter, nEigenValue, nZernike, zeroMean);
 	if nargout>3
     K = naomi.KEYS;
     

@@ -18,7 +18,7 @@ config = bench.config;
 bench.log(sprintf('NOTICE: Close zonal loop in %i step:',nStep), 1);
 
 [~,~,nActuator] = size(PtC);
-if nargin < 6; trgPhi = 0.0; end;
+if nargin < 5; trgPhi = 0.0; end;
 
     for step=1:nStep
         % Read WFS
@@ -27,13 +27,12 @@ if nargin < 6; trgPhi = 0.0; end;
         
         % Control
         res = reshape(naomi.compute.nanzero(phir),1,[]) * reshape(PtC,[],nActuator);
-        naomi.action.cmdRelativeZonal(':', -gain * res');
+        naomi.action.cmdRelativeZonal(bench, -gain * res');
         
         
         % Print    
         cmd = dm.cmdVector + dm.biasVector;
-        bench.log(sprintf('NOTICE %2i/%i rms = %.3f rmsc = %.3f ptv = %.3f '...
-                 'cmax = %.3f cmean = %.3f',...
+        bench.log(sprintf('NOTICE %2i/%i rms = %.3f rmsc = %.3f ptv = %.3f cmax = %.3f cmean = %.3f',...
                 step, nStep, naomi.compute.nanstd(phir(:)), ...
                 naomi.compute.rms_tt(phir),max(phir(:)) - min(phir(:)),...
                 max(abs(cmd(:))),mean(cmd(:))), 2);

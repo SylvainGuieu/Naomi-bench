@@ -8,12 +8,15 @@ function [dmBiasVector,dmBiasData] = dmBias(bench)
     bench.dm.biasVector = 0;
     
     ztcMode = bench.config.biasZtcMode;
+    mask = bench.config.ZtCParameters(ztcMode);
     gain = bench.config.biasGain;
     nStep = bench.config.biasNstep;
     % compute the matrix with the full dm 
-    PtCArray, ZtCArray, ZtPArray] = naomi.measure.commandMatrix(bench, bench.IFMData, ztcMode);
+    [PtCArray, ZtCArray, ZtPArray] = naomi.make.commandMatrix(bench, bench.IFMData, ztcMode);
     
-    
+    % configure the pupill mask 
+    naomi.config.pupillMask(bench, mask);
+    naomi.action.resetDm(bench);
     try
         naomi.action.closeZonal(bench,PtCArray,gain,nStep);
     catch ME

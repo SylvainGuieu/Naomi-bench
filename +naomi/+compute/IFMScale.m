@@ -1,4 +1,4 @@
-function [xS,yS] = IFMScale(IFM)
+function [xS,yS] = IFMScale(IFM, orientation)
 	% IFMScale  Copute the scale of IFM
 	%
 	%   The scale in mm/pix assuming 2.5mm between
@@ -8,11 +8,14 @@ function [xS,yS] = IFMScale(IFM)
 	%   [xS,yS]: output scale in x and y direction. 
 
 	% Collapse IFM in x and y
+    if nargin<2
+        orientation = 'yx';
+    end
 	IfXArray = squeeze(naomi.compute.nansum(IFM,3));
 	IfYArray = squeeze(naomi.compute.nansum(IFM,2));
 
 	% Parameters
-	[i,j,~] = naomi.compute.actuatorPosition();
+	[i,j,~] = naomi.compute.actuatorPosition(orientation);
 	N = 2048*4;
 
 	% Compute scaling in m/pix, assuming

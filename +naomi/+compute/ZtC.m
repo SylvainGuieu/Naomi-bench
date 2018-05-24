@@ -1,5 +1,6 @@
-function ZtC = ZtC(IFM, diameter, centralObscurtionDiameter, dmCenterAct, nEigenValue, nZernike)
-	% compute.ZtC  Compute the Zernique to command Matrix  
+function ZtC = ZtC(IFM, diameter, centralObscurtionDiameter, dmCenterAct, nEigenValue, nZernike, zeroMean, orientation)
+	% compute.ZtC  Compute the Zernique to command Matrix using physical
+	% dimension
 	%
 	% ZtC = compute.ZtC(IFM, diameter, dmCenterAct, nEigenValue, nZernike)
 	%
@@ -12,14 +13,18 @@ function ZtC = ZtC(IFM, diameter, centralObscurtionDiameter, dmCenterAct, nEigen
 	% dmCenterAct: index of the center actuator
 	% nEigenValue: number of accepted Eigenvalues
 	% nZerniken : number of zernikes
+    if nargin <7; zeroMean = 1; end
+    if nargin <8; orientation='yx'; end
+    
 	IFC = squeeze(IFM(dmCenterAct,:,:));
 	[xCenter,yCenter] = naomi.compute.IFCenter(IFC);
 
-    [xS,yS] = naomi.compute.IFMScale(IFM);
+    [xS,yS] = naomi.compute.IFMScale(IFM, orientation);
     scale = 0.5 * (xS + yS);
     diamPix = diameter / scale;
+    
     centralObscurtionPix = centralObscurtionDiameter / scale;
 	[~,ZtC,~] = naomi.compute.commandMatrix(IFM,xCenter,yCenter,diamPix, ...
                                                 centralObscurtionPix, ...
-                                                nEigenValue, nZernike);
+                                                nEigenValue, nZernike, zeroMean);
 end

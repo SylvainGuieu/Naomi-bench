@@ -33,7 +33,7 @@ classdef Config < handle
         ACEROOT =  'C:\AlpaoCoreEngine';
         
         dmIdChoices = {'BAX153','BAX159','BAX199','BAX200', 'BAX201', 'DUMMY'};
-        dmId = '';
+        dmId = 'DUMMY';
         
         % the dm id 2 gimbal assignment loockup table
         dmId2gimbalNumber = {{'BAX153',4},{'BAX159',2},{'BAX199',3},...
@@ -85,14 +85,14 @@ classdef Config < handle
         %           |               |       |   |- nZernike number of Zernique to keep 
         %           |               |       |   |     |- zeroMean  
         ztcDef = {
-                  {'naomi-pup',        'naomi', 140, 100, 1},
-                  {'naomi-pup-sparta', 'naomi', 140, 21 , 1}, 
-                  {'dm-pup',           'dm',    140, 100, 1}
+                  {'naomi-pup',        'naomi', 140, 100, 1},...
+                  {'naomi-pup-sparta', 'naomi', 140, 21 , 1},... 
+                  {'dm-pup',           'dm',    140, 100, 0},...
                   {'no mask',      'no mask',   220, 100, 1} % make a big mask = no mask 
                 };
                 
         % current ztcMode 
-        ztcMode = 'naomi';
+        ztcMode = 'naomi-pup';
         %%
         % add default to the ztc parameters
         % current ztcMask 
@@ -245,9 +245,11 @@ classdef Config < handle
         
         % the ztcMode used to compute the matrix (PtC)
         % leave empty to use default parameters
-        biasZtcMode = 'full-pupill';
-        
-        
+        biasZtcMode = 'dm-pup';
+        % zonal close loop gain used 
+        biasGain = 0.6;
+        % number of step in the close loop 
+        biasNstep = 10;
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %
@@ -542,7 +544,7 @@ classdef Config < handle
           found = false;
           for i=1:length(obj.ztcDef)
               def = obj.ztcDef{i};
-              if strcmp(mode,def{1})
+              if strcmp(ztcMode,def{1})
                   mask = def{2};
                   nEigenValue = def{3};
                   nZernike = def{4};
@@ -550,7 +552,7 @@ classdef Config < handle
                   found = true;
               end
           end
-          if ~found; error(strcat('unknown mode ',mode)); end 
+          if ~found; error(strcat('unknown mode ',ztcMode)); end 
             
         end
         function ztcModes = ztcModeChoices(obj)
