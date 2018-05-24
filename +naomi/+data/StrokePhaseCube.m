@@ -51,15 +51,29 @@ classdef StrokePhaseCube < naomi.data.PhaseCube
             end            
         end
         
-        function maxCommandVector = maxCommandVector(obj, varargin)
-            biasArray 
-            maxCommandVector = max(abs(dm.biasVector + dm.cmdVector),2);
+        function maxCommandVector = maxCommandVector(obj)
+					  maxCommandVector = max(abs(obj.biasVector' + obj.dmCommandArray),[], 2);
+						
         end
-        
+				function phiMaxVector = phiMaxVector(obj)
+					nSubAperture = obj.nSubAperture;
+					nPhase = obj.nPhase;
+					phiMaxVector = max(reshape(obj.phaseCube, nPhase, nSubAperture* nSubAperture), [],2)
+				end
+				function phiMinVector = phiMaxVector(obj)
+					nSubAperture = obj.nSubAperture;
+					nPhase = obj.nPhase;
+					phiMinVector = max(reshape(obj.phaseCube, nPhase, nSubAperture* nSubAperture), [],2)
+				end
+				function ptvVector = ptvVector(obj, varargin)
+						nSubAperture = obj.nSubAperture;
+						nPhase = obj.nPhase;
+						max(reshape(obj.phaseCube, nPhase, nSubAperture* nSubAperture), [],2)
+        end
         function strokeData = strok(obj, phiTarget)
-            
+        Output = zeros(obj.nPhase,5);
         % Get the PtV
-	    outputArray(s,3) = max(phiArray(:)) - min(phiArray(:));
+	    	outputArray(s,3) = max(phiArray(:)) - min(phiArray(:));
         outputArray(s,5) = max(residualArray(:)) - min(residualArray(:));
         
         

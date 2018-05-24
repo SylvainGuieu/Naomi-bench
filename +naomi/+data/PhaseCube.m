@@ -124,16 +124,28 @@ classdef PhaseCube < naomi.data.BaseData
             rmsVector = naomi.compute.nanstd(reshape(obj.phaseCube, obj.nPhase, []), 2);
             if ~isempty(varargin)
                 rmsVector = rmsVector(varargin{:});
-            end
-                
+            end    
         end
         function gainVector = gainVector(obj, varargin)
             % the gain (std) over the active pupill for all the phases with lenght of nPhase
             nPhase = obj.nPhase;
             gainVector = naomi.compute.nanstd(reshape(obj.maskedPhaseCube, nPhase, []), 2);
             %gainVector = naomi.compute.nanstd(reshape(obj.phaseCube, nPhase, []), 2);
-            gainVector = gainVector(varargin{:});
+            if ~empty(varargin) gainVector = gainVector(varargin{:});end
         end
+				function phiMaxVector = phiMaxVector(obj, varargin)
+					phiMaxVector = max(reshape(obj.phaseCube, obj.nPhase, []), [],2);
+					if ~empty(varargin) phiMaxVector = phiMaxVector(varargin{:});end
+
+				end
+				function phiMinVector = phiMaxVector(obj, varargin)
+					phiMinVector = min(reshape(obj.phaseCube, obj.nPhase, []), [],2);
+					if ~empty(varargin) phiMinVector = phiMinVector(varargin{:});end
+				end
+				function p2vVector = p2vVector(obj, varargin)
+					p2vVector = obj.phiMaxVector - obj.phiMinVector;
+					if ~empty(varargin) p2vVector = p2vVector(varargin{:});end
+				end
         function pistonVector = pistonVector(obj, varargin)
             % the piston (std) over the active pupill for all the phases 
             nPhase = obj.nPhase;
