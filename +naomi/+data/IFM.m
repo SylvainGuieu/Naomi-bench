@@ -47,6 +47,12 @@ classdef IFM < naomi.data.PhaseCube
         end        
         function IFMSpartaData = toSparta(obj)
             IFMSpartaData = naomi.data.IFMSpartaData(obj.data, obj.header);
+						if dprVer; 
+							dprVer = strcat(dprVer, '_SPARTA');
+						else
+							dprVer = 'SPARTA';
+						end
+            IFMSpartaData.setKey(naomi.KEYS.DPRVER, sprVer, naomi.KEYS.DPRVERc);
         end
         function IFData = IF(obj, actNumnber)
             data = obj.data;

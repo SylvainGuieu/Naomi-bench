@@ -72,7 +72,7 @@ classdef Config < handle
         %           |        |         |     |- unit 'm' or 'pixel'      
         maskDef = {
                     {'naomi', 28.0e-3,  0.0, 'm'}, ...
-                    {'dm pupill', 36.5e-3, 0.0, 'm'},... 
+                    {'dm',  36.5e-3, 0.0, 'm'},... 
                     {'no mask',  999.9e-3, 0.0,  'm'}% big mask = no mask 
         };
         
@@ -83,14 +83,18 @@ classdef Config < handle
         %           |               |        
         %           |               |       |- n Eigen Value value 
         %           |               |       |   |- nZernike number of Zernique to keep 
+        %           |               |       |   |     |- zeroMean  
         ztcDef = {
-                  {'naomi',        'naomi', 140, 100},
-                  {'naomi-sparta', 'naomi', 140, 21 }, 
-                  {'full dm',      'dm pupill', 140, 100}
-                  {'no mask',      'no mask', 220, 100} % make a big mask = no mask 
+                  {'naomi-pup',        'naomi', 140, 100, 1},
+                  {'naomi-pup-sparta', 'naomi', 140, 21 , 1}, 
+                  {'dm-pup',           'dm',    140, 100, 1}
+                  {'no mask',      'no mask',   220, 100, 1} % make a big mask = no mask 
                 };
+                
         % current ztcMode 
         ztcMode = 'naomi';
+        %%
+        % add default to the ztc parameters
         % current ztcMask 
         ztcMask = 'naomi';
         
@@ -102,6 +106,8 @@ classdef Config < handle
         % number of Zernique to command matrix for the ZtP measurement
         ztpNzernike = 21;
         
+        % 1 or 0 zeroMean for matrix inversion 
+        ztcZeroMean = 1;
         % the haso wafe front sensor dit at startup
         wfsDit = 2.0; % this is the min dit
          
@@ -230,6 +236,18 @@ classdef Config < handle
         flatCloseNzernike  = 15;
         % number of iteration to close loop on flat 
         flatCloseNstep  = 10;
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %
+        % parameters when measuring the dm Bias 
+        %
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+        
+        % the ztcMode used to compute the matrix (PtC)
+        % leave empty to use default parameters
+        biasZtcMode = 'full-pupill';
+        
+        
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %
@@ -479,6 +497,7 @@ classdef Config < handle
                     
                     obj.ztcNeigenValue = def{3};
                     obj.ztcNzernike = def{4};
+                    obj.ztcZeroMean = def{5};
                     found = true;
                 end
             end
@@ -486,6 +505,54 @@ classdef Config < handle
 
             obj.ztcMode = mode; 
         end 
+        function [mask, nEigenValue, nZernike, zeroMean] = ZtCParameters(obj, ztcMode)
+          if nargin<2 || isempty(ztcMode)
+            mask = obj.ztcMask
+            nEigenValue = obj.ztcNeigenValue;
+            nZernike = obj.ztcNzernike;
+            zeroMean = obj.ztcZeroMean;
+            return;
+          end
+          
+          if iscell(ztcMode)
+              
+              if length(ztcMode)>0
+                mask = ztcMode{1};
+              else
+                mask = obj.ztcMask;
+              end
+              if length(ztcMode)>1
+                nEigenValue = ztcMode{2};
+              else
+                nEigenValue = obj.ztcNeigenValue;
+              end
+              if length(ztcMode)>2
+                nZernike = ztcMode{3};
+              else
+                nZernike = obj.ztcNzernike;
+              end
+              if length(ztcMode)>2
+                zeroMean = ztcMode{4};
+              else
+                zeroMean = obj.ztcZeroMean;
+              end
+              return; 
+          end
+          
+          found = false;
+          for i=1:length(obj.ztcDef)
+              def = obj.ztcDef{i};
+              if strcmp(mode,def{1})
+                  mask = def{2};
+                  nEigenValue = def{3};
+                  nZernike = def{4};
+                  zeroMean = def{5};
+                  found = true;
+              end
+          end
+          if ~found; error(strcat('unknown mode ',mode)); end 
+            
+        end
         function ztcModes = ztcModeChoices(obj)
             ztcModes = {};
             for i=1:length(obj.ztcDef)
@@ -497,6 +564,7 @@ classdef Config < handle
             [gid,~] = listdlg('PromptString','Select ztcM measurement mode:','SelectionMode','single','ListString',ztcModes);
             obj.ztcMode = ztcModes{gid};
         end
+        
         function ztcMode = getZ2cMode(obj)
             % return IfMode or ask 
             if strcmp(obj.ztcMode, '')

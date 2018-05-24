@@ -13,6 +13,12 @@ classdef ZtP < naomi.data.PhaseCube
         end
         function ZtPSpartaData = toSparta(obj)
             ZtPSpartaData = naomi.data.ZtPSpartaData(obj.data, obj.header);
+						if dprVer; 
+							dprVer = strcat(dprVer, '_SPARTA');
+						else
+							dprVer = 'SPARTA';
+						end
+            ZtPSpartaData.setKey(naomi.KEYS.DPRVER, sprVer, naomi.KEYS.DPRVERc);
         end
         
         function idx = zernike2index(obj, zernike)

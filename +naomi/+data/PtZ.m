@@ -8,7 +8,7 @@ classdef PtZ < naomi.data.PhaseCube
             obj = obj@naomi.data.PhaseCube(varargin{:});
         end
         function sh = staticHeader(obj)
-        	sh = {{'DPR_TYPE', 'ZTP_MATRIX', ''}};
+					sh = {{naomi.KEYS.DPRTYPE, 'PTZ', naomi.KEYS.DPRTYPEc}};
         end
         
         function plotOneMode(obj, z)

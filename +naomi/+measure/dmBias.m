@@ -6,8 +6,16 @@ function [dmBiasVector,dmBiasData] = dmBias(bench)
     
     savedBiasVector  = bench.dm.biasVector;
     bench.dm.biasVector = 0;
+    
+    ztcMode = bench.config.biasZtcMode;
+    gain = bench.config.biasGain;
+    nStep = bench.config.biasNstep;
+    % compute the matrix with the full dm 
+    PtCArray, ZtCArray, ZtPArray] = naomi.measure.commandMatrix(bench, bench.IFMData, ztcMode);
+    
+    
     try
-        naomi.measure.closeFlat(bench);
+        naomi.action.closeZonal(bench,PtCArray,gain,nStep);
     catch ME
         bench.dm.biasVector = savedBiasVector;
         rethrow(ME);
@@ -20,6 +28,5 @@ function [dmBiasVector,dmBiasData] = dmBias(bench)
        dmBiasData = naomi.data.DmBias(dmBiasVector);
        bench.populateHeader(dmBiasData);
     end
-
 end
 

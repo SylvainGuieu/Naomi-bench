@@ -15,7 +15,10 @@ function filePath = saveData(data, bench)
     
     dprtType = data.getKey(naomi.KEYS.DPRTYPE, 'UNKNOWN');
     
-    filePath = fullfile( directory, sprintf('%s_%s.fits', dprtType, suffix));
+    dprVer = data.getKey(naomi.KEYS.DPRVER, '');
+    if dprVer; dprVer = strcat('_', dprVer);end
+    
+    filePath = fullfile( directory, sprintf('%s%s_%s.fits', dprtType, dprVer, suffix));
     if nargin>1
         bench.log(sprintf('NOTICE: save file to %s', filePath));
     end

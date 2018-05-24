@@ -22,6 +22,9 @@ classdef KEYS
         DPRTYPE = 'DPR_TYPE';
         DPRTYPEc = 'Product name';
         
+        DPRVER = 'DPR_VER';
+        DPRVERc = 'Flavor of the product';
+        
         ORIGIN = 'ORIGIN';
         ORIGINc = 'Where data has been taken IPAG/ESO-HQ/BENCH';
         ORIGINd = 'Bench';
