@@ -1,4 +1,4 @@
-function success = pupillMask(bench, varargin)
+function success = pupillMask(bench, mask, maskCenter)
 	% Configure the Mask for the WFS
 	%
 	% configure.pupillMask(bench)
@@ -18,8 +18,10 @@ function success = pupillMask(bench, varargin)
   % - maskCenter  (optional) is a 2 array giving the [xCenter yCenter] of the mask in pixel
   %               if mask center is not given, the previously measured (or default) mirror center 
 	%               will be taken 
-	
-	[~,maskData] = naomi.make.pupillMask(bench,  varargin{:});
+	if nargin<3; maskCenter = []; end
+	if nargin<2;mask = bench.config.ztcMask; end
+	[~,maskData] = naomi.make.pupillMask(bench,  mask, maskCenter);
 	naomi.config.mask(bench, maskData);
+	
 	success = true;
 end

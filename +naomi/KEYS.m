@@ -38,18 +38,29 @@ classdef KEYS
         MJDOBS = 'MJD-OBS';
         MJDOBSc = 'Modified Julian Date of writing header';
         
+        MASKED = 'MASKED';
+        MASKEDc = '1/0 is the phase masked (numericaly)';
+        
+        MASKNAME = 'MASKNAME';
+        MASKNAMEc = 'Name of the numerical phase mask'
         
         MPUPDIAM = 'MPUPDIAM';
-        MPUPDIAMc = 'Masked Pupill Diamter [m]';
+        MPUPDIAMc = '[m] Masked Pupill Diamter when phase measured';
         
         MPUPDIAMPIX = 'MPUPDIAMP';
-        MPUPDIAMPIXc = 'Masked Pupill Diamter [pixel]';
+        MPUPDIAMPIXc = '[pixel] Masked Pupill Diamter';
         
         MCOBSDIAM = 'MCODIAM';
-        MCOBSDIAMc = 'Mask Central obscuration Diameter [m]';
+        MCOBSDIAMc = '[m] Mask Central obscuration Diameter when phase measured';
         
         MCOBSDIAMPIX = 'MCODIAMP';
-        MCOBSDIAMPIXc = 'Mask Central obscuration Diameter [pixel]';
+        MCOBSDIAMPIXc = '[pixel] Mask Central obscuration Diameter';
+        
+        MXCENTER = 'MXCENTER';
+        MXCENTERc = '[pixel] mask center';
+        
+        MYCENTER = 'MXCENTER';
+        MYCENTERc = '[pixel] mask center';
         
         MNAME = 'MNAME';
         MNAMEc = 'Mask name or UNKNOWN';
@@ -68,6 +79,10 @@ classdef KEYS
         ACTNUM = 'ACTNUM';
         ACTNUMc = 'relevant actuator number pushed';
         
+        ACTSEP = 'ACTSEP';
+        ACTSEPc = '[m] transversal actuator separation distance';
+        ACTSEPd = 2.5e-3;
+         
         IFAMP = 'IF_AMP';
         IFAMPc = '[Cmax] amplitude of push-pull';
         
@@ -151,9 +166,40 @@ classdef KEYS
         YPSCALEc = '[m/pix] Y pixel scale';
         YPSCALEd = 0.38e-3;
         
+        % ZtC coputation 
+        
+        ZTCNEIG= 'ZTC_NEIG';
+        ZTCNEIGc =  'accepted Eigenvalues';
+        
+        ZTCNZERN= 'ZTC_NZER';
+        ZTCNZERNc = 'number of zernikes kep for ZtC';
+        
+        ZTCZMEAN = 'ZTCZMEAN';
+        ZTCZMEANc = '1/0 zero mean used when computing ZtC';
+        
         ZTCDIAM = 'ZTCDIAM';
         ZTCDIAMc = '[m] Pupill diameter used for ZtC';
         ZTCDIAMd = 28.0e-3; % default is the naomi one
+        
+        ZTCOBSDIAM = 'ZTCOBSDI';
+        ZTCOBSDIAMc = '[m] Central obscurationused for ZtC computation';
+        ZTCOBSDIAMd = 0.0; % default is the naomi one
+        
+        ZTCXSCALE= 'ZTCXSCAL';
+        ZTCXSCALEc = '[m/pixel] X pixel scale used for ZtC coputation';
+        
+        ZTCYSCALE= 'ZTCYSCAL';
+        ZTCYSCALEc = '[m/pixel] Y pixel scale used for ZtC coputation';
+        
+        ZTCXSCENTER= 'ZTCXCENT';
+        ZTCXSCENTER = '[pixel] X center used for ZtC coputation';
+        
+        ZTCYSCENTER= 'ZTCYCENT';
+        ZTCYSCENTER = '[pixel] Y center used for ZtC coputation';
+        
+        ZTCNAME = 'ZTCNAME';
+        ZTCNAMEc = 'Name of the ZtC parameters';
+        
         
         NPP = 'NPP';
         NPPc = 'Number of push pull sequence for the measurement';
@@ -188,12 +234,9 @@ classdef KEYS
         
         DMNACT = 'DM_NACT';
         DMNACTc = 'DM  Number of actuactor ';
+        DMNACTd = 241;
         
-        ZTCNEIG= 'ZTC_NEIG';
-        ZTCNEIGc =  'accepted Eigenvalues';
         
-        ZTCNZERN= 'ZTC_NZER';
-        ZTCNZERNc = 'number of zernikes kep for ZtC';
         
         WFSNSUB = 'WFS_NSUB';
         WFSNSUBc = 'Number of subapperture of wavefront sensor';
@@ -296,9 +339,11 @@ classdef KEYS
        ZONAL = 'zonal';
        
        %% default  for unknown  values in header 
+       UNKNOWN = 'UNKNOWN';
        UNKNOWN_STR = '?';
        UNKNOWN_FLOAT = -999.99;
        UNKNOWN_INT = -999;
+       CUSTOM = 'CUSTOM';
        
        %% define names of GUIs here 
        G_STARTUP = 'Naomi Startup';

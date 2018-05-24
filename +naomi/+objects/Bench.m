@@ -262,6 +262,10 @@ classdef Bench < naomi.objects.BaseObject
             test = ~isempty(obj.measuredXpupillCenter);
         end
         
+        function test = isMasked(obj)
+          test = ~isempty(obj.maskData);
+        end
+        
         function orientation = orientation(obj)
             % the mirror vs dm orientation has measured or configured
             % use the isOriented method to check if it has been measured
@@ -790,7 +794,25 @@ classdef Bench < naomi.objects.BaseObject
             
             K = naomi.KEYS;
             
+            if obj.isMasked
+              naomi.addToHeader(h, K.MASKED, 1, K.MASKEDc);
+              maskName = obj.maskData.getKey(K.MASKNAME, K.CUSTOM);
+              naomi.addToHeader(h, K.MASKNAME, maskName, K.MASKNAMEc);
+              
+              if ~strcmp(maskName, K.CUSTOM)
+                % copy the mask keys
+                mKeys = {K.MPUPDIAM, K.MPUPDIAMPIX,...
+                         K.MCOBSDIAM, K.MCOBSDIAMPIX,...
+                         K.MXCENTER, K.MYCENTER};
+                naomi.copyHeaderKeys(obj.maskData, h, mKeys);
+              end
+            end
+            
             if obj.has('dm');
+              naomi.addToHeader(h, K.ACTSEP,  obj.config.dmActuatorSeparation, K.ACTSEPc);
+              naomi.addToHeader(h, K.CENTACT, obj.config.dmCentralActuator, K.CENTACTc);
+              naomi.addToHeader(h, K.DMNACT,  obj.nActuator, K.DMNACTc);
+
               try
                 naomi.addToHeader(h, K.DMID, obj.dm.sSerialName, K.DMIDc);
               catch err

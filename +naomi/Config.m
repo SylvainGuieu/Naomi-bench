@@ -154,7 +154,8 @@ classdef Config < handle
         
         % separation between actuators in [m]
         dmActuatorSeparation = 2.5e-3;
-
+        
+        
         % 1/0 put -1 force to ask user with getRemoveReferenceTipTilt
         removeReferenceTipTilt = -1;
         

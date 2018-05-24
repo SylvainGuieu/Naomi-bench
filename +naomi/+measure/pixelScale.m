@@ -6,7 +6,7 @@ function [xScale,yScale] = pixelScale(bench,  nPushPull, amplitude)
     if nargin<2; nPushPull = bench.config.scaleNpushPull; end
     if nargin<3; amplitude = bench.config.scaleAmplitude; end
 
-    
+    actuatorSeparation = bench.config.dmActuatorSeparation;
     
 
     % Parameters
@@ -37,9 +37,9 @@ function [xScale,yScale] = pixelScale(bench,  nPushPull, amplitude)
     X = squeeze(naomi.compute.nansum(phase,2));
     Xf = abs(fft(X(~isnan(X)),N));
     [~,xf] = max(Xf(1:N/2));
-    xS = 5. / (N./xf);
+    xS = actuatorSeparation*2 / (N./xf);
 
-    bench.log(sprintf('NOTICE: Measured  X pixel scale = %.4fmm/pix',xS), 2);
+    bench.log(sprintf('NOTICE: Measured  X pixel scale = %.4fmm/pix',xS*1000), 2);
 
     % Push-pull with Y-waffle
     phase = zeros(nSubAperture,nSubAperture);
@@ -66,11 +66,11 @@ function [xScale,yScale] = pixelScale(bench,  nPushPull, amplitude)
     Y = squeeze(naomi.compute.nansum(phase,1));
     Yf = abs(fft(Y(~isnan(Y)),N));
     [~,yf] = max(Yf(1:N/2));
-    yS = 5. / (N./yf);
+    yS = actuatorSeparation*2 / (N./yf);
 
-    bench.log(sprintf('NOTICE: Measured Y pixel scale = %.4fmm/pix',yS), 2);    
+    bench.log(sprintf('NOTICE: Measured Y pixel scale = %.4fmm/pix',yS*1000), 2);    
     naomi.action.resetDm(bench);
     
-    xScale = xS*1e-3;% stored in m/pix 
-    yScale = yS*1e-3;
+    xScale = xS;% stored in m/pix 
+    yScale = yS;
 end

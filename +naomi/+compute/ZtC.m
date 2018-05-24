@@ -16,8 +16,9 @@ function ZtC = ZtC(IFM, diameter, centralObscurtionDiameter, dmCenterAct, nEigen
     if nargin <7; zeroMean = 1; end
     if nargin <8; orientation='yx'; end
     
-	IFC = squeeze(IFM(dmCenterAct,:,:));
-	[xCenter,yCenter] = naomi.compute.IFCenter(IFC);
+	 IFC = squeeze(IFM(dmCenterAct,:,:));
+	 [xCenter,yCenter] = naomi.compute.IFCenter(IFC);
+
 
     [xS,yS] = naomi.compute.IFMScale(IFM, orientation);
     scale = 0.5 * (xS + yS);
