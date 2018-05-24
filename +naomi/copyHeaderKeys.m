@@ -15,6 +15,7 @@ function copyHeaderKeys(dataFrom, dataTo, keyList)
       catch err
         dataTo.setKey(key, value, comment)
       end
+    end
   else
     for iKey=1:length(keyList)
       key = keyList{iKey};
@@ -25,5 +26,6 @@ function copyHeaderKeys(dataFrom, dataTo, keyList)
         continue; 
       end
       naomi.addToHeader(dataTo, key, value, comment)
-  end    
+    end
+  end
 end

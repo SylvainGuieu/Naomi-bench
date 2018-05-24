@@ -95,7 +95,9 @@ function [IFMData, IFMcleanData] = IFM(bench, callback, nPushPull, nLoop, amplit
 
 	IFMData = naomi.data.IFM(IFM, h);
 	bench.populateHeader(IFMData.header);
-	IFMData.environmentData = environmentBuffer.toEnvironmentData;
+    if bench.has('environment')
+        IFMData.environmentData = environmentBuffer.toEnvironmentData;
+    end
 	
 	IFMcleanData = naomi.make.cleanIFM(bench, IFMData);
   bench.killProcess('IFM');

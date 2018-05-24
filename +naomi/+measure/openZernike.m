@@ -24,6 +24,6 @@ function [phaseArray, phaseData] = openZernike(bench, zernike, amplitude, nPhase
 		     {K.PHASETT,  bench.config.filterTipTilt, K.PHASETTc}};
 						
         phaseData = naomi.data.Phase(phaseArray, h);
-				bench.populateHeader(phaseData.header);
+		bench.populateHeader(phaseData.header);
     end
 end

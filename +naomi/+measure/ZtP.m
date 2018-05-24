@@ -52,7 +52,7 @@ function [ZtPData,PtZData] = ZtP(bench, nPushPull, amplitude, nZernike, callback
 	    bench.log(sprintf('NOTICE: ZtP Zernike %i',iZernike), 2);  
 	    for p=1:nPushPull
             if bench.isProcessKilled('ZtP')
-								bench.log(sprintf('NOTICE: ZtP finished before end at %i',iZernike), 1);
+				bench.log(sprintf('NOTICE: ZtP finished before end at %i',iZernike), 1);
                 ZtPData =[];
                 PtZData = [];
                 return 
@@ -68,12 +68,12 @@ function [ZtPData,PtZData] = ZtP(bench, nPushPull, amplitude, nZernike, callback
 	        ZtPArray(iZernike,:,:) = ZtPArray(iZernike,:,:) + reshape((push - pull)/(2*amp*nPushPull),1,nSubAperture,nSubAperture);
 	        % put back the zernike vector as it was
 	        naomi.action.cmdModal(bench, iZernike, ref);
-					if ~isempty(callback)
-						% send a phaseZernike to the callback
-						phaseData.dataCash = squeeze(ZtPArray(iZernike,:,:));
-						phaseData.setKey(K.ZERN,iZernike,K.ZERNc);
-						callback(phaseData);
-					end
+            if ~isempty(callback)
+                % send a phaseZernike to the callback
+                phaseData.dataCash = squeeze(ZtPArray(iZernike,:,:));
+                phaseData.setKey(K.ZERN,iZernike,K.ZERNc);
+                callback(phaseData);
+            end
 					
           bench.processStep('ZtP', p*iZernike);
 	    end   
@@ -90,7 +90,7 @@ function [ZtPData,PtZData] = ZtP(bench, nPushPull, amplitude, nZernike, callback
 	    % Plot
 	    if config.plotVerbose
 		    naomi.plot.figure('Mode');
-            phaseData = naomi.data.PhaseZernike(squeeze(ZtPArray(iZernike, :, :)), {{naomi.KEYS.ZERN, iZernike, naomi.KEYS.ZERNc}});
+            phaseData = naomi.data.PhaseZernike(squeeze(ZtPArray(iZernike, :, :)), {{naomi.KEYS.ZERN, iZernike, naomi.KEYS.ZERNc}, {naomi.KEYS.ORIENT, bench.config.orientation, naomi.KEYS.ORIENTc}});
             phaseData.plotAll();   
 		end
     end

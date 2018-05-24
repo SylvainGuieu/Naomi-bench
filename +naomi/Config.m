@@ -145,7 +145,7 @@ classdef Config < handle
         %   '-x-y' : x and y axis flipped 
         %   etc ...
         % After measured by the bench this value is not used anymore
-        orientation = 'yx';
+        orientation = 'xy';
         
         dmasdasda= [39,203];
         

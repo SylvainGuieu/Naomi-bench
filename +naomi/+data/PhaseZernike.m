@@ -70,14 +70,14 @@ classdef PhaseZernike < naomi.data.Phase
                  naomi.compute.theoriticalPhase(nSubAperture,...
                                                 obj.xCenter, obj.yCenter,...
                                                 obj.pupillDiameterPix, ...
-																								0.0,...
+											    0.0,...
                                                 zernike, ...
                                                 obj.orientation);
             if ~isempty(varargin);theoreticalPhaseArray = theoreticalPhaseArray(varargin{:}); end                              
         end
         function theoreticalPhaseData  = theoreticalPhaseData(obj)
                theoreticalPhaseArray = obj.theoreticalPhaseArray;
-							 theoreticalPhaseData = naomi.data.PhaseZernike( theoreticalPhaseArray);
+			   theoreticalPhaseData = naomi.data.PhaseZernike( theoreticalPhaseArray);
 							 
 							 K = naomi.KEYS;
 							 keys = {K.ZERN, 
@@ -102,7 +102,8 @@ classdef PhaseZernike < naomi.data.Phase
         end
         
         function zernikeData = zernikeData(obj)
-            zernikeData = naomi.data.Zernike(obj.getKey(naomi.KEYS.ZERN,1));
+            zernikeData = naomi.data.Zernike(obj.getKey(naomi.KEYS.ZERN,1), ...
+                        {{naomi.KEYS.ORIENT, obj.getKey(naomi.KEYS.ORIENT, naomi.KEYS.ORIENTd), naomi.KEYS.ORIENTc}});
         end   
     end
     

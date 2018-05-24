@@ -61,7 +61,9 @@ classdef IFM < naomi.data.PhaseCube
 					pupillDiameterPix = pupillDiameter / scale;
 				  centralObscurtionDiameterPix = centralObscurtionDiameter / scale;
 				  
-					[PtCArray, ZtCArray, ZtPArray] = naomi.compute.commandMatrix(obj.data, xCenter, yCenter, pupillDiameterPix, centralObscurtionDiameterPix,...
+					[PtCArray, ZtCArray, ZtPArray] = naomi.compute.commandMatrix(obj.data, xCenter, yCenter,...
+                            pupillDiameterPix, centralObscurtionDiameterPix,...
+                            nEigenValue,nZernike, zeroMean);
 				  
 					if nargout>3
 				    K = naomi.KEYS;
@@ -69,8 +71,8 @@ classdef IFM < naomi.data.PhaseCube
 						
 						h = {{K.ZTCDIAM,    pupillDiameter, K.ZTCDIAMc },... 
 						     {K.ZTCOBSDIAM, centralObscurtionDiameterPix, K.ZTCOBSDIAMc},... 
-				         {K.ZTCNEIG,    nEigenValue, K.ZTCNEIGc},...
-				         {K.ZTCNZERN,   nZernike, K.ZTCNZERN},...
+				             {K.ZTCNEIG,    nEigenValue, K.ZTCNEIGc},...
+				             {K.ZTCNZERN,   nZernike, K.ZTCNZERN},...
 								 {K.ZTCZMEAN,   zeroMean, K.ZTCZMEANc},...
 								 {K.ZTCXCENT,   xCenter, K.ZTCXCENTc},...
 								 {K.ZTCYCENT,   yCenter, K.ZTCYCENTc},...
@@ -87,7 +89,7 @@ classdef IFM < naomi.data.PhaseCube
 				      PtCData = naomi.data.PtC(PtCArray, ZtCData.header);
 				      ZtPData = naomi.data.ZtP(ZtPArray, ZtCData.header);
 				      
-				  end                                                     nEigenValue, nZernike, zeroMean);
+				  end                                                    
 			  end
         function IFMSpartaData = toSparta(obj)
             IFMSpartaData = naomi.data.IFMSpartaData(obj.data, obj.header);
@@ -96,7 +98,7 @@ classdef IFM < naomi.data.PhaseCube
 						else
 							dprVer = 'SPARTA';
 						end
-            IFMSpartaData.setKey(naomi.KEYS.DPRVER, sprVer, naomi.KEYS.DPRVERc);
+            IFMSpartaData.setKey(naomi.KEYS.DPRVER, dprVer, naomi.KEYS.DPRVERc);
         end
         function IFData = IF(obj, actNumnber)
             data = obj.data;

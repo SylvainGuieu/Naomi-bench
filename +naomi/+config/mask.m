@@ -28,8 +28,6 @@ function success = mask(bench, data_or_file)
 	end
 	
 	bench.maskData= data;
-	bench.maskName = '';
-	bench.maskParameters = {};
 	success = true;
 	
 	if bench.config.plotVerbose
