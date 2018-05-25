@@ -40,7 +40,7 @@ function [dTip,dTilt] = alignAutoTipTilt(bench, gain, pupillDiameter, timeout)
         tiltArcsec =  -gain*sTilt*dTilt * 1e-6 *4/2 / pupillDiameter / 4.8e-6;
         bench.gimbal.moveByArcsec(axisTilt, tiltArcsec);
         bench.log(sprintf('NOTICE: moving gimbal by %.2f in tip and %.2f arcsec in tilt', tipArcsec, tiltArcsec));
-        pause(0.1); % leave a bit of space for graphical process 
+        pause(0.5); % leave a bit of space for graphical process 
     end
     bench.killProcess('alignAutoTipTilt');
 end

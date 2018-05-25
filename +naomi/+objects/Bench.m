@@ -199,6 +199,7 @@ classdef Bench < naomi.objects.BaseObject
             else
                 obj.config.sessionName = name;
             end
+            obj.log(sprintf('NOTICE: session directory is now %s', obj.config.sessionDirectory));
         end
         function xPixelScale = xPixelScale(obj)
             % measured or configured xPixelScale 
@@ -286,6 +287,43 @@ classdef Bench < naomi.objects.BaseObject
         function  valueMeter = pixel2meter(obj, valuePixel)
         	%return the size in meter for a given size inpixel
           valueMeter = valuePixel*obj.meanPixelScale;
+        end
+        
+        function [mask, maskName] = getPupillMask(obj, mask)
+            K = naomi.KEYS;
+            if nargin<2
+                if obj.isMasked
+                    if strcmp(obj.maskData.getKey(K.MASKNAME, K.CUSTOM), K.CUSTOM)
+                        error('phase was taken with a custom mask cannot determine mask parameters');
+                    end
+                    pupillDiameter = obj.maskData.getKey(K.MPUPDIAM);
+                    centralObscurtion = obj.maskData.getKey(K.MCOBSDIAM);
+                    unit = 'm';
+                    maskName = obj.maskData.getKey(K.MASKNAME);
+                    
+                else
+                    pupillDiameter = obj.nSubAperture*2;
+                    centralObscurtion = 0.0;
+                    unit='pix';
+                    maskName = K.UNKNOWN;
+                end    
+            else
+                if isstr(mask) && strcmp(mask, 'ztc')
+                    % mask of the zernike to command matrix
+                    if isempty(obj.ZtCData)
+                        error('cannot determine mask ztc because no zernike to command has been configured');
+                    end
+                    pupillDiameter = obj.ZtCData.getKey(naomi.KEYS.ZTCDIAM);
+                    centralObscurtion = obj.ZtCData.getKey(naomi.KEYS.ZTCOBSDIAM);
+                    unit='m';
+                    maskName = obj.ZtCData.getKey(naomi.KEYS.ZTCMNAME, K.UNKNOWN);
+                else
+                    [mask, maskName] = obj.config.getMask(mask);
+                    return ;
+                end
+                
+            end
+            mask = {pupillDiameter, centralObscurtion, unit};
         end
         
         function [pupillDiameterPix, centralObscurtionDiameterPix] = getMaskInPixel(bench, mask)
@@ -771,7 +809,7 @@ classdef Bench < naomi.objects.BaseObject
               try
                 obj.wfs.populateHeader(h);
               catch err
-                obj.log('WARNING: problem when populating error from wfs')
+                obj.log('WARNING: problem when populating error from wfs');
                 disp(getReport(err,'extended'));
               end
             end
@@ -779,7 +817,7 @@ classdef Bench < naomi.objects.BaseObject
               try
                 obj.environment.populateHeader(h);
               catch err
-                obj.log('WARNING: problem when populating error from environmnent')
+                obj.log('WARNING: problem when populating error from environmnent');
                 disp(getReport(err,'extended'));
               end
             end
@@ -787,7 +825,7 @@ classdef Bench < naomi.objects.BaseObject
               try
                 obj.gimbal.populateHeader(h);
               catch err
-                obj.log('WARNING: problem when populating error from gimbal')
+                obj.log('WARNING: problem when populating error from gimbal');
                 disp(getReport(err,'extended'));
               end
             end
@@ -809,14 +847,22 @@ classdef Bench < naomi.objects.BaseObject
             end
             
             if obj.has('dm');
+                
+              
               naomi.addToHeader(h, K.ACTSEP,  obj.config.dmActuatorSeparation, K.ACTSEPc);
               naomi.addToHeader(h, K.CENTACT, obj.config.dmCentralActuator, K.CENTACTc);
               naomi.addToHeader(h, K.DMNACT,  obj.nActuator, K.DMNACTc);
-
+                
+              if ~isempty(obj.ZtCData)
+                 kl = {K.ZTCDIAM, K.ZTCOBSDIAM, K.ZTCXSCALE, K.ZTCYSCALE,...
+                       K.ZTCXCENTER, K.ZTCYCENTER,K.ZTCNAME,...
+                       K.ZTCNZERN, K.ZTCNEIG, K.ZTCMNAME};
+                 naomi.copyHeaderKeys( obj.ZtCData, h, kl);
+              end
               try
                 naomi.addToHeader(h, K.DMID, obj.dm.sSerialName, K.DMIDc);
               catch err
-                obj.log('WARNING: problem when populating error from dm')
+                obj.log('WARNING: problem when populating error from dm');
                 disp(getReport(err,'extended'));
               end
             end
@@ -833,8 +879,8 @@ classdef Bench < naomi.objects.BaseObject
             end
             
             if obj.isScaled
-                naomi.addToHeader(h, K.XPSCALE, obj.xPixelScale, K.XPSCALEc)
-                naomi.addToHeader(h, K.YPSCALE, obj.yPixelScale, K.YPSCALEc)
+                naomi.addToHeader(h, K.XPSCALE, obj.xPixelScale, K.XPSCALEc);
+                naomi.addToHeader(h, K.YPSCALE, obj.yPixelScale, K.YPSCALEc);
             end
             naomi.addToHeader(h, K.ORIENT, obj.orientation, K.ORIENTc);
             

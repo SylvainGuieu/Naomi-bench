@@ -1,8 +1,9 @@
-function [phaseArray, phaseData] = phase(bench, nPhase, filterTipTilt, substractReference)
+function [phaseArray, phaseData] = phase(bench, nPhase, filterTipTilt, substractReference, useMask)
 	% phaseArray = phase(bench)
 	% phaseArray = phase(bench, nPhase)
 	% phaseArray = phase(bench, nPhase, filterTipTilt)
-	%  
+	% phaseArray = phase(bench, nPhase, filterTipTilt, useMask)
+    %
 	% Measure a phase. The raw phase is receive from the 
 	% wave front. Then the reference is removed (if any configured).
 	% and eventually the tip tilt is removed if filterTipTilt is true
@@ -10,12 +11,14 @@ function [phaseArray, phaseData] = phase(bench, nPhase, filterTipTilt, substract
 	% nPhase: is the number of phase taken and averaged
     % filterTipTilt: true/false if not given or empty takes bench.filterTipTilt
     % substractReference: true/false if not given takes bench.substractReference
+    % useMask: by default 1 the phase if masked if a mask has been
+    %          configured on the bench. Put 0 to unmask (e.g. for aligment)
 	if nargin<2 || isempty(nPhase); 
 		nPhase = bench.config.defaultNphase;
 	end
 	if nargin<3 || isempty(filterTipTilt); filterTipTilt = bench.config.filterTipTilt; end;
 	if nargin<4 || isempty(substractReference); substractReference = bench.config.substractReference; end;
-
+    if nargin<5 || isempty(useMask); useMask=1;end
 	nSubAperture = bench.nSubAperture;
 	phaseArray = zeros(nSubAperture, nSubAperture)*0.0;
 	
@@ -29,9 +32,11 @@ function [phaseArray, phaseData] = phase(bench, nPhase, filterTipTilt, substract
         rawPhaseArray = bench.wfs.getRawPhase();
 		
 		% Apply the mask 
-		rawPhaseArray(~maskArray) = NaN;
-		if ~bench.checkPhase(rawPhaseArray)
-            bench.log('WARNING: Invalid sup-appertures inside the mask !!', 3);
+        if useMask
+            rawPhaseArray(~maskArray) = NaN;
+            if ~bench.checkPhase(rawPhaseArray)
+                bench.log('WARNING: Invalid sup-appertures inside the mask !!', 3);
+            end
         end
 
         % Remove mean

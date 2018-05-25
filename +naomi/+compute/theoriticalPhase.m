@@ -1,7 +1,7 @@
 function [phaseArray] = theoriticalPhase(nSub,x0,y0,diamPix, centralObscurationPix, zernikeNumber, orientation)
 % theoriticalZtP  Theoretical phase screen for N zernike modes
 %
-%   [phaseArray] = compute.theoriticalPhase(nSub,x0,y0,diamPix, zernikeNumber)
+%   [phaseArray] = compute.theoriticalPhase(nSub,x0,y0,diamPix, centralObscurationPix,  zernikeNumber, orientation)
 %   
 %   The phase screen are roughly normalized to RMS=1
 %   The arrangement is the NOLL indexes, and start at
@@ -14,7 +14,7 @@ function [phaseArray] = theoriticalPhase(nSub,x0,y0,diamPix, centralObscurationP
 %   dimaPix: the diameter of the pupill [pixel]
 %   centralObscurationPix: the central obscuration diameter [pixel]
 %   zernikeNumber: the  zernike number 
-%   
+%   orientation:  see config, one of 'xy', 'yx', '-yx', '-x-y', etc....
 %   phaseArray(nSub,nSub): phase screen for the given zernike
 %   
 %   

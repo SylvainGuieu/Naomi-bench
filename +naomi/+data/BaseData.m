@@ -107,8 +107,10 @@ classdef BaseData < handle
                          obj.filePointer = matlab.io.fits.openFile(obj.file);
                      end
                      [val, comment] = matlab.io.fits.readKey(obj.filePointer, key);
+                     num = str2double(val);
+                     if ~isnan(num); val = num;end
                 else
-                    error(strcat('Unknown key ', key));
+                    error(sprintf('Unknown key: %s', key));
                 end
             else
                 val = default;
@@ -125,6 +127,8 @@ classdef BaseData < handle
                      end
                     try
                         [val, comment] = matlab.io.fits.readKey(obj.filePointer, key);
+                        num = str2double(val);
+                        if ~isnan(num); val = num; end
                     catch
                     end
                 end

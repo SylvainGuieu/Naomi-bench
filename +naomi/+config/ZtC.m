@@ -7,7 +7,7 @@ function  success = ZtC(bench, data_or_file)
 	%
 	success = false;
 	if nargin<2
-		[file, path] = naomi.askFitsFile('Select a Zernique to commande file ZTC_*');
+		[file, path] = naomi.askFitsFile('Select a Zernique to commande file ZTC_*', bench);
 		if isequal(file, 0); return; end;
 		fullPath = fullfile(path, file);
 		data = naomi.data.ZtC(fullPath);
@@ -20,9 +20,7 @@ function  success = ZtC(bench, data_or_file)
 		bench.ZtCData = [];			
 		sucess = false;
 		bench.log('NOTICE: Zernique to Command matrix removed', 2);
-		if bench.config.plotVerbose
-			naomi.plot.figure('Zernique to Command'); clf;
-		end;
+		
 		success = true;
 		return 
 	else
@@ -33,9 +31,6 @@ function  success = ZtC(bench, data_or_file)
 	
 	success = true;
 	
-	if bench.config.plotVerbose
-		naomi.plot.figure('Zernique to Command');
-		bench.ZtCData.plot();
-	end
+	
 	bench.log('NOTICE: Zernike to command matrix configured',2);
 end

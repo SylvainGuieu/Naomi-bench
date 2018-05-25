@@ -9,7 +9,7 @@ function success = IFC(bench, data_or_file)
 	% 
 	success = false;
 	if nargin<2
-		[file, path] = naomi.askFitsFile('Select a central actuator phase IFC_*');
+		[file, path] = naomi.askFitsFile('Select a central actuator phase IFC_*', bench);
 		if isequal(file, 0); return; end;
 		fullPath = fullfile(path, file);
 		data = naomi.data.IF(fullPath);
@@ -35,9 +35,6 @@ function success = IFC(bench, data_or_file)
 	bench.measuredYcenter = yCenter;
 	success = true;
 
-	if bench.config.plotVerbose
-		naomi.plot.figure('IF Central Actuator');% do not modify name for good placement 
-		bench.IFCData.plot();
-	end	
+	
 	bench.log(sprintf('NOTICE: IFC xCenter=%.2f, yCenter=%.2f has been configured ', xCenter, yCenter),2);
 end

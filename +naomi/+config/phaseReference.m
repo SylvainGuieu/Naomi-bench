@@ -8,7 +8,7 @@ function success= phaseReference(bench, data_or_file)
 	%
 	success = false;
 	if nargin<2
-		[file, path] = naomi.askFitsFile('Select a mask file MASK_*');
+		[file, path] = naomi.askFitsFile('Select a mask file MASK_*', bench);
 		if isequal(file, 0); return; end;
 		fullPath = fullfile(path, file);
 		data = naomi.data.PhaseReference(fullPath);
@@ -19,10 +19,6 @@ function success= phaseReference(bench, data_or_file)
 	elseif isempty(data_or_file)
 			bench.phaseReferenceData = [];			
 			isConfigured = false;
-			if bench.config.plotVerbose
-				naomi.plot.figure('Phase Reference');
-				clf;
-			end;
 			success  = true;
 			bench.log('NOTICE: The phase reference has been removed',2);
 			return 
@@ -33,10 +29,7 @@ function success= phaseReference(bench, data_or_file)
 	bench.phaseReferenceData = data;	
 	success = true;
 		
-	if bench.config.plotVerbose
-		naomi.plot.figure('Phase Reference');
-		bench.phaseReferenceData.plot();
-	end	
+	
 	bench.log('NOTICE a new Phase reference has been configured',2);
 end
 

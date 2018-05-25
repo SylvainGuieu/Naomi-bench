@@ -18,6 +18,14 @@ classdef DmBias < naomi.data.DmCommand
         function data = fitsReadData(obj, fileName)
             data = fitsread(fileName);
         end
+        function plotQc(obj, axesList)
+            if nargin<2; axesList = {subplot(2,1,1),subplot(2,2,3),subplot(2,2,4)};end
+            obj.plot(axesList{1});
+            obj.plotContour(axesList{2});
+            
+            obj.plotImage(axesList{3});
+            title(axesList{3}, obj.shortInfo);
+        end
         function plotContour(obj, axes)
             if nargin<2; axes= gca();end;
             

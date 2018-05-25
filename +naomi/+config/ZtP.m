@@ -7,7 +7,7 @@ function  success = ZtP(bench, data_or_file)
 	%
 	success = false;
 	if nargin<2
-		[file, path] = naomi.askFitsFile('Select a Phase to Zernike file ZtP_*');
+		[file, path] = naomi.askFitsFile('Select a Phase to Zernike file ZtP_*', bench);
 		if isequal(file, 0); return; end;
 		fullPath = fullfile(path, file);
 		data = naomi.data.ZtP(fullPath);
@@ -20,9 +20,7 @@ function  success = ZtP(bench, data_or_file)
 		bench.ZtPData = [];			
 		sucess = false;
 		bench.log('NOTICE: Phase to Zernike matrix removed', 2);
-		if bench.config.plotVerbose
-			naomi.plot.figure('Phase to Zernike'); clf;
-		end;
+		
 		success = true;
 		return 
 	else
@@ -33,9 +31,6 @@ function  success = ZtP(bench, data_or_file)
 	
 	success = true;
 	
-	if bench.config.plotVerbose
-		naomi.plot.figure('Phase to Zernike');
-		bench.ZtPData.plot();
-	end
+	
 	bench.log('NOTICE: Phase to Zernike matrix configured',2);
 end

@@ -4,7 +4,6 @@ function [PtCArray, ZtCArray, ZtPArray, PtCData, ZtCData, ZtPData] = commandMatr
 	% measurement stored inside bench or inside config.  
 	% the given IFMdata is preferably cleaned 
 
-	config = bench.config
 	if nargin<2 || isempty(IFMData)
 		IFMData = bench.IFMData;
 	end
@@ -20,7 +19,9 @@ function [PtCArray, ZtCArray, ZtPArray, PtCData, ZtCData, ZtPData] = commandMatr
 	[xCenter,yCenter] = naomi.compute.IFCenter(IFC);
   
   [mask, nEigenValue, nZernike, zeroMean] = bench.config.ZtCParameters(ztcMode);
-	[pupillDiameter, centralObscurtionDiameter] = bench.getMaskInMeter(mask);
+  
+  [mask, maskName] = bench.getPupillMask(mask);
+  [pupillDiameter, centralObscurtionDiameter] = bench.getMaskInMeter(mask);
   
   [xS,yS] = naomi.compute.IFMScale(IFMArray, bench.config.dmActuatorSeparation, bench.config.orientation);
   scale = 0.5 * (xS + yS);
@@ -41,7 +42,8 @@ function [PtCArray, ZtCArray, ZtPArray, PtCData, ZtCData, ZtPData] = commandMatr
 				 {K.ZTCXCENTER,   xCenter, K.ZTCXCENTERc},...
 				 {K.ZTCYCENTER,   yCenter, K.ZTCYCENTERc},...
 				 {K.ZTCXSCALE,  xS, K.ZTCXSCALEc},...
-				 {K.ZTCXSCALE,  yS, K.ZTCXSCALEc},...
+				 {K.ZTCYSCALE,  yS, K.ZTCYSCALEc},...
+                 {K.ZTCMNAME,   maskName, K.ZTCMNAMEc},...
 				 {K.ZTCNAME,    ztcModeName , K.ZTCNAMEc},...
          {K.DPRVER,     ztcModeName,  K.DPRVERc} 
         };

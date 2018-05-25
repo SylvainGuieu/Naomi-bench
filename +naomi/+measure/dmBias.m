@@ -27,7 +27,6 @@ function [dmBiasVector,dmBiasData] = dmBias(bench)
     dmBiasVector = bench.dm.cmdVector; 
     bench.dm.biasVector = savedBiasVector;
     if nargout>1
-       K = naomi.KEYS;
        dmBiasData = naomi.data.DmBias(dmBiasVector);
        bench.populateHeader(dmBiasData);
     end

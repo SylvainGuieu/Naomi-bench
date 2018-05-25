@@ -27,8 +27,19 @@ function fig = figure(name, bringFront)
                     set(fig, 'Position',  grid2screen(screenGrid, [1,-20,26,10]));
                 case 'Last Phase'
                      set(fig, 'Position', grid2screen(screenGrid, [-20,-28,20,28]));
+                case 'ZtP QC'
+                     set(fig, 'Position', [1164 131 560 854]);
+                case 'ZtP QC Mode'
+                     set(fig, 'Position', [1164 131 560 854]);
                 case 'IFM QC'
-                    set(fig, 'Position',  [11 204 499 787]);%grid2screen(screenGrid, [-1, -10, 25,90]));
+                    set(fig, 'Position',  [1106 142 605 848]);
+                case 'DM Bias'
+                    set(fig, 'Position',[1217 417 697 577]);
+                case 'TIP QC'
+                     set(fig, 'Position',[680 337 560 641]);
+                case 'TILT QC'
+                     set(fig, 'Position',[1243 340 560 638]);
+                    %grid2screen(screenGrid, [-1, -10, 25,90]));
 %                     case 'Influence Function'
 %                     %% figure related to measurement 
 %                     case 'Last Phase'

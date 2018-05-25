@@ -6,7 +6,7 @@ function success = mask(bench, data_or_file)
 	%
 	success = false;
 	if nargin<2
-		[file, path] = naomi.askFitsFile('Select a mask file MASK_*');
+		[file, path] = naomi.askFitsFile('Select a mask file MASK_*', bench);
 		if isequal(file, 0); return; end;
 		fullPath = fullfile(path, file);
 		data = naomi.data.Mask(fullPath);
@@ -18,10 +18,6 @@ function success = mask(bench, data_or_file)
 			bench.maskData = [];			
 			success = false;
 			bench.log('NOTICE: the mask has been removed', 2);
-			if bench.config.plotVerbose
-				naomi.plot.figure('Phase Mask');
-				clf;
-			end;
 			return 
 	else
 		data = data_or_file;
@@ -30,9 +26,6 @@ function success = mask(bench, data_or_file)
 	bench.maskData= data;
 	success = true;
 	
-	if bench.config.plotVerbose
-		naomi.plot.figure('Phase Mask');
-		bench.maskData.plot();
-	end	
+	
 	bench.log('NOTICE a new mask has been configured',3);
 end

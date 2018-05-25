@@ -28,6 +28,8 @@ classdef Config < handle
         % it will be created on the fly when the mirror is selected
         % the sessionDirectory will be cataDirectory/yyy-mm-dd/sessionName
         sessionName;
+        % extention list for saved figures; 
+        figureExtentionList = {'png'};
         
         % ACE root directory 
         ACEROOT =  'C:\AlpaoCoreEngine';

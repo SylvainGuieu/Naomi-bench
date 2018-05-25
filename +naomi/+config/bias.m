@@ -7,7 +7,7 @@ function  success = bias(bench, data_or_file)
 	%
 	success = false;
 	if nargin<2
-		[file, path] = naomi.askFitsFile('Select a DM Bias file BIAS_*');
+		[file, path] = naomi.askFitsFile('Select a DM Bias file BIAS_*', bench);
 		if isequal(file, 0); return; end;
 		fullPath = fullfile(path, file);
 		data = naomi.data.DmBias(fullPath);
@@ -20,9 +20,7 @@ function  success = bias(bench, data_or_file)
 		bench.dmBiasData = [];			
 		sucess = false;
 		bench.log('NOTICE: DM Bias removed', 2);
-		if bench.config.plotVerbose
-			naomi.plot.figure('DM Bias'); clf;
-    end
+		
 		success = true;
 		return 
 	else
@@ -34,9 +32,5 @@ function  success = bias(bench, data_or_file)
 	
 	success = true;
 	
-	if bench.config.plotVerbose
-		naomi.plot.figure('DM bias');
-		bench.dmBiasData.plot();
-	end
 	bench.log('NOTICE: DM Bias configured',2);
 end

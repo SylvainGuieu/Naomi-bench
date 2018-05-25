@@ -14,9 +14,9 @@ function [maskArray,maskData] = pupillMask(bench, mask, maskCenter)
   %               will be taken 
     
     if nargin<2
-        [mask, maskName] = bench.config.getMask(bench.config.ztcMask);
+        [mask, maskName] = bench.getPupillMask(bench.config.ztcMask);
     else
-        [mask, maskName] = bench.config.getMask(mask);
+        [mask, maskName] = bench.getPupillMask(mask);
     end
     if iscell(mask)
       if length(mask)~=3
@@ -69,7 +69,7 @@ function [maskArray,maskData] = pupillMask(bench, mask, maskCenter)
          	   {K.MYCENTER, xCenter, K.MYCENTERc},...
          	   {K.MCOBSDIAMPIX, centralObscurtionDiameter, K.MCOBSDIAMPIXc},...
              {K.MCOBSDIAM, bench.pixel2meter(centralObscurtionDiameter), K.MCOBSDIAMc},...  
-             {K.MNAME,  maskName, K.MNAMEc}};
+             {K.MASKNAME,  maskName, K.MASKNAMEc}};
          maskData = naomi.data.Mask(maskArray, h);
          % just put haso information in the mask header
          bench.wfs.populateHeader(maskData.header);
@@ -92,7 +92,7 @@ function [maskArray,maskData] = pupillMask(bench, mask, maskCenter)
       if nargout>1
         K = naomi.KEYS;
         
-        h = {{K.MNAME, naomi.KEYS.CUSTOM, K.MNAMEc}};
+        h = {{K.MASKNAME, naomi.KEYS.CUSTOM, K.MASKNAMEc}};
         maskData = naomi.data.Mask(maskArray, h);
         bench.wfs.populateHeader(maskData.header);
     end	 

@@ -92,16 +92,46 @@ classdef PhaseCube < naomi.data.BaseData
             % see help on naomi.compute.orientedMeshgrid
             orientation = obj.getKey(naomi.KEYS.ORIENT, naomi.KEYS.ORIENTd);
         end
-        
+        function [pupillDiameterPix, centralObscurtionPix, xCenter, yCenter] = ztcMaskParameters(obj)
+            if isempty(obj.getKey(naomi.KEYS.ZTCDIAM, []))
+                error('cannot read ZtC information in header')
+            end
+            pupillDiameter = obj.getKey(naomi.KEYS.ZTCDIAM);
+            centralObscurtion = obj.getKey(naomi.KEYS.ZTCOBSDIAM);
+            xCenter = obj.getKey(naomi.KEYS.ZTCXCENTER);
+            yCenter = obj.getKey(naomi.KEYS.ZTCYCENTER);
+            scale = 0.5 * (obj.getKey(naomi.KEYS.ZTCXSCALE) + obj.getKey(naomi.KEYS.ZTCYSCALE));
+            
+            pupillDiameterPix = pupillDiameter /scale;
+            centralObscurtionPix = centralObscurtion / scale;
+            
+        end
+        function [pupillDiameterPix, centralObscurtionPix, xCenter, yCenter] = pupillMaskParameters(obj)
+            if obj.getKey(naomi.KEYS.MASKED, 0)
+                if strcmp(obj.getKey(naomi.KEYS.MASKNAME,naomi.KEYS.CUSTOM), naomi.KEYS.CUSTOM)
+                    error('phase was taken with a custom mask cannot determine mask parameters');
+                end
+                
+                pupillDiameterPix = obj.getKey(naomi.KEYS.MPUPDIAMPIX);
+                centralObscurtionPix = obj.getKey(naomi.KEYS.MCOBSDIAMPIX);
+                xCenter = obj.getKey(naomi.KEYS.MXCENTER);
+                yCenter = obj.getKey(naomi.KEYS.MYCENTER);
+            else % make a mask bigger than image
+                 pupillDiameterPix = obj.nSubAperture*2;
+                 centralObscurtionPix = 0.0;
+                 xCenter = obj.nSubAperture/2;
+                 yCenter = obj.nSubAperture/2;
+            end
+        end
         function pupillMaskArray = pupillMaskArray(obj, varargin)
             % the mask array defining the active pupill 
             % 
             %  ones are inside the pupill 0 are outside
-            
+            [pupillDiameterPix, centralObscurtionPix, xCenter, yCenter] = obj.pupillMaskParameters;
             pupillMaskArray = naomi.compute.pupillMask(obj.nSubAperture, ...
-                                            obj.pupillDiameterPix,0.0,...
-                                            obj.xCenter, obj.yCenter);
-            pupillMaskArray = pupillMaskArray(varargin{:});                         
+                                            pupillDiameterPix, centralObscurtionPix, ...
+                                            xCenter, yCenter);
+            if ~isempty(varargin); pupillMaskArray = pupillMaskArray(varargin{:}); end                        
         end
         
         function maskedPhaseCube = maskedPhaseCube(obj, varargin)
@@ -113,7 +143,7 @@ classdef PhaseCube < naomi.data.BaseData
             maskedPhaseCube = reshape(phaseCube,nZ,nX*nY);
             maskedPhaseCube(:,~mask) = nan;
             maskedPhaseCube = reshape(maskedPhaseCube,nZ,nX,nY);
-            maskedPhaseCube = maskedPhaseCube(varargin{:});
+            if ~isempty(varargin); maskedPhaseCube = maskedPhaseCube(varargin{:});end
             
         end
         function phaseCube = phaseCube(obj, varargin)
@@ -131,21 +161,21 @@ classdef PhaseCube < naomi.data.BaseData
             nPhase = obj.nPhase;
             gainVector = naomi.compute.nanstd(reshape(obj.maskedPhaseCube, nPhase, []), 2);
             %gainVector = naomi.compute.nanstd(reshape(obj.phaseCube, nPhase, []), 2);
-            if ~empty(varargin) gainVector = gainVector(varargin{:});end
+            if ~isempty(varargin); gainVector = gainVector(varargin{:});end
         end
-				function phiMaxVector = phiMaxVector(obj, varargin)
-					phiMaxVector = max(reshape(obj.phaseCube, obj.nPhase, []), [],2);
-					if ~empty(varargin) phiMaxVector = phiMaxVector(varargin{:});end
+        function phiMaxVector = phiMaxVector(obj, varargin)
+            phiMaxVector = max(reshape(obj.phaseCube, obj.nPhase, []), [],2);
+            if ~isempty(varargin); phiMaxVector = phiMaxVector(varargin{:});end
 
-				end
-				function phiMinVector = phiMaxVector(obj, varargin)
-					phiMinVector = min(reshape(obj.phaseCube, obj.nPhase, []), [],2);
-					if ~empty(varargin) phiMinVector = phiMinVector(varargin{:});end
-				end
-				function p2vVector = p2vVector(obj, varargin)
-					p2vVector = obj.phiMaxVector - obj.phiMinVector;
-					if ~empty(varargin) p2vVector = p2vVector(varargin{:});end
-				end
+        end
+        function phiMinVector = phiMinVector(obj, varargin)
+            phiMinVector = min(reshape(obj.phaseCube, obj.nPhase, []), [],2);
+            if ~isempty(varargin); phiMinVector = phiMinVector(varargin{:});end
+        end
+        function p2vVector = p2vVector(obj, varargin)
+            p2vVector = obj.phiMaxVector - obj.phiMinVector;
+            if ~isempty(varargin); p2vVector = p2vVector(varargin{:});end
+        end
         function pistonVector = pistonVector(obj, varargin)
             % the piston (std) over the active pupill for all the phases 
             nPhase = obj.nPhase;

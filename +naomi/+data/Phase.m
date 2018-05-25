@@ -88,18 +88,35 @@ classdef Phase < naomi.data.BaseData
             % see help on naomi.compute.orientedMeshgrid
             orientation = obj.getKey(naomi.KEYS.ORIENT, naomi.KEYS.ORIENTd);
         end
+         function [pupillDiameterPix, centralObscurtionPix, xCenter, yCenter] = pupillMaskParameters(obj)
+            if obj.getKey(naomi.KEYS.MASKED, 0)
+                if strcmp(obj.getKey(naomi.KEYS.MASKNAME,naomi.KEYS.CUSTOM), naomi.KEYS.CUSTOM)
+                    error('phase was taken with a custom mask cannot determine mask parameters');
+                end
+                
+                pupillDiameterPix = obj.getKey(naomi.KEYS.MPUPDIAMPIX);
+                centralObscurtionPix = obj.getKey(naomi.KEYS.MCOBSDIAMPIX);
+                xCenter = obj.getKey(naomi.KEYS.MXCENTER);
+                yCenter = obj.getKey(naomi.KEYS.MYCENTER);
+            else % make a mask bigger than image
+                 pupillDiameterPix = obj.nSubAperture*2;
+                 centralObscurtionPix = 0.0;
+                 xCenter = obj.nSubAperture/2;
+                 yCenter = obj.nSubAperture/2;
+            end
+         end
+        
         function pupillMaskArray = pupillMaskArray(obj, varargin)
             % the mask array defining the active pupill 
             % 
             %  ones are inside the pupill 0 are outside
-            
+            [pupillDiameterPix, centralObscurtionPix, xCenter, yCenter] = obj.pupillMaskParameters;
             pupillMaskArray = naomi.compute.pupillMask(obj.nSubAperture, ...
-                                            obj.pupillDiameterPix,0.0,...
-                                            obj.xCenter, obj.yCenter);
-																						
-						if ~isempty(varargin); pupillMaskArray = pupillMaskArray(varargin{:}); end      
-						                   
+                                            pupillDiameterPix, centralObscurtionPix, ...
+                                            xCenter, yCenter);
+            if ~isempty(varargin); pupillMaskArray = pupillMaskArray(varargin{:}); end                        
         end
+        
         
         function maskedPhaseArray = maskedPhaseArray(obj, varargin)
             % the phase all subaperture outside of the active pupill are

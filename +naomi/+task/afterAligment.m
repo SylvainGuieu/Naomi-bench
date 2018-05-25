@@ -1,4 +1,4 @@
-function success = afterAligment(bench)
+function afterAligment(bench)
 %AFTERALIGMENT make the task necessary after the alignment of DM or DUMMY
 %   If this is a DUMMY :
 %       - measure the pupillCenter 
@@ -8,17 +8,17 @@ function success = afterAligment(bench)
 %       - measure the central actuator position 
 %       - measure the pixel scale 
 %       - remove ramaining tiptilt (ask user)
-success = 0;
+global naomiGlobalBench
+if nargin<1; bench = naomiGlobalBench; end
 [x,y] = naomi.measure.pupillCenter(bench);
 naomi.config.pupillCenter(bench, x, y);
 if ~strcmp(bench.config.dmId,  bench.config.DUMMY) && bench.has('dm')
     [~,IFCData] = naomi.measure.IFC(bench);
     naomi.config.IFC(bench,IFCData);
-    naomi.saveData(IFCData);
+    naomi.saveData(IFCData, bench);
     [xScale, yScale] = naomi.measure.pixelScale(bench);
     naomi.config.pixelScale(bench, xScale, yScale);
 end
-
-
+close all;
 end
 

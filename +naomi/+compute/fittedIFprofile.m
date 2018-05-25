@@ -17,7 +17,7 @@ function fitResult = fittedIFprofile(img, fitType, sigmaGuess, amplitudeGuess)
     [xSize, ySize] = size(img);
     
     if strcmp(fitType, 'maximum')
-        s = sign(img(int32(yC), int32(xC)));
+        s = sign(img(min(max(int32(yC),1),ySize),min(max(int32(xC),1), xSize)));
         b = 4;
         % take the maximum of a small box within the xC, yC
         boxed = img( max(int32(yC-b),1):min(int32(yC+b),ySize), ...

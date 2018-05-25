@@ -75,6 +75,14 @@ classdef ZtC < naomi.data.BaseData
 
 
         end
+        function plotQc(obj, axesList)
+            if nargin<2; axesList = {subplot(2,1,1),subplot(2,1,2)}; end;
+            ax =axesList{1};
+            obj.plot(ax);
+            ax =axesList{2};
+            text(ax, 0.5 , 0.5, 'ZtC QC plot to be done');
+            
+        end
         
         function ZtCSpartaData = toSparta(obj)
             % SPARTA does not contains the piston and is limited to 20

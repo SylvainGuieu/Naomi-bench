@@ -31,7 +31,10 @@ classdef StrokePhaseCube < naomi.data.PhaseCube
             end
             
         end
-        
+        function zernike = zernike(obj)
+            % the stroke zernike number measurement 
+            zernike = obj.getKey(naomi.KEYS.ZERN);
+        end
         function phaseCube = phaseCube(obj, varargin)
             phaseCube = obj.data;
             if ~isempty(varargin);phaseCube = phaseCube(varargin{:});end
@@ -55,46 +58,79 @@ classdef StrokePhaseCube < naomi.data.PhaseCube
 					  maxCommandVector = max(abs(obj.biasVector' + obj.dmCommandArray),[], 2);
 						
         end
-				function phiMaxVector = phiMaxVector(obj)
-					nSubAperture = obj.nSubAperture;
-					nPhase = obj.nPhase;
-					phiMaxVector = max(reshape(obj.phaseCube, nPhase, nSubAperture* nSubAperture), [],2)
-				end
-				function phiMinVector = phiMaxVector(obj)
-					nSubAperture = obj.nSubAperture;
-					nPhase = obj.nPhase;
-					phiMinVector = max(reshape(obj.phaseCube, nPhase, nSubAperture* nSubAperture), [],2)
-				end
-				function ptvVector = ptvVector(obj, varargin)
-						nSubAperture = obj.nSubAperture;
-						nPhase = obj.nPhase;
-						max(reshape(obj.phaseCube, nPhase, nSubAperture* nSubAperture), [],2)
+        
+        function  theoreticalPhaseArray = theoreticalPhaseArray(obj, varargin)
+            % get the parameters of the used Z2C 
+            [pupDiam, cObs, xCenter, yCenter] = obj.ztcMaskParameters;
+            orientation = obj.getKey(naomi.KEYS.ORIENT,naomi.KEYS.ORIENTd);
+            theoreticalPhaseArray =  naomi.compute.theoriticalPhase(obj.nSubAperture, xCenter, yCenter, pupDiam, cObs, obj.zernike,orientation);
+            
+            if ~isempty(varargin);  theoreticalPhaseArray =  theoreticalPhaseArray(varargin{:}); end
         end
-        function strokeData = strok(obj, phiTarget)
-        Output = zeros(obj.nPhase,5);
-        % Get the PtV
-	    	outputArray(s,3) = max(phiArray(:)) - min(phiArray(:));
-        outputArray(s,5) = max(residualArray(:)) - min(residualArray(:));
         
+        function theoreticalPhaseCube = theoreticalPhaseCube(obj, varargin)
+           theoreticalPhaseArray  = obj.theoreticalPhaseArray;
+           theoreticalPhaseCube = zeros(obj.nPhase, obj.nSubAperture, obj.nSubAperture);
+           for iPhase=1:obj.nPhase
+               theoreticalPhaseCube(iPhase,:,:) = theoreticalPhaseArray*obj.amplitudeVector(iPhase);
+           end
+            if ~isempty(varargin);  theoreticalPhaseCube =  theoreticalPhaseCube(varargin{:}); end
+        end
         
-        % remove the TT only for tip, tilt and piston
-        if nargin<4
-            if zernikeMode < 0
-                outputArray(s,4) = naomi.compute.nanstd(phiArray(:));
-                outputArray(s,6) = naomi.compute.nanstd(residualArray(:));
+        function rmsVector = rmsVector(obj,  varargin)
+            % the rms with tiptilt removed for all phases in the phase cube with lenght of nPhase
+            % however do not remove tip/tilt for piston, tip and tilt e.i
+            % zernike<4
+            if obj.zernike<4
+                rmsVector = naomi.compute.nanstd(reshape(obj.phaseCube, obj.nPhase, []), 2);
             else
-                outputArray(s,4) = naomi.compute.rms_tt(phiArray);
-                outputArray(s,6) = naomi.compute.rms_tt(residualArray);
+                 rmsVector = naomi.compute.rms_tt(reshape(obj.phaseCube, obj.nPhase, []), 2);
             end
-        else
-            residualArray = phiArray - phiTarget.*amplitudeVector(s);
-            
-            
-            
-        
+            if ~isempty(varargin)
+                rmsVector = rmsVector(varargin{:});
+            end    
         end
+          
+        function [residualRmsVector, residualP2vVector] = residualRmsVector(obj,varargin)
+            residualCube = obj.phaseCube - obj.theoreticalPhaseCube; 
+            if obj.zernike<4
+                residualRmsVector = naomi.compute.nanstd(reshape(residualCube, obj.nPhase, []), 2);
+            else
+                residualRmsVector = naomi.compute.rms_tt(reshape(residualCube, obj.nPhase, []), 2);
+            end
+            residualP2vVector = max( reshape(residualCube, obj.nPhase, []), [], 2) - min( reshape(residualCube, obj.nPhase, []), [], 2);
+             if ~isempty(varargin)
+               residualRmsVector  = residualRmsVector(varargin{:});
+               residualP2vVector = residualP2vVector(varargin{:});
+            end 
         end
         
+        function plotQc(obj,axesList)
+            if nargin<2
+                axesList = {subplot(3,1,1), subplot(3,1,2), subplot(3,1,3)};
+            end
+            
+            ax = axesList{1};
+            
+            plot(ax, obj.amplitudeVector, obj.p2vVector, 'bO-');
+            title(ax, sprintf('Stroke Curve mode %d', obj.zernike));
+            ylabel(ax, 'PtV (\mum)');
+            grid(ax); grid(ax, 'minor');
+            
+            ax = axesList{2};
+            plot(ax, obj.amplitudeVector, obj.residualRmsVector, 'bO-');
+            ylabel(ax, 'Res. (\mum rms)');
+            grid(ax); grid(ax, 'minor');
+            
+            
+            ax = axesList{3};
+            plot(ax, obj.amplitudeVector, obj.maxCommandVector, 'bO-');
+            ylabel(ax, 'Max Command');
+            grid(ax); grid(ax, 'minor');
+            
+            xlabel(ax, 'Requested Amplitude (\mum rms)');
+        end
+            
         
         
     end

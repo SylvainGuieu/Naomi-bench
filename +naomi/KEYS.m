@@ -62,10 +62,6 @@ classdef KEYS
         MYCENTER = 'MXCENTER';
         MYCENTERc = '[pixel] mask center';
         
-        MNAME = 'MNAME';
-        MNAMEc = 'Mask name or UNKNOWN';
-        MNAMEd = 'UNKNOWN';
-        
         FPUPDIAM = 'FPUPDIAM';
         FPUPDIAMc = 'Full DM Pupill Diamter [m]';
         FPUPDIAMd = 36.5e-3;
@@ -200,6 +196,8 @@ classdef KEYS
         ZTCNAME = 'ZTCNAME';
         ZTCNAMEc = 'Name of the ZtC parameters';
         
+        ZTCMNAME = 'ZTCMNAME';
+        ZTCMNAMEc = 'Name of the mask use for ZtC';
         
         NPP = 'NPP';
         NPPc = 'Number of push pull sequence for the measurement';
