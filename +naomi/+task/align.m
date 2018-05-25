@@ -8,7 +8,7 @@ if ~bench.has('wfs')
     return            
 else
 if isempty(naomi.findGui('Alignment'))
-    alignmentGui(bench);
+    alignmentGui(bench, {@naomi.task.afterAligment});
 end
 end
 

@@ -11,7 +11,7 @@ function fig = figure(name, bringFront)
     %              |     |    |  |  |    |- v grid resolution
     screenGrid = [-1,   -1, 0, 0, 100, 100];
     if nargin<2
-        bringFront = 0;
+        bringFront = 1;
     end
     fig = findobj('type','figure','name',name);
 
@@ -25,8 +25,10 @@ function fig = figure(name, bringFront)
                     set(fig, 'Position',  grid2screen(screenGrid, [13,-10,13,10]));                                 
                 case 'Zernique to Command' 
                     set(fig, 'Position',  grid2screen(screenGrid, [1,-20,26,10]));
+                case 'DM Command'    
+                    set(fig, 'Position', [1525 231 392 336]);
                 case 'Last Phase'
-                     set(fig, 'Position', grid2screen(screenGrid, [-20,-28,20,28]));
+                     set(fig, 'Position', [1521 652 396 344]);
                 case 'ZtP QC'
                      set(fig, 'Position', [1164 131 560 854]);
                 case 'ZtP QC Mode'
@@ -39,6 +41,8 @@ function fig = figure(name, bringFront)
                      set(fig, 'Position',[680 337 560 641]);
                 case 'TILT QC'
                      set(fig, 'Position',[1243 340 560 638]);
+                case 'ZtP Modes'
+                     set(fig, 'Position',[1228 121 560 843]);
                     %grid2screen(screenGrid, [-1, -10, 25,90]));
 %                     case 'Influence Function'
 %                     %% figure related to measurement 

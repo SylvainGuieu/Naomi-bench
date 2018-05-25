@@ -27,18 +27,18 @@ classdef BaseData < handle
             end
             obj.header = containers.Map();
             % fill the header with the staticHeader for 
-            % this object 
-            
-            sh = obj.staticHeader;
-            for iKey=1:length(sh)
-                    card = sh{iKey};
-                    if length(card)<3
-                        obj.header(card{1}) = {card{2}, ''};
-                    else
-                        obj.header(card{1}) = {card{2}, card{3}};
-                    end
+            % this object only if it is not a file
+            if isempty(obj.file)
+                sh = obj.staticHeader;
+                for iKey=1:length(sh)
+                        card = sh{iKey};
+                        if length(card)<3
+                            obj.header(card{1}) = {card{2}, ''};
+                        else
+                            obj.header(card{1}) = {card{2}, card{3}};
+                        end
+                end
             end
-            
             obj.addHeader(header);
             
             
@@ -195,7 +195,13 @@ classdef BaseData < handle
                else
                    c = card{1};
                end
-               matlab.io.fits.writeKey(fpr,ks{iKey}, card{1}, c);
+               value = card{1};
+               if isempty(value)% avoid empty, empty is ''
+                   value = '???';
+               end
+                
+               
+               matlab.io.fits.writeKey(fpr,ks{iKey}, value, c);
            end
            matlab.io.fits.closeFile(fpr);
         end

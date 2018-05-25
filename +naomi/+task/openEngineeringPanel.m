@@ -1,4 +1,4 @@
-function  openEngineeringPannel(bench)
+function  openEngineeringPanel(bench)
 %ALIGN Summary of this function goes here
 %   Detailed explanation goes here
 global naomiGlobalBench;

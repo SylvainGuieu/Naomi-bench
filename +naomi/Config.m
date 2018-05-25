@@ -194,7 +194,7 @@ classdef Config < handle
             
         };
         % quick or accurate leave it '' to ask user 
-        ifMode = '';
+        ifMode = 'accurate';
 
         %%
         % The 4 following parameters will be modified 
@@ -308,8 +308,8 @@ classdef Config < handle
         % Specify if the gimbal is used on the bench and motorized
         useGimbal = true;
         % Which order correspond to rX and rY motor movement tip or tilt 
-        rXOrder = 'tilt';  %tip
-        rYOrder = 'tip'; % not used just for consistancy
+        rXOrder = 'tip';  %tip
+        rYOrder = 'tilt'; % not used just for consistancy
         % Sign of rX movement regarding to zernic order 
         rXSign = 1;
         rYSign = 1;

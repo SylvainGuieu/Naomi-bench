@@ -45,9 +45,6 @@ function strokeData = stroke(bench,zernikeMode,amplitudeVector)
     strokeData.biasVector = bench.biasVector;
     strokeData.amplitudeVector = amplitudeVector;
     
-     bench.log(sprintf('NOTICE:  stroke measurement for mode %d finished', zernikeMode));
-    if config.plotVerbose
-    	naomi.plot.figure('Modal Stroke'); clf;
-    	strokeData.plot();
-    end
+    bench.log(sprintf('NOTICE:  stroke measurement for mode %d finished', zernikeMode));
+    
 end

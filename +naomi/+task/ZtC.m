@@ -4,7 +4,7 @@ function  ZtC(bench)
 global naomiGlobalBench
 if nargin<1; bench = naomiGlobalBench; end;
 if isempty(bench.IFMData)
-  f = msgbox({'A zernike 2 command matrix can ', 'only be maed after an IFM as bean measured or loaded'});
+  msgbox({'A zernike 2 command matrix can ', 'only be maed after an IFM as bean measured or loaded'});
   return; 
 end
 % the naomi Zernike To Command
@@ -17,8 +17,8 @@ naomi.config.ZtC(bench, ZtCData);
 naomi.saveData(ZtCData,bench);
 naomi.saveData(ZtCDmData,bench);
 
-naomi.figure('ZtC QC');
+naomi.plot.figure('ZtC QC');
 ZtCData.plotQc;
-naomi.saveFigure(ZtC, 'QC', bench);
+naomi.saveFigure(ZtCData, 'QC', bench);
 end
 

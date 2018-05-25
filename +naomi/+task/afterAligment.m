@@ -13,11 +13,24 @@ if nargin<1; bench = naomiGlobalBench; end
 [x,y] = naomi.measure.pupillCenter(bench);
 naomi.config.pupillCenter(bench, x, y);
 if ~strcmp(bench.config.dmId,  bench.config.DUMMY) && bench.has('dm')
+    naomi.action.resetDm(bench); 
+    
+    %                                          |- no tip/tilt removal
+    %                                          |  |- no phase ref
+    %                                          |  |  |- no mask
+    [~,phaseData] = naomi.measure.phase(bench, 0, 0, 0); 
+    
+    phaseData.setKey(naomi.KEYS.DPRTYPE, 'DM', naomi.KEYS.DPRTYPEc);
+    
     [~,IFCData] = naomi.measure.IFC(bench);
     naomi.config.IFC(bench,IFCData);
     naomi.saveData(IFCData, bench);
     [xScale, yScale] = naomi.measure.pixelScale(bench);
     naomi.config.pixelScale(bench, xScale, yScale);
+else
+    [~, phaseReferenceData] = naomi.measure.phaseReference(bench);
+    naomi.config.phaseReference(bench,phaseReferenceData);
+    naomi.saveData(phaseReferenceData, bench);
 end
 close all;
 end

@@ -43,7 +43,7 @@ classdef PhaseZernike < naomi.data.Phase
             ax = axesList{1};
             obj.plot(ax);
             hold(ax,'on'); 
-                obj.plotPupill(ax); 
+            obj.plotPupill(ax); 
             hold(ax,'off');
             
             ax = axesList{2};
@@ -88,7 +88,9 @@ classdef PhaseZernike < naomi.data.Phase
         
         function residualArray = residualArray(obj, varargin)
             tPhase = obj.theoreticalPhaseArray;
-            phase  = obj.normalizedPhaseArray;
+           
+            %phase  = obj.normalizedPhaseArray;
+            phase = obj.phaseArray;
             residualArray = phase - tPhase;
             if ~isempty(varargin);residualArray = residualArray(varargin{:});end
         end

@@ -1,4 +1,6 @@
-clear all;
+if exist('naomiGlobalBench', 'var')
+    naomiShutdown;
+end
 % this is necessary to create a global and unique object for the wfs 
 % toherwise it does not work 
 global naomiGlobalWfs;
@@ -25,3 +27,6 @@ if isempty(naomi.findGui('Naomi Startup'))
     startupGui(bench);
 end
 
+if isempty(naomi.findGui('Calibration'))
+    calibGui(bench);
+end

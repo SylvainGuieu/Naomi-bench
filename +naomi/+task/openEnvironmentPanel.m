@@ -1,5 +1,5 @@
-function  controlEnvironmnet(bench)
-%CONTROLENVIRONMNET Summary of this function goes here
+function  openEnvironmentPanel(bench)
+%openEnvironmentPanel Summary of this function goes here
 %   Detailed explanation goes here
 global naomiGlobalBench;
 if nargin<1; bench=naomiGlobalBench;end

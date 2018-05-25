@@ -209,7 +209,7 @@ classdef Simulator < naomi.objects.BaseObject
            if isempty(obj.zernike2Command)
                 
                cleanIFMArray = naomi.compute.cleanIFM(IFM, obj.ifmNexclude, obj.ifmCleanPercentil); 
-               [~,ZtC,~] = commandMatrix(IFM, obj.xCenter, obj.yCenter, obj.fullPupillDiameter/obj.pixelScale, 0.0, obj.ztcNeigenValue, obj.ztcNzernike, 1);
+               [~,ZtC,~] = naomi.compute.commandMatrix(IFM, obj.xCenter, obj.yCenter, obj.fullPupillDiameter/obj.pixelScale, 0.0, obj.ztcNeigenValue, obj.ztcNzernike, 1);
                if isempty(obj.zernike2Command)
                 obj.zernike2Command = ZtC;         
                end

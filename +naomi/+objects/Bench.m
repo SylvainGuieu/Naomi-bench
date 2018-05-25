@@ -60,9 +60,7 @@ classdef Bench < naomi.objects.BaseObject
     
     % The mask data as created by naomi.make.pupillMask 
     maskData;
-    % mask can have a name 
-    maskName = 'UNKNOWN';
-
+    
     % phaseReferenceData
     % the phase Reference data, this should be a naomi.data.PhaseReference object 
     % and represent the bench static aberation (taken with a dummy) and should not
@@ -171,11 +169,17 @@ classdef Bench < naomi.objects.BaseObject
                 end
             end
             sessionNumber =1;
-            while (exist(fullfile(obj.config.todayDirectory, sprintf('%s.%d', dmId, sessionNumber)), 'file'))
+            if obj.config.simulated
+                simstr = '_SIMULATED';
+            else
+                simstr = '';
+            end
+            while (exist(fullfile(obj.config.todayDirectory, sprintf('%s%s.%d', dmId, simstr, sessionNumber)), 'file'))
                 sessionNumber = sessionNumber +1;
             end
             
-            obj.config.sessionName = sprintf('%s.%d', dmId, max( 1,sessionNumber-1)); 
+            obj.config.sessionName = sprintf('%s%s.%d', dmId, simstr, max( 1,sessionNumber-1)); 
+            
             obj.log(sprintf('NOTICE: dm chenged  to %s',obj.config.dmId));
             obj.log(sprintf('NOTICE: session name is now %s ',obj.config.sessionName));
         end
@@ -325,6 +329,9 @@ classdef Bench < naomi.objects.BaseObject
             end
             mask = {pupillDiameter, centralObscurtion, unit};
         end
+        function maskName = maskName(obj)
+            [~,maskName] = obj.getPupillMask;
+        end
         
         function [pupillDiameterPix, centralObscurtionDiameterPix] = getMaskInPixel(bench, mask)
           mask = bench.config.getMask(mask);
@@ -454,8 +461,7 @@ classdef Bench < naomi.objects.BaseObject
         end
 
         function test = isPhaseReferenced(obj)
-            %test  = max(abs(obj.wfs.ref(:)))> 0;
-            test = ~isempty(obj.phaseReferenceData);
+            test = ~isempty(obj.phaseReferenceData) && obj.config.substractReference;
         end
 
         function axisName = axisMotor(obj, tip_or_tilt)
@@ -524,7 +530,11 @@ classdef Bench < naomi.objects.BaseObject
         function set.ZtCData(obj, ZtCData)
         	obj.log('NOTICE: Received a new Zernique to Command Matrix', 2);
              if obj.has('dm')
-                	obj.dm.zernike2Command = ZtCData.data;
+                 if isempty(ZtCData)
+                	obj.dm.zernike2Command = [];
+                 else
+                    obj.dm.zernike2Command = ZtCData.data;
+                 end
              end
             obj.ZtCData = ZtCData;
         end
@@ -538,7 +548,11 @@ classdef Bench < naomi.objects.BaseObject
         function set.dmBiasData(obj, dmBiasData)
             obj.log('NOTICE: Receive a new DM bias', 2);
              if obj.has('dm')
+                 if isempty(dmBiasData)
+                     obj.dm.biasVector = 0;
+                 else
                     obj.dm.biasVector = dmBiasData.data(':');
+                 end
              end
             obj.dmBiasData = dmBiasData;
         end

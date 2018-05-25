@@ -96,18 +96,19 @@ classdef ZtP < naomi.data.PhaseCube
            [residualVector, gainVector] = naomi.compute.ztpDifference(ZtPArray, ZtPRefArray, maxZernike);
            
            axes = axesList{1};
-           plot(axes, residualVector);
+           plot(axes, residualVector, 'bo-');
            ylabel(axes, 'Res. RMS (um)');
            title(axes, 'Measured naomi modes');
            grid(axes);  set(axes,'xminorgrid','on','yminorgrid','on');
            xlim(axes, [0,maxZernike+1]);
            
            axes = axesList{2};
-           plot(axes, gainVector);
+           plot(axes, gainVector, 'bo-');
            ylabel(axes, 'gain');
            xlabel(axes, 'Naomi mode');
            grid(axes);  set(axes,'xminorgrid','on','yminorgrid','on');
            xlim(axes, [0,maxZernike+1]);
+           ylim(axes, [0.8, 1.2]);
            
            axes = axesList{3};
            

@@ -1,4 +1,4 @@
-function  openCalibrationPannel(bench)
+function  openCalibrationPanel(bench)
 % open the calibration pannel
 global naomiGlobalBench;
 if nargin<1; bench=naomiGlobalBench;end
