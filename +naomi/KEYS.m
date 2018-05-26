@@ -343,6 +343,16 @@ classdef KEYS
        UNKNOWN_INT = -999;
        CUSTOM = 'CUSTOM';
        
+       %%
+       % some custon devices  or location ...
+       REFERENCE_MIRROR = 'Reference-Mirror';
+       DUMMY = 'DUMMY';
+       IPAG = 'IPAG';
+       ESOHQ = 'ESO-HQ';
+       PARANAL = 'PARANAL';
+       
+       
+       
        %% define names of GUIs here 
        G_STARTUP = 'Naomi Startup';
        G_ALIGNMENT = 'Naomi Alignment';

@@ -65,7 +65,7 @@ function [phaseArray, phaseData] = phase(bench, nPhase, filterTipTilt, substract
     bench.phaseCounter = bench.phaseCounter + 1;
     % If plot verbose is True plot the phase
 	if bench.config.plotVerbose
-		naomi.plot.figure('Last Phase');
+		naomi.plot.figure('Last Phase', 0);
 		naomi.plot.phase(bench);
     end
     

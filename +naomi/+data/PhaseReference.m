@@ -7,7 +7,7 @@ classdef PhaseReference < naomi.data.Phase
             obj = obj@naomi.data.Phase(varargin{:});
         end
         function sh = staticHeader(obj)
-        	sh = {{'DPR_TYPE', 'REF_DUMMY', ''}};
+        	sh = {{naomi.KEYS.DPRTYPE, 'WF_REF', naomi.KEYS.DPRTYPEc}};
         end
         function plot(obj, axes)
             if nargin<2; axes= gca;end;

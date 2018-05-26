@@ -8,14 +8,16 @@ function dmBias(bench)
 %               all the pupill
 global naomiGlobalBench;
 if nargin<1; bench=naomiGlobalBench;end
-    [~, dmBiasData] = naomi.measure.dmBias(bench);
+    [~, dmBiasData, flatData] = naomi.measure.dmBias(bench);
     naomi.config.bias(bench, dmBiasData);
     if ~isempty(bench.IFMData) % should be otherwise measure.dmBias would fail
         % put the sqme DATEOB 
         dmBiasData.setKey(naomi.KEYS.DATEOB, bench.IFMData.getKey(naomi.KEYS.DATEOB, now), naomi.KEYS.DATEOBc);
     end
     naomi.saveData(dmBiasData, bench);
+    naomi.saveData(flatData, bench);
     naomi.plot.figure('DM Bias');dmBiasData.plotQc;
     naomi.saveFigure(dmBiasData, 'QC', bench);
+    naomi.plot.figure('Flat Zonal');flatData.plot;
 end
 

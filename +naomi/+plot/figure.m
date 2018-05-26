@@ -43,6 +43,8 @@ function fig = figure(name, bringFront)
                      set(fig, 'Position',[1243 340 560 638]);
                 case 'ZtP Modes'
                      set(fig, 'Position',[1228 121 560 843]);
+                case 'Alignment RTD' % alpao RtD
+                    set(fig, 'Position',[1228 121 560 843]);
                     %grid2screen(screenGrid, [-1, -10, 25,90]));
 %                     case 'Influence Function'
 %                     %% figure related to measurement 

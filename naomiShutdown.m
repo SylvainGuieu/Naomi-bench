@@ -1,5 +1,6 @@
 if exist('naomiGlobalBench', 'var') && ~isempty(naomiGlobalBench)
     naomiGlobalBench.log('WARNING: Naomi is shutting down');
+    naomiGlobalBench.stop;
 end
 % close regular figures
 close all

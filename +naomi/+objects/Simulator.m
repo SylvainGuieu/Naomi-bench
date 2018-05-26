@@ -90,6 +90,7 @@ classdef Simulator < naomi.objects.BaseObject
         end
         function img = getRawImage(obj)
             img = ones(10,10)*0.8;
+            img = zeros(10,10);
         end
         function rawPhase = getRawPhase(obj)
             pause(obj.pause);

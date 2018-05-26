@@ -1,4 +1,4 @@
-function phi = closeZonal(bench, PtC,gain,nStep,trgPhi)
+function phaseArray = closeZonal(bench, PtC,gain,nStep,trgPhi)
 % closeZonal Close a zonal loop
 %
 %   phi = closeZonal(dm,wfs,PtC,gain,nStep)
@@ -11,9 +11,9 @@ function phi = closeZonal(bench, PtC,gain,nStep,trgPhi)
 %
 %   phi(nSubAperture,nSubAperture): the residuals at the loop end.
 %
-wfs = bench.wfs;
+
 dm = bench.dm;
-config = bench.config;
+
 
 bench.log(sprintf('NOTICE: Close zonal loop in %i step:',nStep), 1);
 
@@ -37,5 +37,6 @@ if nargin < 5; trgPhi = 0.0; end;
                 naomi.compute.rms_tt(phir),max(phir(:)) - min(phir(:)),...
                 max(abs(cmd(:))),mean(cmd(:))), 2);
     end
-
+    phaseArray  = naomi.measure.phase(bench, 1);
+    
 end

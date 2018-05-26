@@ -34,10 +34,11 @@ classdef Config < handle
         % ACE root directory 
         ACEROOT =  'C:\AlpaoCoreEngine';
         
-        % becarefull when changing make sure that any DUMMY match what is 
-        % defined in the method isDm 
-        dmIdChoices = {'BAX153','BAX159','BAX199','BAX200', 'BAX201', 'DUMMY'};
-        dmId = 'DUMMY';
+        % becarefull when changing make sure that any Reference Mirror or  
+        %DUMMY match what is defined in the method isDm 
+        dmIdChoices = {naomi.KEYS.REFERENCE_MIRROR, 'BAX153','BAX159','BAX199','BAX200', 'BAX201', naomi.KEYS.DUMMY};
+        % defulat dmId is the Reference Mirror 
+        dmId = naomi.KEYS.REFERENCE_MIRROR;
         
         % the dm id 2 gimbal assignment loockup table
         dmId2gimbalNumber = {{'BAX153',4},{'BAX159',2},{'BAX199',3},...
@@ -91,7 +92,7 @@ classdef Config < handle
         ztcDef = {
                   {'naomi-pup',        'naomi', 140, 100, 1},...
                   {'naomi-pup-sparta', 'naomi', 140, 21 , 1},... 
-                  {'dm-pup',           'dm',    140, 100, 0},...
+                  {'dm-pup',           'dm',    220, 100, 0},...
                   {'no mask',      'no mask',   220, 100, 1} % make a big mask = no mask 
                 };
                 
@@ -368,14 +369,6 @@ classdef Config < handle
         screenGrid = {-1,   -1, 0, 0, 100, 100};
 
 
-
-
-        % some constant
-        IPAG = 'IPAG';
-        ESOHQ = 'ESO-HQ';
-        BENCH = 'Bench';
-        DUMMY = 'DUMMY';
-        REFERENCE_MIRROR = 'Reference Mirror';
         
         TIP = 'tip';
         TILT = 'tilt';
@@ -444,9 +437,9 @@ classdef Config < handle
         function test = isDm(obj)
             % true if the current configured mirror is a dm otherwise false
             switch obj.dmId
-                case obj.DUMMY
+                case naomi.KEYS.DUMMY
                     test = 0;
-               case obj.REFERENCE_MIRROR
+               case naomi.KEYS.REFERENCE_MIRROR
                     test = 0;
                 otherwise
                     test = 1;

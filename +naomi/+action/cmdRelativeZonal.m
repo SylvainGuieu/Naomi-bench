@@ -8,7 +8,7 @@ function cmdRelativeZonal(bench, actNum, amplitudeOffset)
     
     bench.dmCounter = bench.dmCounter + 1;
 	if bench.config.plotVerbose
-		naomi.plot.figure('DM Command');
+		naomi.plot.figure('DM Command', 0);
 		naomi.plot.dmCommand(bench);
 	end		
 end

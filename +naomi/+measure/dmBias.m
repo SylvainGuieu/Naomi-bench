@@ -1,4 +1,4 @@
-function [dmBiasVector,dmBiasData] = dmBias(bench)
+function [dmBiasVector,dmBiasData, flatData] = dmBias(bench)
 %DMBIAS measure the dm bias by doing a close loop flat 
 %   To do so the current dm bias is first removed, a close-loop flat 
 %   is made (naomi.measure.closeFlat) the cmdVector becomes the dmBias
@@ -18,7 +18,7 @@ function [dmBiasVector,dmBiasData] = dmBias(bench)
     naomi.config.pupillMask(bench, mask);
     naomi.action.resetDm(bench);
     try
-        naomi.action.closeZonal(bench,PtCArray,gain,nStep);
+       phaseArray =  naomi.action.closeZonal(bench,PtCArray,gain,nStep);
     catch ME
         bench.dm.biasVector = savedBiasVector;
         rethrow(ME);
@@ -27,8 +27,26 @@ function [dmBiasVector,dmBiasData] = dmBias(bench)
     dmBiasVector = bench.dm.cmdVector; 
     bench.dm.biasVector = savedBiasVector;
     if nargout>1
+        
        dmBiasData = naomi.data.DmBias(dmBiasVector);
        bench.populateHeader(dmBiasData);
+       if nargout>2
+           
+        K = naomi.KEYS;
+        
+        h = {{K.LOOPMODE, K.ZONAL,  K.LOOPMODEc}, ...
+             {K.LOOP,      K.CLOSED,  K.LOOPc}, ...
+             {K.NPHASE,    nStep,    K.NPHASEc  }, ...
+             {K.LOOPGAIN,  gain,     K.LOOPGAINc}, ...
+             {K.LOOPSTEP,  nStep,    K.LOOPSTEPc}, ...
+             {K.DPRVER, 'ZONAL', K.DPRVERc}
+             };
+        
+        flatData  = naomi.data.Flat(phaseArray, h);
+		bench.populateHeader(flatData.header);
+       end
     end
+       
+   
 end
 

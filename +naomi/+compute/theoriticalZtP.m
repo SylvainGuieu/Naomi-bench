@@ -51,8 +51,9 @@ for iZer=1:nZernike
 end
 
 % Comptue the Phase to Zernike
-PtZArray = reshape(pinv(reshape(naomi.compute.nanzero(ZtPArray),nZernike,[])),nSub,nSub,[]);
-
+if nargout>1
+    PtZArray = reshape(pinv(reshape(naomi.compute.nanzero(ZtPArray),nZernike,[])),nSub,nSub,[]);
+end
 end
 
 

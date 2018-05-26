@@ -138,6 +138,34 @@ classdef Bench < naomi.objects.BaseObject
                 end
             end
         end
+        function stop(obj, varargin)
+            if isempty(varargin)
+                if obj.has('dm'); obj.stopDm();end
+                if obj.has('wfs'); obj.stopWfs();end
+                if obj.has('gimbal'); obj.stopGimbal();end
+                if obj.has('environment'); obj.stopEnvironment();end
+            else
+                
+               for iArg=1:length(varargin)
+                        switch varargin{iArg}
+                            case 'ace'
+
+                            case 'dm'
+                                obj.stopDm();
+                            case 'wfs'
+                                obj.stopWfs();
+                            case 'gimbal'
+                                obj.stopGimbal();
+                            case 'environment'
+                                obj.stopEnvironment();
+                            case 'autocol'
+
+                            otherwise
+                                error('unknown subsystem %s', varargin{iArg});
+                        end
+                    end
+            end
+        end
         
         function value = getMeasuredParam(obj, paramName, configName)
             if nargin<2
@@ -656,11 +684,9 @@ classdef Bench < naomi.objects.BaseObject
         end
         function stopWfs(obj)
           obj.log('NOTICE: Stopping WaveFront Sensor...', 1);
-            if obj.config.simulated
-                obj.wfs = [];
-            else
-                obj.wfs = [];
-            end
+            
+            obj.wfs = [];
+            
             obj.log('NOTICE: WaveFront Stopped', 1);
         end
         
@@ -691,11 +717,9 @@ classdef Bench < naomi.objects.BaseObject
         end
         function stopDm(obj)
             obj.log('NOTICE: Stopping DM ...', 1);
-            if obj.config.simulated
-                obj.dm = [];
-            else
-                obj.dm = [];
-            end
+            
+            obj.dm = [];
+            
             obj.log('NOTICE: DM Stopped', 1);
         end
         
@@ -745,6 +769,19 @@ classdef Bench < naomi.objects.BaseObject
                 if any(isnan(phase(maskArray)))
                     check = 0;
                 end
+            end
+        end
+        function check = checkFlux(obj, flux)
+           % return 1 is flux is enough to work with (but not necessarly optimum) 
+           % flux can be given or measured 
+           if nargin<2
+               flux = naomi.measure.flux(obj);
+           end
+           
+            if flux<obj.config.minFlux
+                check = 0;
+            else
+                check = 1;
             end
         end
         

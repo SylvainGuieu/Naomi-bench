@@ -8,7 +8,7 @@ function [flatArray, flatData] = closeFlat(bench, gain, nZernike, nStep)
 	nPhase = config.flatNphase;
     
     
-	[~,PtZArray] = naomi.make.theoriticalZtP(bench);
+	[~,PtZArray] = naomi.make.theoriticalZtP(bench, [], [], nZernike);
 
 	
 	naomi.action.resetDm(bench);
@@ -18,6 +18,7 @@ function [flatArray, flatData] = closeFlat(bench, gain, nZernike, nStep)
 	naomi.action.closeModal(bench,PtZArray, gain, nStep, 2, nZernike);
 	
 	
+    
 	flatArray = naomi.measure.phase(bench, nPhase);
     
     % if to output argument encapsule the result in a 
@@ -26,7 +27,7 @@ function [flatArray, flatData] = closeFlat(bench, gain, nZernike, nStep)
         K = naomi.KEYS;
         
         h = {{K.DPRTYPE, 'FLAT_CLOSED', K.DPRTYPEc}, ...
-            {K.LOOPMODE,  K.ZONAL,  K.LOOPMODEc}, ...
+            {K.LOOPMODE,  K.MODAL,  K.LOOPMODEc}, ...
             {K.LOOP,      K.CLOSED, K.LOOPc}, ...
             {K.NPHASE,    nPhase,   K.NPHASEc  }, ...
             {K.LOOPGAIN,  gain,     K.LOOPGAINc}, ...

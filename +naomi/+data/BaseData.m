@@ -53,14 +53,19 @@ classdef BaseData < handle
         
         function info = shortInfo(obj)
            K = naomi.KEYS;
-            
-           info =  obj.getKey(K.DATE, 'Unknown');
+           
+           date = obj.getKey(K.DATEOB, 0');
+           if date
+               info = datestr(date, 'yyyy-mm-ddThh-MM-SS');
+           else
+            info = '';
+           end
            %tpl = obj.getKey(K.TPLNAME, '');
            %if tpl; info = strcat(info, '/ ', tpl);end
            dpr = obj.getKey(K.DPRTYPE, '');
-           if dpr; info = strcat(info, '/ ', dpr); end
+           if dpr; info = strcat(info, ' / ', dpr); end
            dm = obj.getKey(K.DMID, '');
-           if dm; info = strcat(info, '/ ', dm); end
+           if dm; info = strcat(info, ' / ', dm); end
         end
         
         function dmId = dmId(obj)
