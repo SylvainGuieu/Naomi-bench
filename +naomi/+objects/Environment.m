@@ -218,7 +218,7 @@ classdef Environment < naomi.objects.BaseObject
         
         % acceptable difference of temperature between 
         % mirror and embiant to allow door opening                   
-        safeDeltaTemp = 2.0 
+        safeDeltaTemp = 4.0 
         
         % temperature difference forwhich it is acceptable to start calibration
         % abs(e.getTemp(e.MIROR)-e.calibTemperature) < e.calibDeltaTemp               

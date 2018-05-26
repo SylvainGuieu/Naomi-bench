@@ -34,6 +34,8 @@ classdef Config < handle
         % ACE root directory 
         ACEROOT =  'C:\AlpaoCoreEngine';
         
+        % becarefull when changing make sure that any DUMMY match what is 
+        % defined in the method isDm 
         dmIdChoices = {'BAX153','BAX159','BAX199','BAX200', 'BAX201', 'DUMMY'};
         dmId = 'DUMMY';
         
@@ -373,6 +375,7 @@ classdef Config < handle
         ESOHQ = 'ESO-HQ';
         BENCH = 'Bench';
         DUMMY = 'DUMMY';
+        REFERENCE_MIRROR = 'Reference Mirror';
         
         TIP = 'tip';
         TILT = 'tilt';
@@ -442,6 +445,8 @@ classdef Config < handle
             % true if the current configured mirror is a dm otherwise false
             switch obj.dmId
                 case obj.DUMMY
+                    test = 0;
+               case obj.REFERENCE_MIRROR
                     test = 0;
                 otherwise
                     test = 1;

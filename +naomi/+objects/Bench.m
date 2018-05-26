@@ -111,7 +111,7 @@ classdef Bench < naomi.objects.BaseObject
 
         function start(obj, varargin)
             if isempty(varargin)
-                if obj.config.isDm
+                if obj.isDm
                     obj.start('dm', 'wfs', 'gimbal', 'environment');
                 else
                      obj.start('wfs', 'gimbal', 'environment');
@@ -162,7 +162,7 @@ classdef Bench < naomi.objects.BaseObject
             % this will stop the dm environment
             obj.log(sprintf('NOTICE: changing dm from %s to %s',obj.config.dmId, dmId));
             obj.config.dmId = dmId;
-            if obj.config.isDm
+            if obj.isDm
                 obj.stopDm; % stop the dm environment 
                 if obj.has('gimbal')
                     obj.stopGimbal; % stop the gimbal mount 
@@ -618,7 +618,10 @@ classdef Bench < naomi.objects.BaseObject
                 dmId = obj.config.dmId;
             end
         end
-
+        function test = isDm(obj)
+          % True if the current configured mirror is a DM
+           test = obj.config.isDm;
+        end
         function maskArray = maskArray(obj, varargin)
             if isempty(obj.maskData)
                 nSubAperture = obj.nSubAperture;

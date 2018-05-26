@@ -5,11 +5,9 @@ function dmCommand(bench,  axes)
 
     if nargin<2; axes = gca; end;
 	
-    if strcmp(bench.config.dmId, bench.config.DUMMY)
-        
-	
+    if ~bench.isDm
         cla(axes);
-        text(axes, 0.5, 0.5, 'Dummy Mirror', 'Color','red','FontSize',16,...
+        text(axes, 0.5, 0.5, bench.dmId, 'Color','red','FontSize',16,...
                              'HorizontalAlignment', 'center' );
         return
     end

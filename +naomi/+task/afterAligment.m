@@ -12,7 +12,8 @@ global naomiGlobalBench
 if nargin<1; bench = naomiGlobalBench; end
 [x,y] = naomi.measure.pupillCenter(bench);
 naomi.config.pupillCenter(bench, x, y);
-if ~strcmp(bench.config.dmId,  bench.config.DUMMY) && bench.has('dm')
+
+if ~bench.isDm && bench.has('dm')
     naomi.action.resetDm(bench); 
     
     %                                          |- no tip/tilt removal

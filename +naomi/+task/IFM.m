@@ -19,8 +19,10 @@ if ~force
                                'Temperature Check', ...
                                'Cancel','Continue', 'Cancel');
             switch answer
-                case 'Cancel'
-                    return 
+            case 'Continue'
+              bench.log('NOTICE: continue calibration without optnimal conditions');
+            otherwise
+              error('IFM interupted by user. Calibration condition not met');
             end
         end 
     else
@@ -28,8 +30,10 @@ if ~force
                                'Temperature Check', ...
                                'Cancel','Continue', 'Cancel');
             switch answer
-                case 'Cancel'
-                    return 
+            case 'Continue'
+                  bench.log('NOTICE: continue calibration without optnimal conditions');
+            otherwise
+                  error('IFM interupted by user. Calibration condition not met');
             end
     end
 end
