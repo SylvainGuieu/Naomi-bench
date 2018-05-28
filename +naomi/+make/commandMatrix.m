@@ -23,7 +23,7 @@ function [PtCArray, ZtCArray, ZtPArray, PtCData, ZtCData, ZtPData] = commandMatr
   [maskMeter, maskName,  nEigenValue, nZernike, zeroMean, ztcOrientation] = bench.ztcParameters(ztcMode, 'm');
   
   
-  [xS,yS] = naomi.compute.IFMScale(IFMArray, bench.config.dmActuatorSeparation, bench.config.dmOrientation);
+  [xS,yS] = naomi.compute.IFMScale(IFMArray, bench.config.dmActuatorSeparation, bench.config.phaseOrientation);
   scale = 0.5 * (xS + yS);
   
   % convert the mask unit in pixel 

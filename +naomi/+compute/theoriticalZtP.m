@@ -23,12 +23,14 @@ function [ZtPArray,PtZArray] = theoriticalZtP(nSub,x0,y0,diamPix, centralObscura
 if nargin<7
     orientation = 'xy';
 end
+
 mask = naomi.compute.pupillMask(nSub, diamPix, centralObscurationPix, x0, y0);
 
-[X,Y] = naomi.compute.orientedMeshgrid(1:nSub,orientation); 
-
+[X,Y] = meshgrid(1:nSub,1:nSub); 
 % Radius
 [theta,r] = cart2pol(double(X-x0)/double(diamPix/2),double(Y-y0)/double(diamPix/2));
+[theta,r] = naomi.compute.orientPolar(theta, r, orientation);
+
 mask(r>1.0) = 0;
 mask(r<0.0) = 0;
 

@@ -94,9 +94,9 @@ classdef Config < handle
         %           |               |           |   |     |- zeroMean 
         %           |               |           |   |     |   |- orientation 
         ztcDef = {
-                  {'NAOMI_PUPILL', 'NAOMI_PUPILL', 140, 100, 1, 'xy'},...
-                  {'DM_PUPILL',    'DM_PUPILL',    220, 100, 0, 'xy'},...
-                  {'NO_MASK',      'NO_MASK',     220, 100, 1, 'xy'} % make a big mask = no mask 
+                  {'NAOMI_PUPILL', 'NAOMI_PUPILL', 140, 100, 1, '-xy'},...
+                  {'DM_PUPILL',    'DM_PUPILL',    220, 100, 0, '-xy'},...
+                  {'NO_MASK',      'NO_MASK',     220, 100, 1,  '-xy'} % make a big mask = no mask 
                 };
                 
         % current ztcMode 
@@ -115,8 +115,8 @@ classdef Config < handle
         % In witch orientation the zernike to command matrix will be
         % computed. Changing this will change the orientation of mode over
         % the DM. For the orienatation of Naomi Calibration bench and what
-        % SPARTA is using this should be 'xy'
-        ztcOrientation = 'xy'
+        % SPARTA is using this should be '-xy'
+        ztcOrientation = '-xy'
         
         % number of Zernique to command matrix for the ZtP measurement
         ztpNzernike = 21;
@@ -160,15 +160,21 @@ classdef Config < handle
         %   etc ...
         % After measured by the bench this value is not used anymore
         
-        % dmOrientation has 3 purposes
-        %   - plot purpose: in order to represent the dm commands that match
-        %    the phase 
+        % dmOrientation has only one graphical purpose:
+        %   in order to represent the dm commands that match
+        %   the phase 
         %   - when computing pixel scale to know in which direction 
         %     we need to copute the fft
         %   - When computing miss alignment the tip and tilt must correnspond 
         %      to what is set in rXOrder and rYOrder, rXsign, rYsign 
-        dmOrientation = 'xy';
+        dmOrientation = 'y-x';
         
+        % phase orientation has 2 criticals puposes 
+        %   - when computing pixel scale to know in which direction 
+        %     we need to copute the fft (unsigned)
+        %   - When computing miss alignment the tip and tilt must correnspond 
+        %      to what is set in rXOrder and rYOrder, rXsign, rYsign 
+        phaseOrientation = 'xy';
         
         dmasdasda= [39,203];
         
@@ -528,7 +534,7 @@ classdef Config < handle
         end 
         function [mask, nEigenValue, nZernike, zeroMean, ztcOrientation] = ztcParameters(obj, ztcMode)
           if nargin<2 || isempty(ztcMode)
-            mask = obj.ztcMask
+            mask = obj.ztcMask;
             nEigenValue = obj.ztcNeigenValue;
             nZernike = obj.ztcNzernike;
             zeroMean = obj.ztcZeroMean;

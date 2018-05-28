@@ -861,6 +861,7 @@ classdef Bench < naomi.objects.BaseObject
                 naomi.addToHeader(h, K.YPSCALE, obj.yPixelScale, K.YPSCALEc);
             end
             naomi.addToHeader(h, K.DMORIENT, obj.dmOrientation, K.DMORIENTc);
+            naomi.addToHeader(h, K.PHASEORIENT, obj.config.phaseOrientation, K.PHASEORIENTc);
             
         end
     end

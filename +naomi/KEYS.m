@@ -130,7 +130,11 @@ classdef KEYS
         DMORIENT = 'DMORIENT';
         DMORIENTc = 'Orientation of the DM compare to phase screen';
         DMORIENTd = 'xy';
-        
+
+        PHASEORIENT = 'PHORIENT';
+        PHASEMORIENTc = 'Orientation of the phase';
+        PHASEORIENTd = 'xy';
+
         XCENTER = 'XCENTER';
         XCENTERc = '[pix] X central actuator position';
         XCENTERd = 64;

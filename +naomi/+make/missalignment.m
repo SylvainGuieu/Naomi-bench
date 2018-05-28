@@ -9,7 +9,7 @@ function [dX,dY,dTip,dTilt,dFoc] = missalignment(bench, phaseArray)
 	% - dFoc  : un um rms 
     pscale = bench.meanPixelScale;
     diam = bench.config.fullPupillDiameter;
-    orientation = bench.dmOrientation;
+    orientation = bench.phaseOrientation;
     
     [dXPix, dYPix, dTip, dTilt, dFoc] = naomi.compute.missalignment(phaseArray, diam/pscale, orientation);
     dX = dXPix*pscale;
