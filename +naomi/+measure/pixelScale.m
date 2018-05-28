@@ -10,7 +10,7 @@ function [xScale,yScale] = pixelScale(bench,  nPushPull, amplitude)
     
 
     % Parameters
-    [i,j,~] = naomi.compute.actuatorPosition(bench.config.orientation);
+    [i,j,~] = naomi.compute.actuatorPosition(bench.config.dmOrientation);
     N = 2048*4;
 
     % Push-pull with X-waffle

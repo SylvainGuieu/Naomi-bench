@@ -11,7 +11,7 @@ function [xS,yS] = IFMScale(IFM, actuatorSeparation, orientation)
   %   orientation : 'yx', 'xy', etc ... (see config) phase to dm orientation 
 	% Collapse IFM in x and y
     if nargin<2
-        orientation = 'yx';
+        orientation = 'xy';
     end
 	IfXArray = squeeze(naomi.compute.nansum(IFM,3));
 	IfYArray = squeeze(naomi.compute.nansum(IFM,2));

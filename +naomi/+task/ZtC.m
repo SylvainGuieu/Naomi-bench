@@ -8,9 +8,9 @@ if isempty(bench.IFMData)
   return; 
 end
 % the naomi Zernike To Command
-ZtCData = naomi.make.ZtC(bench, bench.IFMData, 'naomi-pup');
+ZtCData = naomi.make.ZtC(bench, bench.IFMData, 'NAOMI_PUPILL');
 % the fll dm pupill Zernike To Command
-ZtCDmData = naomi.make.ZtC(bench,bench.IFMData , 'dm-pup');
+ZtCDmData = naomi.make.ZtC(bench,bench.IFMData , 'DM_PUPILL');
 % configure the naomi Zernike to Command in the bench 
 naomi.config.ZtC(bench, ZtCData);
 

@@ -127,6 +127,10 @@ classdef KEYS
         ORIENTc = 'Bench DM orientation compare to conventional zernike';
         ORIENTd = 'yx';
         
+        DMORIENT = 'DMORIENT';
+        DMORIENTc = 'Orientation of the DM compare to phase screen';
+        DMORIENTd = 'xy';
+        
         XCENTER = 'XCENTER';
         XCENTERc = '[pix] X central actuator position';
         XCENTERd = 64;
@@ -198,6 +202,10 @@ classdef KEYS
         
         ZTCMNAME = 'ZTCMNAME';
         ZTCMNAMEc = 'Name of the mask use for ZtC';
+        
+        ZTCORIENT = 'ZTCORIEN';
+        ZTCORIENTc = 'Orientation of the Zernike to command matrix compare to IFM oriantation';
+        ZTCORIENTd = 'xy';
         
         NPP = 'NPP';
         NPPc = 'Number of push pull sequence for the measurement';

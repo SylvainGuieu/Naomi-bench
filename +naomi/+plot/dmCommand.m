@@ -14,7 +14,7 @@ function dmCommand(bench,  axes)
     
     cmdVector = bench.cmdVector + bench.biasVector;
     
-	[xi,yi,mask] = naomi.compute.actuatorPosition();
+	[xi,yi,mask] = naomi.compute.actuatorPosition(bench.config.dmOrientation);
     [yM, xM] = size(mask);
 	values = mask*1.0;
     

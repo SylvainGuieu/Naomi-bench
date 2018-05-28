@@ -30,7 +30,7 @@ classdef DmBias < naomi.data.DmCommand
             if nargin<2; axes= gca();end;
             
             % get the orientation from header 
-            orientation = obj.getKey(naomi.KEYS.ORIENT, naomi.KEYS.ORIENTd);
+            orientation = obj.getKey(naomi.KEYS.DMORIENT, naomi.KEYS.DMORIENTd);
     		
 	    	[x,y,mask] = naomi.compute.actuatorPosition(orientation);
             [nAct, ~] = size(mask);

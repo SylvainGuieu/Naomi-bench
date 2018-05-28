@@ -48,7 +48,7 @@ classdef DmCommand < naomi.data.BaseData
             if nargin<2; axes= gca();end;
             
             % get the orientation from header 
-            orientation = obj.getKey(naomi.KEYS.ORIENT, naomi.KEYS.ORIENTd);
+            orientation = obj.getKey(naomi.KEYS.DMORIENT, naomi.KEYS.DMORIENTd);
     		
 	    	[~,~,mask] = naomi.compute.actuatorPosition(orientation);
             

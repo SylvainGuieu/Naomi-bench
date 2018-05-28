@@ -8,7 +8,7 @@ function [dmBiasVector,dmBiasData, flatData] = dmBias(bench)
     bench.dm.biasVector = 0;
     
     ztcMode = bench.config.biasZtcMode;
-    mask = bench.config.ZtCParameters(ztcMode);
+    mask = bench.config.ztcParameters(ztcMode);
     gain = bench.config.biasGain;
     nStep = bench.config.biasNstep;
     % compute the matrix with the full dm 

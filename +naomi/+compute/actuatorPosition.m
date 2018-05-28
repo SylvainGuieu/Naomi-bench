@@ -15,9 +15,8 @@ function [xi,yj,mask] = actuatorPosition(orientation)
 
     % Compute mesh and mask
     if nargin<1; orientation = 'xy'; end
-    % the mesh grid for the DM is the inverse of what computed
-    % for a zernike
-    [Y,X] = naomi.compute.orientedMeshgrid(-8:1:8, orientation);
+    
+    [X, Y] = naomi.compute.orientedMeshgrid(-8:1:8, orientation);
     mask = (Y.^2+X.^2) < 8.75*8.75;
     
     % Return only actuator in mask

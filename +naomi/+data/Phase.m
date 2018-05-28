@@ -83,10 +83,10 @@ classdef Phase < naomi.data.BaseData
                       obj.getKey(naomi.KEYS.YOFFSET, 0.0);
         end
         function orientation = orientation(obj)
-            % return the orientation has defined by the bench
-            % orientation is used to build and compare a phase model 
+            % return the orientation has defined by the zernike to command
+            % orientation. It is used to build and compare a phase model 
             % see help on naomi.compute.orientedMeshgrid
-            orientation = obj.getKey(naomi.KEYS.ORIENT, naomi.KEYS.ORIENTd);
+            orientation = obj.getKey(naomi.KEYS.ZTCORIENT, naomi.KEYS.ZTCORIENTd);
         end
          function [pupillDiameterPix, centralObscurtionPix, xCenter, yCenter] = pupillMaskParameters(obj)
             if obj.getKey(naomi.KEYS.MASKED, 0)

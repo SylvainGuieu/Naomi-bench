@@ -62,7 +62,7 @@ classdef StrokePhaseCube < naomi.data.PhaseCube
         function  theoreticalPhaseArray = theoreticalPhaseArray(obj, varargin)
             % get the parameters of the used Z2C 
             [pupDiam, cObs, xCenter, yCenter] = obj.ztcMaskParameters;
-            orientation = obj.getKey(naomi.KEYS.ORIENT,naomi.KEYS.ORIENTd);
+            orientation = obj.getKey(naomi.KEYS.ZTCORIENT,naomi.KEYS.ZTCORIENTd);
             theoreticalPhaseArray =  naomi.compute.theoriticalPhase(obj.nSubAperture, xCenter, yCenter, pupDiam, cObs, obj.zernike,orientation);
             
             if ~isempty(varargin);  theoreticalPhaseArray =  theoreticalPhaseArray(varargin{:}); end

@@ -90,7 +90,7 @@ classdef PhaseCube < naomi.data.BaseData
             % return the orientation has defined by the bench
             % orientation is used to build and compare a phase model 
             % see help on naomi.compute.orientedMeshgrid
-            orientation = obj.getKey(naomi.KEYS.ORIENT, naomi.KEYS.ORIENTd);
+            orientation = obj.getKey(naomi.KEYS.ZTCORIENT, naomi.KEYS.ZTCORIENTd);
         end
         function [pupillDiameterPix, centralObscurtionPix, xCenter, yCenter] = ztcMaskParameters(obj)
             if isempty(obj.getKey(naomi.KEYS.ZTCDIAM, []))

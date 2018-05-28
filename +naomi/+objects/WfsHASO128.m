@@ -8,7 +8,7 @@ classdef WfsHASO128 < naomi.objects.Wfs
         % pause before measuring the phase (after emptying the buffer)
         pause = 0.1;
         % if true the phase is rotated by 90 degree
-        rotatePhase = 1;
+        rotatePhase = 0;
         % array off liped axis 
         % e.g. : [1 2] or  [1] or [] etc ...
         % !! the flip occure After rotation if any 

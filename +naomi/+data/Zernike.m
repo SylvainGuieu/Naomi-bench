@@ -38,7 +38,7 @@ classdef Zernike < naomi.data.BaseData
             if nargin<2; axes = gca; end
             zernike = obj.data;
             n = obj.nSubAperture;
-            orientation = obj.getKey(naomi.KEYS.ORIENT,naomi.KEYS.ORIENTd);
+            orientation = obj.getKey(naomi.KEYS.ZTCORIENT,naomi.KEYS.ZTCORIENTd);
             
             theoriticalPhase = naomi.compute.theoriticalPhase(n, n/2, n/2, n, 0.0, zernike, orientation);
             cla(axes);

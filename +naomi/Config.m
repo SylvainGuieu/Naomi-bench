@@ -68,6 +68,9 @@ classdef Config < handle
         % not the one used for ZtC (see bellow)  
         fullPupillDiameter = 36.5e-3;
         
+        
+        
+        
         % define typical mask here in naomi, mask can be called by their name
         % or by a 3xCell array defining the {diameter, central-obscurtion-diameter, unit}
         %  unit can be 'm' (converted in pixel by xPixelScale and yPixelSCale) or 'pixel' 
@@ -76,9 +79,9 @@ classdef Config < handle
         %           |        |         |- central obscuration diameter (in given unit)
         %           |        |         |     |- unit 'm' or 'pixel'      
         maskDef = {
-                    {'naomi', 28.0e-3,  0.0, 'm'}, ...
-                    {'dm',  36.5e-3, 0.0, 'm'},... 
-                    {'no mask',  999.9e-3, 0.0,  'm'}% big mask = no mask 
+                    {'NAOMI_PUPILL', 28.0e-3,  0.0, 'm'}, ...
+                    {'DM_PUPILL',  36.5e-3, 0.0, 'm'},... 
+                    {'NO_MASK',   999.9e-3, 0.0,  'm'}% big mask = no mask 
         };
         
         
@@ -86,33 +89,39 @@ classdef Config < handle
         %           |- config mode for Zernique2Command computation
         %           |               |- mask name or definition 
         %           |               |        
-        %           |               |       |- n Eigen Value value 
-        %           |               |       |   |- nZernike number of Zernique to keep 
-        %           |               |       |   |     |- zeroMean  
+        %           |               |           |- n Eigen Value value 
+        %           |               |           |   |- nZernike number of Zernique to keep 
+        %           |               |           |   |     |- zeroMean 
+        %           |               |           |   |     |   |- orientation 
         ztcDef = {
-                  {'naomi-pup',        'naomi', 140, 100, 1},...
-                  {'naomi-pup-sparta', 'naomi', 140, 21 , 1},... 
-                  {'dm-pup',           'dm',    220, 100, 0},...
-                  {'no mask',      'no mask',   220, 100, 1} % make a big mask = no mask 
+                  {'NAOMI_PUPILL', 'NAOMI_PUPILL', 140, 100, 1, 'xy'},...
+                  {'DM_PUPILL',    'DM_PUPILL',    220, 100, 0, 'xy'},...
+                  {'NO_MASK',      'NO_MASK',     220, 100, 1, 'xy'} % make a big mask = no mask 
                 };
                 
         % current ztcMode 
-        ztcMode = 'naomi-pup';
+        ztcMode = 'NAOMI_PUPILL';
         %%
         % add default to the ztc parameters
         % current ztcMask 
-        ztcMask = 'naomi';
+        ztcMask = 'NAOMI_PUPILL';
         
         % number of eigen value for Zernique to command matrix 
         ztcNeigenValue = 140;
         % number of Zernique to command matrix 
         ztcNzernike = 100;
+        % 1 or 0 zeroMean for matrix inversion 
+        ztcZeroMean = 1;
+        % In witch orientation the zernike to command matrix will be
+        % computed. Changing this will change the orientation of mode over
+        % the DM. For the orienatation of Naomi Calibration bench and what
+        % SPARTA is using this should be 'xy'
+        ztcOrientation = 'xy'
         
         % number of Zernique to command matrix for the ZtP measurement
         ztpNzernike = 21;
         
-        % 1 or 0 zeroMean for matrix inversion 
-        ztcZeroMean = 1;
+       
         % the haso wafe front sensor dit at startup
         wfsDit = 2.0; % this is the min dit
          
@@ -150,7 +159,16 @@ classdef Config < handle
         %   '-x-y' : x and y axis flipped 
         %   etc ...
         % After measured by the bench this value is not used anymore
-        orientation = 'xy';
+        
+        % dmOrientation has 3 purposes
+        %   - plot purpose: in order to represent the dm commands that match
+        %    the phase 
+        %   - when computing pixel scale to know in which direction 
+        %     we need to copute the fft
+        %   - When computing miss alignment the tip and tilt must correnspond 
+        %      to what is set in rXOrder and rYOrder, rXsign, rYsign 
+        dmOrientation = 'xy';
+        
         
         dmasdasda= [39,203];
         
@@ -251,7 +269,7 @@ classdef Config < handle
         
         % the ztcMode used to compute the matrix (PtC)
         % leave empty to use default parameters
-        biasZtcMode = 'dm-pup';
+        biasZtcMode = 'DM_PUPILL';
         % zonal close loop gain used 
         biasGain = 0.6;
         % number of step in the close loop 
@@ -508,12 +526,13 @@ classdef Config < handle
 
             obj.ztcMode = mode; 
         end 
-        function [mask, nEigenValue, nZernike, zeroMean] = ZtCParameters(obj, ztcMode)
+        function [mask, nEigenValue, nZernike, zeroMean, ztcOrientation] = ztcParameters(obj, ztcMode)
           if nargin<2 || isempty(ztcMode)
             mask = obj.ztcMask
             nEigenValue = obj.ztcNeigenValue;
             nZernike = obj.ztcNzernike;
             zeroMean = obj.ztcZeroMean;
+            ztcOrientation = obj.ztcOrientation;
             return;
           end
           
@@ -534,10 +553,15 @@ classdef Config < handle
               else
                 nZernike = obj.ztcNzernike;
               end
-              if length(ztcMode)>2
+              if length(ztcMode)>3
                 zeroMean = ztcMode{4};
               else
                 zeroMean = obj.ztcZeroMean;
+              end
+              if length(ztcMode)>4
+                ztcOrientation = ztcMode{5};
+              else
+                ztcOrientation = obj.ztcOrientation;
               end
               return; 
           end
@@ -550,6 +574,7 @@ classdef Config < handle
                   nEigenValue = def{3};
                   nZernike = def{4};
                   zeroMean = def{5};
+                  ztcOrientation = def{6};
                   found = true;
               end
           end

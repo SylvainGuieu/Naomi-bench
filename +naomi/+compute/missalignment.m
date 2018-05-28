@@ -9,7 +9,7 @@ function [dX,dY,dTip,dTilt,dFoc] = missalignment(phaseArray, diameter, orientati
 	% - dFoc  : un um rms 
     
     if nargin<3
-        orientation = 'yx';    	
+        orientation = 'xy';    	
     end
     
 	

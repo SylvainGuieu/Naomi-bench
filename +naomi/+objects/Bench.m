@@ -28,7 +28,7 @@ classdef Bench < naomi.objects.BaseObject
     
     
     % measured orientation see Config for detailed
-    measuredOrientation;
+    measuredDmOrientation;
     
     
     % center of dm in pixel unit has returned by naomi.measure.missalignment
@@ -299,13 +299,13 @@ classdef Bench < naomi.objects.BaseObject
           test = ~isempty(obj.maskData);
         end
         
-        function orientation = orientation(obj)
-            % the mirror vs dm orientation has measured or configured
+        function orientation = dmOrientation(obj)
+            % NOT USE SO FAR the mirror vs dm orientation has measured or configured
             % use the isOriented method to check if it has been measured
-            orientation = obj.getMeasuredParam('measuredOrientation', 'orientation');
+            orientation = obj.getMeasuredParam('measuredDmOrientation', 'dmOrientation');
         end
         function test = isOriented(obj)
-            test = ~isempty(obj.measuredOrientation);
+            test = ~isempty(obj.measuredDmOrientation);
         end
         
         
@@ -321,7 +321,47 @@ classdef Bench < naomi.objects.BaseObject
           valueMeter = valuePixel*obj.meanPixelScale;
         end
         
-        function [mask, maskName] = getPupillMask(obj, mask)
+        function [mask, maskName,  nEigenValue, nZernike, zeroMean, ztcOrientation]  = ztcParameters(obj, ztcMode, maskUnit)
+            if nargin<3; maskUnit = 'pixel';end
+            pixelScale = 0.5 * (obj.xPixelScale + obj.yPixelScale);
+            if nargin<2 || isempty(ztcMode)
+
+                % no zernike to command configured 
+                % send it back to default 
+                [mask, nEigenValue, nZernike, zeroMean, ztcOrientation] = obj.config.ztcParameters([]);
+                [mask, maskName] = obj.getPupillMask(mask, maskUnit);
+
+            elseif strcmp(ztcMode, 'ztc')
+                    if isempty(obj.ZtCData)
+                        % no zernike to command configured 
+                        % send it back to default 
+                        obj.log('WARNING: asking for ZtC parameters but no ZtC data is configured, returning defaults');
+                        [mask, nEigenValue, nZernike, zeroMean, ztcOrientation] = obj.config.ztcParameters([]);
+                        [mask, maskName] = obj.getPupillMask(mask, maskUnit);
+                    else
+                        
+                        try
+                            [mask, maskName, nEigenValue, nZernike, zeroMean, ztcOrientation] = naomi.ztcParametersFromData(obj.ZtCData,maskUnit);
+                        catch EM
+                            % there is not enough infomation in the header to
+                            % compute the ztcParametert. Maybe an old file ?
+                            % send a warning and return config default
+                            obj.log('WARNING: cannot compute ZtC parameter from the ZtC matrix storef');
+                            obj.log(sprintf('WARNING: error is %s', EM.message));
+                            obj.log('WARNING: returning default ztc parameters');
+                            [mask, nEigenValue, nZernike, zeroMean, ztcOrientation] = obj.config. ztcParameters([]);
+                            [mask, maskName] = obj.getPupillMask(mask, maskUnit);
+
+                        end 
+                    end
+                
+            else     
+                [mask, nEigenValue, nZernike, zeroMean, ztcOrientation] = obj.config.ztcParameters(ztcMode);
+                [mask, maskName] = obj.getPupillMask(mask, maskUnit);
+            end
+            
+        end
+        function [mask, maskName] = getPupillMask(obj, mask, maskUnit)
             K = naomi.KEYS;
             if nargin<2
                 if obj.isMasked
@@ -332,12 +372,14 @@ classdef Bench < naomi.objects.BaseObject
                     centralObscurtion = obj.maskData.getKey(K.MCOBSDIAM);
                     unit = 'm';
                     maskName = obj.maskData.getKey(K.MASKNAME);
+                    mask = {pupillDiameter, centralObscurtion, unit};
                     
                 else
                     pupillDiameter = obj.nSubAperture*2;
                     centralObscurtion = 0.0;
                     unit='pix';
                     maskName = K.UNKNOWN;
+                    mask = {pupillDiameter, centralObscurtion, unit};
                 end    
             else
                 if isstr(mask) && strcmp(mask, 'ztc')
@@ -345,91 +387,23 @@ classdef Bench < naomi.objects.BaseObject
                     if isempty(obj.ZtCData)
                         error('cannot determine mask ztc because no zernike to command has been configured');
                     end
-                    pupillDiameter = obj.ZtCData.getKey(naomi.KEYS.ZTCDIAM);
-                    centralObscurtion = obj.ZtCData.getKey(naomi.KEYS.ZTCOBSDIAM);
-                    unit='m';
+                    mask = naomi.ztcParametersFromData(obj.ZtCData, 'm');
+                   
                     maskName = obj.ZtCData.getKey(naomi.KEYS.ZTCMNAME, K.UNKNOWN);
                 else
                     [mask, maskName] = obj.config.getMask(mask);
+                    
                     return ;
                 end
                 
             end
-            mask = {pupillDiameter, centralObscurtion, unit};
+            
+            if nargin>2
+                mask = naomi.convertMaskUnit(mask, maskUnit, 0.5*(obj.xPixelScale + obj.yPixelScale));
+            end
         end
         function maskName = maskName(obj)
             [~,maskName] = obj.getPupillMask;
-        end
-        
-        function [pupillDiameterPix, centralObscurtionDiameterPix] = getMaskInPixel(bench, mask)
-          mask = bench.config.getMask(mask);
-          if iscell(mask)
-            if length(mask)~=3
-              error('Mask must be a string, a 3 cell array or a matrix');
-            end
-            pupillDiameter = mask{1};
-            centralObscurtionDiameter = mask{2};
-            unit = mask{3};
-            switch unit
-              case 'm'
-                pupillDiameterPix = bench.meter2pixel(pupillDiameter);
-              	centralObscurtionDiameterPix = bench.meter2pixel(centralObscurtionDiameter);
-              case 'mm'
-                pupillDiameterPix = bench.meter2pixel(pupillDiameter/1000.);
-              	centralObscurtionDiameterPix = bench.meter2pixel(centralObscurtionDiameter/1000.);
-              case 'cm'
-                pupillDiameterPix = bench.meter2pixel(pupillDiameter/100.);
-              	centralObscurtionDiameterPix = bench.meter2pixel(centralObscurtionDiameter/100.);
-              case 'mum'
-                pupillDiameterPix = bench.meter2pixel(pupillDiameter/1e6);
-              	centralObscurtionDiameterPix = bench.meter2pixel(centralObscurtionDiameter/1e6);
-              case 'pixel'
-                pupillDiameterPix = pupillDiameter;
-                centralObscurtionDiameterPix = centralObscurtionDiameter;
-             
-              otherwise
-                error('mask unit must be on of m, mm, cm, mum or pixel')
-            end   
-          else
-            pupillDiameterPix = nan;
-            centralObscurtionDiameterPix = nan;
-          end
-        end
-        
-        
-        function [pupillDiameterMeter, centralObscurtionDiameterMeter] = getMaskInMeter(bench, mask)
-          mask = bench.config.getMask(mask);
-          if iscell(mask)
-            if length(mask)~=3
-              error('Mask must be a string, a 3 cell array or a matrix');
-            end
-            pupillDiameter = mask{1};
-            centralObscurtionDiameter = mask{2};
-            unit = mask{3};
-            switch unit
-              case 'm'
-                pupillDiameterMeter = pupillDiameter;
-              	centralObscurtionDiameterMeter = centralObscurtionDiameter;
-              case 'mm'
-                pupillDiameterMeter = pupillDiameter/1000.;
-              	centralObscurtionDiameterMeter = centralObscurtionDiameter/1000.;
-              case 'cm'
-                pupillDiameterMeter = pupillDiameter/100.;
-              	centralObscurtionDiameterMeter = centralObscurtionDiameter/100.;
-              case 'mum'
-                pupillDiameterMeter = pupillDiameter/1e6;
-              	centralObscurtionDiameterMeter = centralObscurtionDiameter/1e6;
-              case 'pixel'
-                pupillDiameterMeter = bench.pixel2meter(pupillDiameter);
-                centralObscurtionDiameterMeter = bench.pixel2meter(centralObscurtionDiameter);
-             
-              otherwise
-                error('mask unit must be on of m, mm, cm, mum or pixel')
-            end   
-          else
-            pupillDiameterMeter = nan;
-            centralObscurtionDiameterMeter = nan;
-          end
         end
         
         
@@ -803,56 +777,6 @@ classdef Bench < naomi.objects.BaseObject
           obj.productBuffer.newEntry(string(product));
         end
         
-        function value = getKey(bench, key, default)
-            % define here all the relation between bench parameters and
-            % data header keyword
-            K = naomi.KEYS;
-            switch key 
-                case K.WFSNSUB                    
-                    value = bench.nSubAperture;
-                    
-                case K.WFSNAME
-                    if bench.has('wfs')
-                        value = bench.wfs.model;
-                    else
-                        value = K.UNKNOWN_STR;
-                    end
-                    
-                case K.ZTCDIAM
-                    value = bench.getMaskInMeter(bench.config.ztcMask);
-                    
-                case K.FPUPDIAM
-                    value = bench.config.fullPupillDiameter;
-                    
-                case K.DMID
-                    if bench.has('dm')
-                        value = bench.dm.sSerialName;
-                    else
-                        value = bench.config.dmId;
-                    end
-                case K.TEMP0
-                    if bench.has('environment')
-                        value = bench.environment.getTemp(0);
-                    else
-                        value = K.UNKNOWN_FLOAT;
-                    end
-                case K.TEMP1
-                    if bench.has('environment')
-                        value = bench.environment.getTemp(1);
-                    else
-                        value = K.UNKNOWN_FLOAT;
-                    end
-                
-                
-                otherwise
-                    if nargin<2
-                        error('unknown key "%s"', key);
-                    else
-                        value = default;
-                    end
-                    
-            end
-        end
         
         
         function h = populateHeader(obj, h)
@@ -936,7 +860,7 @@ classdef Bench < naomi.objects.BaseObject
                 naomi.addToHeader(h, K.XPSCALE, obj.xPixelScale, K.XPSCALEc);
                 naomi.addToHeader(h, K.YPSCALE, obj.yPixelScale, K.YPSCALEc);
             end
-            naomi.addToHeader(h, K.ORIENT, obj.orientation, K.ORIENTc);
+            naomi.addToHeader(h, K.DMORIENT, obj.dmOrientation, K.DMORIENTc);
             
         end
     end

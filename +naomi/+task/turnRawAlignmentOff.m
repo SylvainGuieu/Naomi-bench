@@ -3,5 +3,7 @@ function  turnRawAlignmentOff(bench)
 %   Detailed explanation goes here
 global naomiGlobalBench;
 if nargin<1; bench=naomiGlobalBench;end
-    bench.wfs.haso.StopAlignmentRtd;
+    if bench.has('wfs')
+        bench.wfs.haso.StopAlignmentRtd;
+    end
 end
