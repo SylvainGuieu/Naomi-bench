@@ -115,7 +115,7 @@ classdef Config < handle
         % In witch orientation the zernike to command matrix will be
         % computed. Changing this will change the orientation of mode over
         % the DM. For the orienatation of Naomi Calibration bench and what
-        % SPARTA is using this should be '-xy'
+        % SPARTA is using this should be the saem as phaseOrientation 
         ztcOrientation = '-xy'
         
         % number of Zernique to command matrix for the ZtP measurement
@@ -174,7 +174,7 @@ classdef Config < handle
         %     we need to copute the fft (unsigned)
         %   - When computing miss alignment the tip and tilt must correnspond 
         %      to what is set in rXOrder and rYOrder, rXsign, rYsign 
-        phaseOrientation = 'xy';
+        phaseOrientation = '-xy';
         
         dmasdasda= [39,203];
         
@@ -227,13 +227,13 @@ classdef Config < handle
         % The 4 following parameters will be modified 
         % when ifMode is changed
         % default nPushPull for IF and IFM computation 
-        ifNpushPull = 1;
+        ifNpushPull = 2;
         % default Amplitude for IF and IFM computation 
-        ifAmplitude = 0.3;
+        ifAmplitude = 0.35;
         % default number of llop for IFM computation 
-        ifmNloop = 1;
+        ifmNloop = 2;
         % default pause (in sec) between actuator for IFM 
-        ifmPause = 0.0;
+        ifmPause = 1.0;
 
         %%
         % IFM cleaning parameter 
@@ -335,8 +335,8 @@ classdef Config < handle
         % Specify if the gimbal is used on the bench and motorized
         useGimbal = true;
         % Which order correspond to rX and rY motor movement tip or tilt 
-        rXOrder = 'tip';  %tip
-        rYOrder = 'tilt'; % not used just for consistancy
+        rXOrder = 'tilt';  %tip
+        rYOrder = 'tip'; % not used just for consistancy
         % Sign of rX movement regarding to zernic order 
         rXSign = 1;
         rYSign = 1;

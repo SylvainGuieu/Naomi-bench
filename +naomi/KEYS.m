@@ -132,7 +132,7 @@ classdef KEYS
         DMORIENTd = 'xy';
 
         PHASEORIENT = 'PHORIENT';
-        PHASEMORIENTc = 'Orientation of the phase';
+        PHASEORIENTc = 'Orientation of the phase';
         PHASEORIENTd = 'xy';
 
         XCENTER = 'XCENTER';
