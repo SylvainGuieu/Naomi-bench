@@ -1,9 +1,11 @@
 classdef Buffer < handle
-  properties 
-      
+    
+  properties (SetObservable)
+      index = 0;
+  end
+  properties
       buffer;
       ncol = 1;
-      index = 0;
       size;
       stepSize;
       dynamic = 0;

@@ -14,21 +14,17 @@ warning('off', 'MATLAB:subscripting:noSubscriptsSpecified');
 
 % create a new config file (it will be updated by naomiLocalConfig if exists)
 naomiGlobalConfig = naomi.newConfig();
-naomiGlobalBench = naomi.objects.Bench(naomiGlobalConfig);
+naomiGlobalBench = naomi.newBench(naomiGlobalConfig);
 % create a buffer for monitoring the temperature when the environment
 % pannel is opened. Dynamic buffer with initialy  15000 row and will
 % increase by 5000 if needed
-naomiGlobalEnvironmentBuffer = naomi.objects.EnvironmentBuffer(15000,5000, 1);
+naomiGlobalEnvironmentBuffer = naomi.newEnvironmentBuffer;
 
 % create a copy with the name bench
 bench = naomiGlobalBench;
 % make a new session after each startup ?
-% bench.newSession;
-if isempty(naomi.findGui('Naomi Startup'))
-    startupGui(bench);
-end
-movegui(naomi.findGui('Naomi Startup'), 'northwest');
-
+% bench.newSession
+naomi.task.openStartupPanel;
 if isempty(naomi.findGui('Calibration'))
     calibGui(bench);
 end

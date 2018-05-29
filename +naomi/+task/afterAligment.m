@@ -34,7 +34,10 @@ if bench.isDm
         [xScale, yScale] = naomi.measure.pixelScale(bench);
         naomi.config.pixelScale(bench, xScale, yScale);
     end
-else
+else 
+    [x, y] = naomi.measure.pupillCenter(bench); 
+    naomi.config.pupillCenter(bench, x, y);
+    
     [~, phaseReferenceData] = naomi.measure.phaseReference(bench);
     naomi.config.phaseReference(bench,phaseReferenceData);
     naomi.saveData(phaseReferenceData, bench);

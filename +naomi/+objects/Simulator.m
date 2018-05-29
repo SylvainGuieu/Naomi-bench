@@ -288,11 +288,20 @@ classdef Simulator < naomi.objects.BaseObject
         end
         
         function init(obj, axis)
-            switch axis
-                case 'rX'
-                    obj.rXMotorPosition = rXzero;
-                case 'rY'
-                    obj.rYMotorPosition = rYzero;
+            if nargin>1
+                switch axis
+                    case 'rX'
+                        obj.rXMotorPosition = obj.rXzero;
+                        pause(2);
+                    case 'rY'
+                        obj.rYMotorPosition = obj.rYzero;
+                        pause(2);
+                end
+            else
+                obj.rXMotorPosition = obj.rXzero;
+                 pause(2);
+                obj.rYMotorPosition = obj.rYzero;
+                 pause(2);
             end
         end    
     end

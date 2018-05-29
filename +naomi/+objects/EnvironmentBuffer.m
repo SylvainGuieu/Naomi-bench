@@ -13,6 +13,8 @@ classdef EnvironmentBuffer < naomi.objects.Buffer
         TEMBIANT = 10;
         HUMIDITY = 11;
         
+        environment; 
+        timer; 
     end
     methods 
         function obj = EnvironmentBuffer(bufferSize, stepSize, dynamic)
@@ -122,6 +124,7 @@ classdef EnvironmentBuffer < naomi.objects.Buffer
             % nothing and 
             %
             % if environment object is note connected do nothing silently
+            
             if ~e.isConnected
                 return 
             end
@@ -142,5 +145,34 @@ classdef EnvironmentBuffer < naomi.objects.Buffer
             obj.buffer(i, obj.CURRENT) = e.current; 
             obj.buffer(i, obj.HUMIDITY) = e.humidity;                 
         end
+        function updateForTimer(obj, varargin)
+            if isempty(obj.environment)
+                error('cannot update buffer missing environment object');
+            end
+            obj.update(obj.environment);
+        end
+        function stopTimer(obj)
+            if isempty(obj.timer); return ; end
+            if isvalid(obj.timer)
+                if strcmp(get(obj.timer, 'Running'), 'on')
+                    stop(obj.timer);
+                end
+            end
+            delete(obj.timer);
+            obj.timer = []; 
+        end
+        function startTimer(obj, environment, dTime)
+            if nargin<3; dTime=5; end
+            
+            obj.stopTimer; 
+            obj.environment = environment; 
+            app.timer = timer('Period',dTime,...
+                'ExecutionMode', 'fixedSpacing', ...
+                'TasksToExecute', Inf);
+            app.timer.TimerFcn = @obj.updateForTimer;
+            start(app.timer);
+            
+        end
+        
     end
 end

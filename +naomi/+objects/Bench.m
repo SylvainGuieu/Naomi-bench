@@ -2,7 +2,7 @@ classdef Bench < naomi.objects.BaseObject
     %  Bench object contain all the subsystem of naomi calibration bench 
     %  this is the uniue interface for all the measurement function.
 
-    properties
+    properties (SetObservable)
     config; % configuration object all the configuration goes here 
     wfs; % wavefront sensor object 
     dm;  % dm object 
@@ -14,6 +14,7 @@ classdef Bench < naomi.objects.BaseObject
     subsystems = {'config', 'wfs', 'dm', 'environment', 'gimbal', 'autocol'};
     
     logBuffer; % initialized at startup 
+    logCounter = 0; % used by any listener
     productBuffer;
     
     % processes is a containers.Map object. It is used to check if a process
@@ -34,17 +35,6 @@ classdef Bench < naomi.objects.BaseObject
     % measured orientation see Config for detailed
     measuredDmOrientation;
     
-    
-    % center of dm in pixel unit has returned by naomi.measure.missalignment
-    % unit is meters [m]
-    dX;
-    dY;
-    % delta tip and tilt has returned by naomi.measure.missalignment
-    % unit are um rms 
-    dTip; 
-    dTilt;
-    dFocus;
-
     % center of dm in pixel unit. This is the central actuator position 
     % as returned by naomi.measure.IFC
     measuredXcenter;
@@ -724,6 +714,22 @@ classdef Bench < naomi.objects.BaseObject
             end
             obj.log('NOTICE: Gimbal Started', 1);
         end
+        function initGimbal(obj)
+           if ~obj.has('gimbal')
+               error('Gimbal Init requested, but gimbal is off'); 
+           end
+           obj.registerProcess(naomi.KEYS.P_INITGIMBAL);
+           obj.log('NOTICE: starting gimbal motor init, can take some time ...'); 
+           
+           try
+            obj.gimbal.init;
+           catch EM
+             obj.killProcess(naomi.KEYS.P_INITGIMBAL);
+             obj.log('ERROR: gimbal motor init failed'); 
+             rethrow(EM);
+           end
+           obj.log('NOTICE: gimbal motor init finished'); 
+        end
         function stopGimbal(obj)
             obj.log('NOTICE: Stopping Gimbal ...', 1);
             obj.gimbal = [];
@@ -739,17 +745,20 @@ classdef Bench < naomi.objects.BaseObject
             end
             obj.log('NOTICE: Environment Started', 1);
         end
+        
         function stopEnvironment(obj)
           obj.log('NOTICE: Stopping Environment ...', 1);
           if obj.has('environment'); obj.environment.disconnect; end
 			     obj.environment = [];  
           obj.log('NOTICE: Environment Stopped', 1);
         end
+        
         function startSimulator(obj)
             obj.log('NOTICE: Starting Simulator ...', 1);
             if ~obj.has('simulator'); obj.simulator = naomi.newSimulator(obj.config); end  
             obj.log('NOTICE: Simulator Started', 1);
         end
+        
         function check = checkPhase(obj, phase)
             % Check the integrity of a phase screen
             check = 1;
@@ -760,6 +769,7 @@ classdef Bench < naomi.objects.BaseObject
                 end
             end
         end
+        
         function check = checkFlux(obj, flux)
            % return 1 is flux is enough to work with (but not necessarly optimum) 
            % flux can be given or measured 
@@ -784,6 +794,7 @@ classdef Bench < naomi.objects.BaseObject
             obj.logBuffer.newEntry(string(sprintf('%s %s',date, txt)));
             fprintf('%s %s\n',date, txt);
           end
+          obj.logCounter = obj.logBuffer.index;
         end
         
         function logProduct(obj, product)
@@ -791,8 +802,6 @@ classdef Bench < naomi.objects.BaseObject
           %   the input string is the product path 
           obj.productBuffer.newEntry(string(product));
         end
-        
-        
         
         function h = populateHeader(obj, h)
             % populate a generic fits header for all files a maximum of

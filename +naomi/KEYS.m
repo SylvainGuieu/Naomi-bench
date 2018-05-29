@@ -370,12 +370,17 @@ classdef KEYS
        
        
        %% define names of GUIs here 
+       % Must match the UIFigure Name defined in the gui
        G_STARTUP = 'Naomi Startup';
        G_ALIGNMENT = 'Naomi Alignment';
-       G_CALIB = 'Naomi Calibration';
+       G_CALIB = 'Calibration';
        G_IFM_MEASUREMENT = 'Naomi IFM Measurement';
        G_MAIN = 'Naomi Engeneering';
        G_ENVIRONMENT = 'Naomi Environment Control';
+       
+       %% define some process name 
+       P_INITGIMBAL = 'Init Gimbal'; 
+       
     end
 end
 
