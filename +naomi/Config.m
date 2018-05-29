@@ -5,9 +5,14 @@ classdef Config < handle
     properties
         verbose = 2; % verbose level for NAOMI measurement/action/config ... 
         plotVerbose = true; % standalone plot are ploted or not when doing measurement 
-        % turn on/off the simulator 
-        simulated = 0;
         
+        %% SIMULATOR 
+        %turn on/off the simulator 
+        simulated = 0;
+        simulatorIFM = 'E:\Config\Bench\Simulator\IFM_2018-05-29T13-26-43.fits'; 
+        simulatorZtC = []; % made on the fly
+        simulatorBias = 'E:\Config\Bench\Simulator\DM_BIAS_2018-05-29T13-26-43.fits';
+        simulatorTurbu = 'E:\Config\Bench\Simulator\turbu.fits';
         
         % software version. This is writen in the fits files to eventualy check one
         % day for uncompatibilities 

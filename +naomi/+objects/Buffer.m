@@ -1,7 +1,7 @@
 classdef Buffer < handle
     
   properties (SetObservable)
-      index = 0;
+      updateCounter = 0;
   end
   properties
       buffer;
@@ -10,6 +10,7 @@ classdef Buffer < handle
       stepSize;
       dynamic = 0;
       arrayType;
+      index = 0;
   end
   methods 
       function obj = Buffer(ncol, bufferSize, stepSize, dynamic, arrayType)

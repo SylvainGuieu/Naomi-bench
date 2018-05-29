@@ -9,7 +9,7 @@ classdef Simulator < naomi.objects.BaseObject
         biasVector % the bias vector name as aco 
         turbuArray; % tubulances array must be ntubu x nSub x nSub array 
         turbuIndex =1;
-        
+        simuOrientation = '-xy';
         zernike2Command; % the matrix name as aco 
         ZtPtheoricArray;
         PtZtheoricArray
@@ -217,7 +217,7 @@ classdef Simulator < naomi.objects.BaseObject
            if isempty(obj.zernike2Command)
                 
                cleanIFMArray = naomi.compute.cleanIFM(IFM, obj.ifmNexclude, obj.ifmCleanPercentil); 
-               [~,ZtC,~] = naomi.compute.commandMatrix(IFM, obj.xCenter, obj.yCenter, obj.fullPupillDiameter/obj.pixelScale, 0.0, obj.ztcNeigenValue, obj.ztcNzernike, 1);
+               [~,ZtC,~] = naomi.compute.commandMatrix(cleanIFMArray, obj.xCenter, obj.yCenter, obj.fullPupillDiameter/obj.pixelScale, 0.0, obj.ztcNeigenValue, obj.ztcNzernike, 1, obj.simuOrientation);
                if isempty(obj.zernike2Command)
                 obj.zernike2Command = ZtC;         
                end

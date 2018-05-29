@@ -143,9 +143,12 @@ classdef EnvironmentBuffer < naomi.objects.Buffer
             obj.buffer(i, obj.FANIN) = e.fanIn;
             obj.buffer(i, obj.FANOUT) = e.fanOut;
             obj.buffer(i, obj.CURRENT) = e.current; 
-            obj.buffer(i, obj.HUMIDITY) = e.humidity;                 
+            obj.buffer(i, obj.HUMIDITY) = e.humidity;    
+            
+            obj.updateCounter = obj.updateCounter + 1;
         end
         function updateForTimer(obj, varargin)
+            
             if isempty(obj.environment)
                 error('cannot update buffer missing environment object');
             end
@@ -166,13 +169,15 @@ classdef EnvironmentBuffer < naomi.objects.Buffer
             
             obj.stopTimer; 
             obj.environment = environment; 
-            app.timer = timer('Period',dTime,...
+            obj.timer = timer('Period',dTime,...
                 'ExecutionMode', 'fixedSpacing', ...
                 'TasksToExecute', Inf);
-            app.timer.TimerFcn = @obj.updateForTimer;
-            start(app.timer);
+            obj.timer.TimerFcn = @obj.updateForTimer;
+            start(obj.timer);
             
         end
-        
+        function delete(obj)
+            obj.stopTimer;
+        end
     end
 end
