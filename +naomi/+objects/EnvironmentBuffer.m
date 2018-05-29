@@ -101,6 +101,8 @@ classdef EnvironmentBuffer < naomi.objects.Buffer
             
             plot(axesList{3}, time, obj.get('tempMirror'), 'r-', 'DisplayName', 'mirror');
             plot(axesList{3}, time, obj.get('tempQSM'), 'r:', 'DisplayName', 'qsm');
+            
+            
             legend(axesList{3}, 'Location','southwest');
             legend(axesList{3}, 'boxoff');
             

@@ -1,4 +1,4 @@
-function [ZtPArray,PtZArray] = theoriticalZtP(nSub,x0,y0,diamPix, centralObscurationPix, nZernike, orientation)
+function [ZtPArray,PtZArray] = theoriticalZtP(nSub,x0,y0,diamPix, centralObscurationPix, nZernike, orientation, angle)
 % theoriticalZtP  Theoretical phase screen for N zernike modes
 %
 %   [ZtPArray,PtZArray] = compute.theoriticalZtP(nSub,x0,y0, diamPix,centralObscurationPix, nZernike, orientation)
@@ -23,13 +23,14 @@ function [ZtPArray,PtZArray] = theoriticalZtP(nSub,x0,y0,diamPix, centralObscura
 if nargin<7
     orientation = 'xy';
 end
+if nargin<8; angle = 0.0; end
 
 mask = naomi.compute.pupillMask(nSub, diamPix, centralObscurationPix, x0, y0);
 
 [X,Y] = meshgrid(1:nSub,1:nSub); 
 % Radius
 [theta,r] = cart2pol(double(X-x0)/double(diamPix/2),double(Y-y0)/double(diamPix/2));
-[theta,r] = naomi.compute.orientPolar(theta, r, orientation);
+[theta,r] = naomi.compute.orientPolar(theta, r, orientation, angle);
 
 mask(r>1.0) = 0;
 mask(r<0.0) = 0;

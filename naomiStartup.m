@@ -22,8 +22,8 @@ naomiGlobalEnvironmentBuffer = naomi.objects.EnvironmentBuffer(15000,5000, 1);
 
 % create a copy with the name bench
 bench = naomiGlobalBench;
-% make a new session after each startup
-bench.newSession;
+% make a new session after each startup ?
+% bench.newSession;
 if isempty(naomi.findGui('Naomi Startup'))
     startupGui(bench);
 end

@@ -4,7 +4,7 @@ classdef WfsHASO128 < naomi.objects.Wfs
         nSubAperture = 128;
         % empty the buffer before measuring the phase
         % by this number 
-        nGetImageBeforePhase = 3;
+        nGetImageBeforePhase = 4;
         % pause before measuring the phase (after emptying the buffer)
         pause = 0.1;
         % if true the phase is rotated by 90 degree

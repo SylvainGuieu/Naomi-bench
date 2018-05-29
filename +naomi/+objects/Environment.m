@@ -222,7 +222,7 @@ classdef Environment < naomi.objects.BaseObject
         
         % temperature difference forwhich it is acceptable to start calibration
         % abs(e.getTemp(e.MIROR)-e.calibTemperature) < e.calibDeltaTemp               
-        calibDeltaTemp = 0.25 % +/- x 
+        calibDeltaTemp = 0.5 % +/- x 
         
         %% Temperature
         % When cooling down (or warming up, depend of the embient temperature)
@@ -238,7 +238,7 @@ classdef Environment < naomi.objects.BaseObject
         
         % in the same way, To set the regulation temperature the formulae
         % is Tregul = Tcalib - (Tembiant - Tcalib) * correctiveFactor
-        maintainCorrectiveFactor = 0.0; 
+        maintainCorrectiveFactor = 0.2; 
         
         % also when doing a clibration (= fan off) the factor can be set 
         % Tregul = Tcalib - (Tembiant - Tcalib) * correctiveFactor

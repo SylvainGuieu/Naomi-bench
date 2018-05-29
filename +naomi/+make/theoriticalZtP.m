@@ -15,7 +15,7 @@ function [ZtPArray,PtZArray] = theoriticalZtP(bench, ztcMode, maskCenter, nZerni
     if nargin<4 || isempty(nZernike)
         nZernike = bench.nZernike;
     end
-    [mask, ~,  ~, ~, ~, orientation] = bench.config.ztcParameters(ztcMode, 'pixel');
+    [mask, ~,  ~, ~, ~, orientation] = bench.ztcParameters(ztcMode, 'pixel');
     pupillDiameterPix = mask{1};
     centralObscurationPix = mask{2};
 	[ZtPArray,PtZArray] = naomi.compute.theoriticalZtP(nSubAperture,x0,y0, pupillDiameterPix, centralObscurationPix, nZernike, orientation);

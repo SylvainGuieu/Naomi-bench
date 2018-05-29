@@ -40,6 +40,10 @@ function strokeData = stroke(bench,zernikeMode,amplitudeVector)
          {K.ZERN,  zernikeMode, K.ZERNc},...
          {K.DPRVER, naomi.compute.zernikeInfo(zernikeMode), K.DPRVERc}};
     strokeData = naomi.data.StrokePhaseCube(allPhiArray, h);
+    if ~isempty(bench.ZtCData)
+        naomi.copyHeaderKeys(bench.ZtCData, strokeData, naomi.ztcKeyList);
+        naomi.copyHeaderKeys(bench.ZtCData, strokeData, naomi.ifmKeyList);
+    end
 	bench.populateHeader(strokeData);
     strokeData.dmCommandArray = allCmdArray;
     strokeData.biasVector = bench.biasVector;

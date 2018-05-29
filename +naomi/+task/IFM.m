@@ -45,6 +45,7 @@ IFMData = naomi.measure.IFM(bench);
 % save the start date as the DATEOB this allows to make sure that 
 % all the derived product will have the same file name time stamp (same 'ob') 
 IFMData.setKey(naomi.KEYS.DATEOB, startDate, naomi.KEYS.DATEOBc);
+
 naomi.task.afterIFM(bench, IFMData);
 end
 
