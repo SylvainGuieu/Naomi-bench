@@ -68,7 +68,13 @@ classdef Config < handle
         % not the one used for ZtC (see bellow)  
         fullPupillDiameter = 36.5e-3;
         
-        
+        % CRITICAL On top of 'ZTCOrientation' which is  more a choice of Zernike to
+        % command orientation, one can add an ofset angle which correspond
+        % of a missalignment of the dm over the wfs. Here is the default, the dmAngle 
+        % can also be overwriten by the bench when measuring it
+        % (naomi.measure.dmAngle). 
+        % angle in radiant 
+        dmAngle = 0.0;
         
         
         % define typical mask here in naomi, mask can be called by their name

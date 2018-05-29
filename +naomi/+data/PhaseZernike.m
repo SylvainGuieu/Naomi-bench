@@ -23,7 +23,7 @@ classdef PhaseZernike < naomi.data.Phase
 %             xlim(axes, [1,nSubAperture]);
 %             ylim(axes, [1,nSubAperture]);
            
-            zernike = obj.getKey(naomi.KEYS.ZERN,-1); 	
+            zernike = obj.getKey(naomi.KEYS.ZERN,-99); 	
             ttl = sprintf('Zernike %d, rms=%.3fum ptv=%.3fum', zernike, obj.std, obj.ptv);
             
             title(axes,ttl);

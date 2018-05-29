@@ -35,7 +35,7 @@ function [phaseArray, phaseData] = phase(bench, nPhase, filterTipTilt, substract
         if useMask
             rawPhaseArray(~maskArray) = NaN;
             if ~bench.checkPhase(rawPhaseArray)
-                bench.log('WARNING: Invalid sup-appertures inside the mask !!', 3);
+                bench.log('WARNING: Invalid sup-appertures inside the mask !!', 2);
             end
         end
 
@@ -48,7 +48,7 @@ function [phaseArray, phaseData] = phase(bench, nPhase, filterTipTilt, substract
 
 
     % Remove the reference
-  if substractReference
+    if substractReference
 	    phaseArray = phaseArray - bench.phaseReferenceArray;
 	end
 	% Remove the tip tilt if needed

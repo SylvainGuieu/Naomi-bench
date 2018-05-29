@@ -134,7 +134,11 @@ classdef KEYS
         PHASEORIENT = 'PHORIENT';
         PHASEORIENTc = 'Orientation of the phase';
         PHASEORIENTd = 'xy';
-
+        
+        DMANGLE = 'DMANGLE'
+        DMANGLEc = '[rad] angle between wfs and dm measured or configured';
+        DMANGLEd = 0.0;
+        
         XCENTER = 'XCENTER';
         XCENTERc = '[pix] X central actuator position';
         XCENTERd = 64;

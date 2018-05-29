@@ -26,6 +26,10 @@ classdef Bench < naomi.objects.BaseObject
     measuredXpixelScale;
     measuredYpixelScale;
     
+    % the dm offset angle as measured by measure.dmAngle.
+    % it is used when computing the zernike modes on top of the
+    % given ztcOrientation parameter
+    measuredDmAngle;
     
     % measured orientation see Config for detailed
     measuredDmOrientation;
@@ -251,6 +255,17 @@ classdef Bench < naomi.objects.BaseObject
         function test = isScaled(obj)
             % check if the pixel scale has been measured or not 
             test = ~isempty(obj.measuredXpixelScale);
+        end
+        
+        function dmAngle = dmAngle(obj)
+            % measured or configured dmAngle
+            % the angle offset between dm and wfs (on top of orientation)
+            % use isDmAngleMeasured method to check if the value has been measured
+            dmAngle = obj.getMeasuredParam('measuredDmAngle', 'dmAngle');
+        end
+        function test = isDmAngleMeasured(obj)
+            % check if the dmAngle has been measured or not 
+            test = ~isempty(obj.measuredDmAngle);
         end
         
         function xCenter = xCenter(obj)
@@ -862,6 +877,7 @@ classdef Bench < naomi.objects.BaseObject
             end
             naomi.addToHeader(h, K.DMORIENT, obj.dmOrientation, K.DMORIENTc);
             naomi.addToHeader(h, K.PHASEORIENT, obj.config.phaseOrientation, K.PHASEORIENTc);
+            naomi.addToHeader(h, K.DMANGLE, obj.dmAngle, K.DMANGLEc);
             
         end
     end

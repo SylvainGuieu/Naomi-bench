@@ -4,7 +4,7 @@ function [theta,r] = orientPolar(theta, r, orientation, angle)
 if nargin<4; angle= 0.0; end
 switch orientation
     case 'xy'
-        theta = theata + angle;
+        theta = theta + angle;
     case '-xy'
         theta = -theta + pi + angle;
     case '-x-y'
