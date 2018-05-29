@@ -7,10 +7,7 @@ classdef Config < handle
         plotVerbose = true; % standalone plot are ploted or not when doing measurement 
         % turn on/off the simulator 
         simulated = 0;
-        simulatorIFM = '/Users/guieus/DATA/NAOMI/IFM_direct.fits';
-        simulatorZtC = '/Users/guieus/DATA/NAOMI/NTC_2018-04-03T11-19-30.fits';
-        simulatorBias;
-        simulatorTurbu = '/Users/guieus/DATA/NAOMI/turbu.fits';
+        
         
         % software version. This is writen in the fits files to eventualy check one
         % day for uncompatibilities 
@@ -22,8 +19,8 @@ classdef Config < handle
         % default tplName as writen in data header products 'TPL_NAME'
         tplName = 'TEST';
 
-        dataDirectory = 'N:\Bench\Data';
-        configDirectory = 'N:\Bench\Config';
+        dataDirectory = 'E:\Data';
+        configDirectory = 'E:\Config\Bench';
         % the session name is not mendatory to set here
         % it will be created on the fly when the mirror is selected
         % the sessionDirectory will be cataDirectory/yyy-mm-dd/sessionName
@@ -358,7 +355,7 @@ classdef Config < handle
         gimbalsDef =   {{1,14.5,15.7, 3300, 5000},...
                         {2,14.5,15.7, 3300, 5000},...
                         {3,14.5,15.7, 3300, 5000},...
-                        {4,14.4405,15.8042, 3300, 5000},...%measure @ipag with wave view
+                        {4,14.2288,15.6511, 3300, 5000},...%measure @ipag with wave view
                         {5,14.5,15.7, 3300, 5000}
                        };
         % these parameters are modified when the gimbalNumber is set 
