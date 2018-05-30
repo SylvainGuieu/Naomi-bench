@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="author" content="Sylvain Guieu">
+  <title>Overview of Naomi Bench Software</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href="/Users/guieus/src/pandoc.css">
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header>
+<h1 class="title">Overview of Naomi Bench Software</h1>
+<p class="author">Sylvain Guieu</p>
+</header>
+<h1 id="introduction">Introduction</h1>
+<p>The goal of the Naomi Calibration Bench Software (NCBS) is to offer a simple way to calibrate the DM mirror interaction matrix and the DM BIAS used by Sparta. The software should handle:</p>
+<ul>
+<li>The mirror alignment</li>
+<li>The control of the temperature inside the calibration climatic chamber</li>
+<li>An automatised calibration process followed by several check on the integrity of the calibration products</li>
+<li>The creation of a report showing all the quality check (QC) parameters, key results and key figures to control the good health of the DM and the quality of the newly created interaction matrix.</li>
+</ul>
+<p>On top of that the software has been layered in order to provide both basic actions with the DM and adaptative optics operation and more advanced tasks and an efficient user interface. The law level core of the software is based on the <a href="https://www.alpao.com/adaptive-optics/ao-softwares.html">ACE</a> Matlab software (furnished by Alpao). The ALPAO <a href="https://www.alpao.com/adaptive-optics/ao-softwares.html">ACE</a> software allows to communicate with the DM, with the Haso wave front sensor and to compute matrix inversion. The <a href="https://www.alpao.com/adaptive-optics/ao-softwares.html">ACE</a> drove our choice to build the NCBS with Matlab.</p>
+<h1 id="architecture">Architecture</h1>
+<p>The architecture of the NCBS was driven, on top on the core tasks exposed above, by several ideas</p>
+<ul>
+<li>Provide low level function independent of Naomi environment, e.g. function to make interaction matrix from an Influance Matrix function, to clean Tip/Tilt from an phase screen array etc. These function takes as many input argument has necessary.</li>
+<li>Offline analyses. The ability to analyse raw data, to (re)build intermediate data, makes plot, report etc without the need to have the bench started (DM, wave front, etc …). The data produced and recorded on disk (fits file) must have all the necessary information for off line analysis (environment parameters, measurement configuration, alignment parameters, etc…).</li>
+<li>Build high level functions to make complex tasks with the DM with a very few number of arguments. Such tasks are, for instance, Influence Matrix measurement, Closing loop, etc… Arguments are included in a bench configuration object.</li>
+</ul>
+<p>The figure bellow shows the global structure of the bench. The blues boxes are the control command objects, the red boxes are modules (containing a set of function). The green box represent data which can be Matlab value or array or <code>naomi.data</code> objects. These object contain data, keywords and limited methods to plot and analyse the data its contain.</p>
+<figure>
+<img src="img/NCBS_architecture.png" alt="NCBS architecture" /><figcaption>NCBS architecture</figcaption>
+</figure>
+</body>
+</html>
