@@ -1,9 +1,9 @@
-function  success = bias(bench, data_or_file)
-    % isConfigured = config.bias(bench) do nothing return true if configured
-    % config.bias(bench)   a gui ask the user to fetch a file
-	% config.bias(bench, filePath) load a IF file as bias 
-	% config.bias(bench, dmBiasData)   the bias data object is configured
-	% config.bias(bench, [])  remove the configured bias if any
+function  success = dmBias(bench, data_or_file)
+    % isConfigured = config.dmBias(bench) do nothing return true if configured
+    % config.dmBias(bench)   a gui ask the user to fetch a file
+	% config.dmBias(bench, filePath) load a IF file as bias 
+	% config.dmBias(bench, dmBiasData)   the bias data object is configured
+	% config.dmBias(bench, [])  remove the configured bias if any
 	%
 	success = false;
 	if nargin<2

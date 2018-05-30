@@ -283,11 +283,11 @@ classdef Config < handle
         
         % the ztcMode used to compute the matrix (PtC)
         % leave empty to use default parameters
-        biasZtcMode = 'DM_PUPILL';
+        dmBiasZtcMode = 'DM_PUPILL';
         % zonal close loop gain used 
-        biasGain = 0.6;
+        dmBiasGain = 0.6;
         % number of step in the close loop 
-        biasNstep = 10;
+        dmBiasNstep = 10;
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %

@@ -8,7 +8,7 @@ if ~bench.has('environment')
     return            
 else
 if isempty(naomi.findGui('Environment'))
-    environmentControlGui(bench.environment);
+    naomi.gui.environmentControlGui(bench.environment);
 end
 end
 

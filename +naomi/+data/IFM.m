@@ -205,7 +205,7 @@ classdef IFM < naomi.data.PhaseCube
         end
         
         function gui(obj)
-            ifmExplorerGui(obj);
+            naomi.gui.ifmExplorerGui(obj);
         end
     end
 end

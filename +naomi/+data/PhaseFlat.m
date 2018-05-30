@@ -18,10 +18,15 @@ classdef PhaseFlat < naomi.data.Phase
             xlim(axes, [1,nSubAperture]);
             ylim(axes, [1,nSubAperture]);
             
-            
-            tit = 'Flat';
-            	
-            title(axes, {tit,...
+						K = naomi.KEYS;
+            switch obj.getKey(K.LOOP, K.OPENED)
+						case K.OPENED
+            	 ttl = 'Open Loop Flat';
+            otherwise
+            	 ttl = 'Close Loop Flat';
+            end	
+                        	
+            title(axes, {ttl,...
                    sprintf('rms=%.3fum ptv=%.3fum',...
                    naomi.compute.nanstd(phase(:)),...
                    max(phase(:)) - min(phase(:)))});

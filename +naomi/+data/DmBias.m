@@ -55,7 +55,7 @@ classdef DmBias < naomi.data.DmCommand
             %naomi.plot.phaseAxesLabel(axes, orientation);
         end
         function gui(obj)
-            dmBiasExplorerGui(obj);
+            naomi.gui.dmBiasExplorerGui(obj);
         end
  	end
 end

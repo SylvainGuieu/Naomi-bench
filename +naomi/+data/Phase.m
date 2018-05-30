@@ -231,7 +231,7 @@ classdef Phase < naomi.data.BaseData
         end
         
         function gui(obj)
-            phaseExplorerGui(obj);
+            naomi.gui.phaseExplorerGui(obj);
         end
     end
 end

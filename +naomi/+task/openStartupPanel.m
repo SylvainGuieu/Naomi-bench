@@ -5,7 +5,7 @@ global naomiGlobalBench;
 if nargin<1; bench=naomiGlobalBench;end
 
 if isempty(naomi.findGui(naomi.KEYS.G_STARTUP))
-    startupGui(bench);
+    naomi.gui.startupGui(bench);
     movegui(naomi.findGui(naomi.KEYS.G_STARTUP), 'northwest');
 end
 

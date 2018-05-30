@@ -4,7 +4,7 @@ global naomiGlobalBench;
 if nargin<1; bench=naomiGlobalBench;end
 
 if isempty(naomi.findGui(naomi.KEYS.G_CALIB))
-    calibGui(bench);
+    naomi.gui.calibGui(bench);
     movegui(naomi.findGui(naomi.KEYS.G_CALIB), 'north');
 end
 end

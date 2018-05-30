@@ -98,7 +98,7 @@ classdef ZtC < naomi.data.BaseData
         end
         
         function gui(obj)
-            ztcExplorerGui(obj);
+            naomi.gui.ztcExplorerGui(obj);
         end
  	end
 end

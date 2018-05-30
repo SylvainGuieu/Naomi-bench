@@ -170,7 +170,7 @@ classdef ZtP < naomi.data.PhaseCube
 			end	
         end
         function gui(obj)
-            ztpExplorerGui(obj)
+            naomi.gui.ztpExplorerGui(obj)
         end
  	end
 end

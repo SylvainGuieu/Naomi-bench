@@ -25,7 +25,4 @@ bench = naomiGlobalBench;
 % make a new session after each startup ?
 % bench.newSession
 naomi.task.openStartupPanel;
-if isempty(naomi.findGui('Calibration'))
-    calibGui(bench);
-end
-movegui(naomi.findGui('Calibration'), 'north');
+naomi.task.openCalibrationPanel;
