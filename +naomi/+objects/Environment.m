@@ -554,7 +554,7 @@ classdef Environment < naomi.objects.BaseObject
             %  - switch from goToEmbiant to off if embiant temperature reached 
             % additional arguments are for timer callback but will be ignored
             state = obj.controlState;
-            fprintf('tick');
+            
             temp = obj.getTemp(obj.S_MIRROR); % temperature of the mirror
             regulTemp = obj.tempRegul;
             embiantTemp = obj.getTemp(obj.S_EMBIANT);

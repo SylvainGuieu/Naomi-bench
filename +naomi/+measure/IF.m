@@ -44,7 +44,12 @@ function [IFArray,IFData] = IF(bench,  act, varargin)
         IFArray = naomi.measure.phase(bench,1);
         %naomi.action.cmdZonal(bench, act, ref);
     end
-   	 
+   	if bench.config.plotVerbose
+       naomi.plot.figure('IF');
+       imagesc(IFArray);
+       colorbar; 
+       title(sprintf('IF %d rms=%.3f', act, naomi.compute.nanstd(IFArray(:))));
+    end
     if nargout>1
         K = naomi.KEYS;
         tplName = naomi.getParameter([], P, 'tplName', [], K.TPLNAMEd);

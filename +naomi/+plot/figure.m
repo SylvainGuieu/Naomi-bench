@@ -29,6 +29,8 @@ function fig = figure(name, bringFront)
                     set(fig, 'Position', [1525 231 392 336]);
                 case 'Last Phase'
                      set(fig, 'Position', [1521 652 396 344]);
+                 case 'IF'
+                     set(fig, 'Position', [1128 654 392 342]); 
                 case 'ZtP QC'
                      set(fig, 'Position', [1164 131 560 854]);
                 case 'ZtP QC Mode'

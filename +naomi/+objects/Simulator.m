@@ -54,7 +54,8 @@ classdef Simulator < naomi.objects.BaseObject
         pause = 0.2;
         
         simuDmActuatorSeparation = 0.0025;
-
+        
+        model = 'simu';
         
     end
     
@@ -294,7 +295,12 @@ classdef Simulator < naomi.objects.BaseObject
                 obj.rYMotorPosition = obj.rYzero;
                  pause(2);
             end
-        end    
+        end
+        function populateHeader(obj,h)
+          K = naomi.KEYS;
+          naomi.addToHeader(h, K.WFSNSUB, obj.nSubAperture, K.WFSNSUBc);
+          naomi.addToHeader(h, K.WFSNAME, obj.model, K.WFSNAMEc);
+        end
     end
 end
 

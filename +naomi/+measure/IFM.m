@@ -100,9 +100,10 @@ function [IFMData, IFMcleanData] = IFM(bench, varargin) %callback, nPushPull, nL
     end
     bench.killProcess('IFM');
 		bench.log(sprintf('NOTICE: IFM measurement for DM %s finished', bench.dmId),1);
+        K = naomi.KEYS;
 		dateOb = naomi.getParameter([], P, 'dateOb', [], now);
         tplName = naomi.getParameter([], P, 'tplName', [], K.TPLNAMEd);
-		K = naomi.KEYS;
+		
 		h = {{K.MJDOBS ,mjd, K.MJDOBSc},  ...
              {K.DATEOB, dateOb, K.DATEOBc}, ...
              {K.TPLNAME, tplName, K.TPLNAMEc}, ...

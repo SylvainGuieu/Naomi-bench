@@ -393,7 +393,7 @@ classdef Bench < naomi.objects.BaseObject
                     if isempty(obj.ZtCData)
                         error('cannot determine mask ztc because no zernike to command has been configured');
                     end
-                    mask = naomi.ztcParametersFromData(obj.ZtCData, 'm');
+                    mask = naomi.getFromData.ztcParameters(obj.ZtCData, 'm');
                    
                     maskName = obj.ZtCData.getKey(naomi.KEYS.ZTCMNAME, K.UNKNOWN);
                 else
@@ -808,7 +808,7 @@ classdef Bench < naomi.objects.BaseObject
             % catch a maximum of Error to avoid that files writing fail
             if obj.has('wfs');
               try
-                obj.wfs.populateHeader(h);
+                  obj.wfs.populateHeader(h);
               catch err
                 obj.log('WARNING: problem when populating error from wfs');
                 disp(getReport(err,'extended'));

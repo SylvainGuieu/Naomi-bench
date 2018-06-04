@@ -15,7 +15,6 @@ global naomiGlobalBench
 if nargin<1 || isempty(bench); bench = naomiGlobalBench; end
 if nargin<2; force=0; end
 naomi.task.IFM(bench, force);
-naomi.task.ZtC(bench);
-naomi.task.dmBias(bench);
+naomi.task.ztcAndDmBias(bench);
 end
 
