@@ -160,11 +160,16 @@ classdef KEYS
         % these are normaly not writen in header but allow user to modify 
         % the centering and pupill size on the fly
         XOFFSET = 'XOFFSET';
-        XOFFSETc = 'User offset in subpupill of the active pupill '
+        XOFFSETc = 'User offset in subpupill of the active pupill. Should not appear in fits file'
         YOFFSET = 'YOFFSET';
-        YOFFSETc = 'User offset in subpupill of the active pupill '
+        YOFFSETc = 'User offset in subpupill of the active pupill. Should not apprear in fits file'
         DIAMRESC = 'DIAMRESC'; 
         DIAMRESCc = 'Active pupill diameter rescale factor';
+        DMANGLEOFFSET = 'DMAOFFSE';
+        DMANGLEOFFSETc = 'User offset of the DM angle. Should not appear in fits file';
+        
+        PIXSCALEFACTOR = 'PSCALEFA'
+        PIXSCALEFACTORc = 'User pixel scale factor. Should not appear in fits file';
         
         XPSCALE = 'XPSCALE';
         XPSCALEc = '[m/pix] X pixel scale';

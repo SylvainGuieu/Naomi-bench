@@ -1,7 +1,7 @@
-function [IFMData, IFMcleanData] = IFM(bench, callback, nPushPull, nLoop, amplitude, ifPause)
+function [IFMData, IFMcleanData] = IFM(bench, varargin) %callback, nPushPull, nLoop, amplitude, ifmPause)
 %   measure.IFM  Get the Influence Function of all actuators 
 % 
-%   IFM = measure.IFM(bench, nPushPull, nLoop, amplitude, ifPause)
+%   IFM = measure.IFM(bench, nPushPull, nLoop, amplitude, ifmPause)
 %
 %   The requested actuator is push-pulled and the difference
 %   is returned as its influence function. The amplitude is reversed
@@ -13,7 +13,7 @@ function [IFMData, IFMcleanData] = IFM(bench, callback, nPushPull, nLoop, amplit
 %   nPushPull: number of push-pull
 %   nLoop: Number of loop across actuator (recommended 2)
 %   amplitude: amplitude of the push-pull
-%   ifPause: pause before starting next actuator
+%   ifmPause: pause before starting next actuator
 % 
 %   IFMData : the influence functions data object
 %   IFMCleanData : the cleaned influence functions object   
@@ -21,13 +21,30 @@ function [IFMData, IFMcleanData] = IFM(bench, callback, nPushPull, nLoop, amplit
 	config = bench.config;
 	mjd =  config.mjd;
     
-  if nargin<2; callback = []; end
+    P = naomi.parseParameters(varargin, {'nPushPull', 'nLoop', 'amplitude', 'ifmPause', 'callback', 'mode', 'dateOb', 'tplName'}, 'measure.IFM');
     
-	if nargin<3; nPushPull = config.ifNpushPull; end
-	if nargin<4; nLoop = config.ifmNloop; end
-	if nargin<5; amplitude   = config.ifAmplitude; end
-	if nargin<6; ifPause  = config.ifmPause; end
-
+    callback = naomi.getParameter([], P, 'callback', 'ifmCallback', []);
+    
+    mode = naomi.getParameter([], P, 'mode', 'ifmMode', []);
+    if isempty(mode)
+        % get the default or user parameters
+        nPushPull = naomi.getParameter(bench, P, 'nPushPull', 'ifmNpushPull');
+        amplitude = naomi.getParameter(bench, P, 'amplitude', 'ifmAmplitude');
+        nLoop   = naomi.getParameter(bench, P, 'nLoop', 'ifmNloop');
+        ifmPause = naomi.getParameter(bench, P, 'ifmPause', 'ifmPause');
+    else
+        % retrieve the parameter for this mode 
+        [nPushPull, amplitude, nLoop, ifmPause] = bench.config.ifmParameters(mode);
+        % overwrite parameter of this mode from user, if any
+         nPushPull = naomi.getParameter([], P, 'nPushPull', 'ifmNpushPull', nPushPull);
+         amplitude = naomi.getParameter([], P, 'amplitude', 'ifmAmplitude', amplitude);
+         nLoop     = naomi.getParameter([], P, 'nLoop', 'ifmNloop', nLoop);
+         ifmPause  = naomi.getParameter([], P, 'ifmPause', 'ifmPause', ifmPause); 
+    end
+    
+    P.nPushPull = nPushPull;
+    P.Amplitude = amplitude;
+    
 	nActuator = bench.nActuator;
 	nSubAperture = bench.nSubAperture;
 	IFM = zeros(nActuator,nSubAperture,nSubAperture);
@@ -60,7 +77,7 @@ function [IFMData, IFMcleanData] = IFM(bench, callback, nPushPull, nLoop, amplit
                 bench.log(sprintf('NOTICE: IFM Loop=%d/%d Actuator=%d/%d Time=%0.3fs', iLoop, nLoop, iActuator, nActuator, (now-start)*24*3600),2);
             end		
             
-           IFArray = naomi.measure.IF(bench, iActuator, nPushPull, amplitude);
+           IFArray = naomi.measure.IF(bench, iActuator, P);
             
             
             if ~isempty(callback)
@@ -70,10 +87,10 @@ function [IFMData, IFMcleanData] = IFM(bench, callback, nPushPull, nLoop, amplit
 	        
 	        	IFM(iActuator,:,:) = IFM(iActuator,:,:) + reshape(IFArray,1,nSubAperture,nSubAperture) / nLoop;
 						
-	        	pause(ifPause);
-						if bench.has('environment')
-							environmentBuffer.update(bench.environment);
-						end
+	        	pause(ifmPause);
+                if bench.has('environment')
+                    environmentBuffer.update(bench.environment);
+                end
             bench.processStep('IFM', iLoop*iActuator);
 						        
 	    end
@@ -83,15 +100,18 @@ function [IFMData, IFMcleanData] = IFM(bench, callback, nPushPull, nLoop, amplit
     end
     bench.killProcess('IFM');
 		bench.log(sprintf('NOTICE: IFM measurement for DM %s finished', bench.dmId),1);
-		
+		dateOb = naomi.getParameter([], P, 'dateOb', [], now);
+        tplName = naomi.getParameter([], P, 'tplName', [], K.TPLNAMEd);
 		K = naomi.KEYS;
 		h = {{K.MJDOBS ,mjd, K.MJDOBSc},  ...
-		   	{K.IFAMP  ,amplitude, K.IFAMPc }, ...
-	     	{K.IFNPP  ,nPushPull, K.IFNPPc }, ...
-	     	{K.IFMLOOP , nLoop, K.IFMLOOPc }, ...
-	     	{K.IFMPAUSE,ifPause,K.IFMPAUSEc}, ... 
-				{K.PHASEREF, bench.isPhaseReferenced, K.PHASEREFc}, ... 
-				{K.PHASETT,  bench.config.filterTipTilt, K.PHASETTc}};
+             {K.DATEOB, dateOb, K.DATEOBc}, ...
+             {K.TPLNAME, tplName, K.TPLNAMEc}, ...
+		   	 {K.IFAMP  , amplitude, K.IFAMPc }, ...
+	     	 {K.IFNPP  , nPushPull, K.IFNPPc }, ...
+	     	 {K.IFMLOOP, nLoop, K.IFMLOOPc }, ...
+	     	 {K.IFMPAUSE,ifmPause,K.IFMPAUSEc}, ... 
+			 {K.PHASEREF, bench.isPhaseReferenced, K.PHASEREFc}, ... 
+			 {K.PHASETT,  bench.config.filterTipTilt, K.PHASETTc}};
 
 	IFMData = naomi.data.IFM(IFM, h);
 	bench.populateHeader(IFMData.header);

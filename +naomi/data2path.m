@@ -1,7 +1,7 @@
-function filePath = data2path(data, bench)
+function filePath = data2path(bench, data)
 %DATA2PATH from a naomi.data objects and the bench
 %    create a path (without extention) and return it
-   if nargin<2 || isempty(bench)
+   if isempty(bench)
         directory = '.';
     else
         directory = bench.config.sessionDirectory;

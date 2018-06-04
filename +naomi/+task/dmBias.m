@@ -6,7 +6,7 @@ function dmBias(bench)
   %    
   %
   % Syntax:  naomi.task.dmBias;   % default bench taken
-  %          naomi.task.dmBias(bench);
+  %          naomi.task.dmBias(bench)
   %
   % Relevant Config Parameters
   % --------------------------
@@ -47,10 +47,10 @@ if nargin<1; bench=naomiGlobalBench;end
         % put the sqme DATEOB 
         dmBiasData.setKey(naomi.KEYS.DATEOB, bench.IFMData.getKey(naomi.KEYS.DATEOB, now), naomi.KEYS.DATEOBc);
     end
-    naomi.saveData(dmBiasData, bench);
-    naomi.saveData(flatData, bench);
+    naomi.saveData(bench, dmBiasData);
+    naomi.saveData(bench, flatData);
     naomi.plot.figure('DM Bias');dmBiasData.plotQc;
-    naomi.saveFigure(dmBiasData, 'QC', bench);
+    naomi.saveFigure(bench, dmBiasData, 'QC');
     naomi.plot.figure('Flat Zonal');flatData.plot;
 end
 

@@ -88,13 +88,15 @@ classdef ZtC < naomi.data.BaseData
             % SPARTA does not contains the piston and is limited to 20
             % thernikes
             ZtCSpartaData = naomi.data.ZtCSparta(obj.data(2:21,':'), obj.header);
-						dprVer = obj.getKey(naomi.KEYS.DPRVER, '');
-						if dprVer; 
-							dprVer = strcat(dprVer, '_SPARTA');
-						else
-							dprVer = 'SPARTA';
-						end
-            ZtCSpartaData.setKey(naomi.KEYS.DPRVER, dprVer, naomi.KEYS.DPRVERc);
+% 						dprVer = obj.getKey(naomi.KEYS.DPRVER, '');
+% 						if dprVer; 
+% 							dprVer = strcat(dprVer, '_SPARTA');
+% 						else
+% 							dprVer = 'SPARTA';
+% 						end
+            ZtCSpartaData.setKey(naomi.KEYS.DPRVER,'SPARTA', naomi.KEYS.DPRVERc);
+            ZtCSpartaData.setKey(naomi.KEYS.DPRTYPE, 'M2DM', naomi.KEYS.DPRTYPEc);
+
         end
         
         function gui(obj)

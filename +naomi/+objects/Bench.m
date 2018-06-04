@@ -329,6 +329,7 @@ classdef Bench < naomi.objects.BaseObject
         function [mask, maskName,  nEigenValue, nZernike, zeroMean, ztcOrientation]  = ztcParameters(obj, ztcMode, maskUnit)
             if nargin<3; maskUnit = 'pixel';end
             pixelScale = 0.5 * (obj.xPixelScale + obj.yPixelScale);
+            
             if nargin<2 || isempty(ztcMode)
 
                 % no zernike to command configured 
@@ -397,8 +398,6 @@ classdef Bench < naomi.objects.BaseObject
                     maskName = obj.ZtCData.getKey(naomi.KEYS.ZTCMNAME, K.UNKNOWN);
                 else
                     [mask, maskName] = obj.config.getMask(mask);
-                    
-                    return ;
                 end
                 
             end

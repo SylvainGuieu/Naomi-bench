@@ -33,7 +33,6 @@ function [PtCArray, ZtCArray, ZtPArray, PtCData, ZtCData, ZtPData] = commandMatr
   pupillDiameterPix = mask{1};
   centralObscurtionDiameterPix = mask{2};
   
-	
 	[PtCArray, ZtCArray, ZtPArray] = naomi.compute.commandMatrix(IFMArray, xCenter, yCenter, pupillDiameterPix, centralObscurtionDiameterPix,...
                                                                  nEigenValue, nZernike, zeroMean, ztcOrientation);
 	if nargout>3

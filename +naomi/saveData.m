@@ -1,8 +1,8 @@
-function filePath = saveData(data, bench)
-    if nargin<2; bench = []; end
-    filePath = naomi.data2path(data, bench);
+function filePath = saveData(bench, data)
+    
+    filePath = naomi.data2path(bench, data);
     filePath = sprintf('%s.fits', filePath);
-    if nargin>1
+    if ~isempty(bench)
         bench.log(sprintf('NOTICE: save file to %s', filePath));
     end
     data.saveFits(filePath);

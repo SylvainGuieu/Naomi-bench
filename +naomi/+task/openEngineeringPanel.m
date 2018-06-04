@@ -5,6 +5,6 @@ global naomiGlobalBench;
 if nargin<1; bench=naomiGlobalBench;end
 
 if isempty(naomi.findGui('Engineering'))
-    naom.gui.mainGui(bench);
+    naomi.gui.mainGui(bench);
 end
 end

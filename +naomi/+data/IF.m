@@ -50,7 +50,24 @@ classdef IF < naomi.data.Phase
             hold(axes, 'off');
         end
 
+        function plot(obj, axes)
+            if nargin<2; axes= gca;end;
+        	phaseArray = obj.phaseArray;
+            nSubAperture = obj.nSubAperture;
+            cla(axes); imagesc(axes, phaseArray);
+            xlim(axes, [1,nSubAperture]);
+            ylim(axes, [1,nSubAperture]);
             
+            
+            	
+            title(axes, ...
+                  sprintf('rms=%.3f mum/cmd ptv=%.3fum/cmd',obj.std,obj.ptv));
+            
+            naomi.plot.phaseAxesLabel(axes, obj.orientation);
+            colorbar(axes);
+            daspect(axes, [1,1,1]); % square figure 
+        end
+        
         function plotScreenPhase(obj, axes)
         
             if nargin<2; axes = gca;figure(get(gcf, 'Number'));end
@@ -68,7 +85,7 @@ classdef IF < naomi.data.Phase
 
             hold(axes, 'on'); 
 
-                plot(axes,  fit.yHwhm*cos(alpha+fit.angle)+fit.xCenter, fit.xHwhm*sin(alpha+fit.angle)+fit.yCenter, 'k-'); 
+            plot(axes,  fit.yHwhm*cos(alpha+fit.angle)+fit.xCenter, fit.xHwhm*sin(alpha+fit.angle)+fit.yCenter, 'k-'); 
             hold(axes, 'off');
 
             title(axes, sprintf('#%d Amp=%.3f hwhm=%.3f x,y =%.1f, %.1f', obj.getKey('ACTNUM', -99), ...
@@ -90,6 +107,7 @@ classdef IF < naomi.data.Phase
            obj.plotProfiles( axesList(4:5));
            
         end
+        
     function fit = profileFit(obj)
         if isempty(obj.profileResult) || ~strcmp(obj.profileResult.type, obj.fitType)
                 obj.profileResult = naomi.compute.fittedIFprofile(obj.data, obj.fitType);

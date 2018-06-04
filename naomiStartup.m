@@ -12,6 +12,10 @@ global naomiGlobalEnvironmentBuffer;
 % https://fr.mathworks.com/matlabcentral/answers/336493-warning-a-value-of-class-appdesigner-internal-service-appmanagementservice-was-indexed-with-no-su
 warning('off', 'MATLAB:subscripting:noSubscriptsSpecified');
 
+%
+% Some shortcut 
+K = naomi.KEYS;
+
 % create a new config file (it will be updated by naomiLocalConfig if exists)
 naomiGlobalConfig = naomi.newConfig();
 naomiGlobalBench = naomi.newBench(naomiGlobalConfig);

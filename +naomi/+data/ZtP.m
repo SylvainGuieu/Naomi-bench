@@ -35,12 +35,14 @@ classdef ZtP < naomi.data.PhaseCube
         
         
         function phaseZernikeData = phaseDataOfZernike(obj, zernike)
-             
+            K = naomi.KEYS;
             phaseArray = squeeze(obj.phaseArray(obj.zernike2index(zernike)));
+            phaseZernikeData = naomi.data.PhaseZernike(phaseArray, {{naomi.KEYS.ZERN, zernike, naomi.KEYS.ZERNc}});           
+            naomi.copyHeaderKeys( obj, phaseZernikeData, naomi.ztcKeyList);
+            naomi.copyHeaderKeys( obj, phaseZernikeData, naomi.benchKeyList);
+            naomi.copyHeaderKeys( obj, phaseZernikeData, naomi.ifmKeyList);
+            naomi.copyHeaderKeys( obj, phaseZernikeData, {K.XOFFSET, K.YOFFSET, K.DMANGLEOFFSET, K.PIXSCALEFACTOR});
             
-            phaseZernikeData = naomi.data.PhaseZernike(phaseArray, obj.header);             
-            phaseZernikeData.setKey(naomi.KEYS.ZERN, zernike, naomi.KEYS.ZERNc);
-            phaseZernikeData.setKey(naomi.KEYS.GAIN, median(obj.gainVector), naomi.KEYS.GAINc);
         end
         
         function zernikeData = zernike(obj, zernike)
@@ -83,17 +85,10 @@ classdef ZtP < naomi.data.PhaseCube
             [nZer,nSubAperture,~] = size(ZtPArray);
             maxZernike = min(nZer, obj.maxZernike);
             K = naomi.KEYS;
-            ZtPRefArray = naomi.compute.theoriticalZtP(...
-    						 nSubAperture, ...
-                             obj.xCenter, ...
-                             obj.yCenter, ...
-                             obj.pupillDiameterPix, ...
-							 0.0,... 
-                             maxZernike, ...
-                             obj.getKey(K.ZTCORIENT, 'xy')); 
             
+           ZtPRefArray = naomi.getFromData.theoriticalZtP(obj, maxZernike);
             
-           [residualVector, gainVector] = naomi.compute.ztpDifference(ZtPArray, ZtPRefArray, maxZernike);
+           [residualVector, gainVector] = naomi.compute.ztpDifference(ZtPArray, ZtPRefArray(obj.firstZernike:end,:,:), maxZernike);
            
            axes = axesList{1};
            plot(axes, residualVector, 'bo-');
@@ -134,36 +129,23 @@ classdef ZtP < naomi.data.PhaseCube
     	function plotModes(obj,  axesList)
             
             ZtPArray = obj.data;
-            [nZernike,nSubAperture,~] = size(ZtPArray);
+            [nZernike,~,~] = size(ZtPArray);
             nZernike = min(nZernike,obj.maxZernike);	
             if nargin<2; clf; axesList = obj.makeAxesList(nZernike); end;
     		
     		
-            K = naomi.KEYS;
-            
-    		ZtPRefArray = naomi.compute.theoriticalZtP(...
-    						 nSubAperture, ...
-                             obj.xCenter, ...
-                             obj.yCenter, ...
-                             obj.pupillDiameterPix, ...
-														 0.0, ...
-                             nZernike, ...
-                             obj.getKey(K.ZTCORIENT, 'xy')); 
-    		
-					
-			
-			
-			[residualVector, ~] = naomi.compute.ztpDifference(ZtPArray, ZtPRefArray, nZernike);
+            ZtPRefArray = naomi.getFromData.theoriticalZtP(obj, nZernike);
+			[residualVector, ~, residualArray] = naomi.compute.ztpDifference(ZtPArray, ZtPRefArray(obj.firstZernike:end,:,:), nZernike);
 			
     		for iZernike=1:nZernike
-                idx = obj.zernike2index(iZernike);
+                
 			    ax = axesList{iZernike*2-1};
-			    imagesc(ax, squeeze(ZtPArray(idx,:,:)));
+			    imagesc(ax, squeeze(ZtPArray(iZernike,:,:)));
 			    set(ax,'XTickLabel','','YTickLabel','');
 			    title(ax, sprintf('Mode %i',iZernike));
                 daspect(ax, [1 1 1]);
 			    ax = axesList{iZernike*2};
-			    imagesc(ax, squeeze(ZtPArray(idx,:,:) - ZtPRefArray(iZernike,:,:)));
+			    imagesc(ax, squeeze(residualArray(iZernike,:,:)));
 			    set(ax,'XTickLabel','','YTickLabel','');
 			    title(ax, sprintf('%.3fum',residualVector(iZernike)));
                 daspect(ax, [1 1 1]);

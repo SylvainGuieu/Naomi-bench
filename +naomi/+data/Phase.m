@@ -53,8 +53,7 @@ classdef Phase < naomi.data.BaseData
             % return the diameter of the active pupill, the one used to
             % compute the Zernike to Command matrix
             % the returned diameter is in meter 
-            diam = obj.getKey(naomi.KEYS.ZTCDIAM,naomi.KEYS.ZTCDIAMd).*...
-                   obj.getKey(naomi.KEYS.DIAMRESC,1.0);
+            diam = obj.getKey(naomi.KEYS.ZTCDIAM,naomi.KEYS.ZTCDIAMd);
         
         end
         
@@ -222,12 +221,15 @@ classdef Phase < naomi.data.BaseData
         end
         function plotPupill(obj, axes)
             % plot the circle that define the active pupill
-            if nargin<2; axes = gca;end;
-            radius = obj.pupillDiameterPix/2;
+            if nargin<2; axes = gca;end
+            
+            mask = naomi.getFromData.ztcMask(obj, 'pixel');
+            radius = mask{1}/2;
+            [xCenter, yCenter] = naomi.getFromData.dmCenter(obj);
             
             alpha = linspace(0, 2*pi, 50);
-            plot(axes,radius*cos(alpha)+obj.xCenter, ...
-                      radius*sin(alpha)+obj.yCenter, 'k-');
+            plot(axes,radius*cos(alpha)+xCenter, ...
+                      radius*sin(alpha)+yCenter, 'k-');
         end
         
         function gui(obj)

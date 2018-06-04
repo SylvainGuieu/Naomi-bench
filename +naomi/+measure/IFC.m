@@ -1,4 +1,4 @@
-function [IFCArray,IFCData] = IFC(bench, nPushPull, amplitude)
+function [IFCArray,IFCData] = IFC(bench, varargin)
 %   IFC  measure the Influence Function of the central actuator 
 % 
 %   IFC = measure.IFC(bench, act, nPushPull, amplitude)
@@ -17,12 +17,11 @@ function [IFCArray,IFCData] = IFC(bench, nPushPull, amplitude)
 %   yCenter
 %   
 	config = bench.config;
-	if nargin<2; nPushPull = config.ifNpushPull; end
-	if nargin<3; amplitude = config.ifAmplitude; end
+	
     
     if nargout<2
-        IFCArray= naomi.measure.IF(bench, bench.config.dmCentralActuator, nPushPull, amplitude);
+        IFCArray= naomi.measure.IF(bench, bench.config.dmCentralActuator, varargin{:});
     else
-        [IFCArray,IFCData] = naomi.measure.IF(bench, bench.config.dmCentralActuator, nPushPull, amplitude);
+        [IFCArray,IFCData] = naomi.measure.IF(bench, bench.config.dmCentralActuator, varargin{:});
     end
 end

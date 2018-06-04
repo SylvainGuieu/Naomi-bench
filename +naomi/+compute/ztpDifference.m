@@ -1,4 +1,4 @@
-function [residualVector, gainVector] = ztpDifference(ZtPArray, ZtPRefArray, nZerMax)
+function [residualVector, gainVector, residualArray] = ztpDifference(ZtPArray, ZtPRefArray, nZerMax)
 	% compute.ztpDifference compare two Zernike to phase Array
 	% typicaly one measured and one theoritical
 	% 
@@ -12,7 +12,8 @@ function [residualVector, gainVector] = ztpDifference(ZtPArray, ZtPRefArray, nZe
 	% residualVector [nZer] : The vector of computed residuals
 	% gainVector [nZer] : The vector of measured gain from the ZtPArray 
     [nZer,nSubAperture,~] = size(ZtPArray);
-	nZer = min(nZer,nZerMax);			
+    [nZerRes,~,~] = size(ZtPRefArray);
+	nZer = min([nZer nZerRes nZerMax]);			
 	ZtPRefArray = ZtPRefArray(1:nZer,:,:);
 	ZtPArray = ZtPArray(1:nZer,:,:);
 
@@ -35,7 +36,8 @@ function [residualVector, gainVector] = ztpDifference(ZtPArray, ZtPRefArray, nZe
 
 	% Multiply reference by gain:
 	ZtPRefm = ZtPRefm * median(gainVector);
-
+    
+    residualArray = ZtPRefm - ZtPm;
 	% Residual across the pupil
-	residualVector = naomi.compute.nanstd(reshape(ZtPRefm - ZtPm,nZer,[]),2);
+	residualVector = naomi.compute.nanstd(reshape(residualArray,nZer,[]),2);
 end

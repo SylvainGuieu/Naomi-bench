@@ -1,4 +1,4 @@
-function [IFArray,IFData] = IF(bench,  act, nPushPull, amplitude)
+function [IFArray,IFData] = IF(bench,  act, varargin)
 %   IF  measure the Influence Function of one actuator 
 % 
 %   IFArray = measure.IF(bench act, nPushPull, amplitude)
@@ -14,43 +14,51 @@ function [IFArray,IFData] = IF(bench,  act, nPushPull, amplitude)
 % 
 %   IF is a data.IF   the influence function of this actuator
 	config = bench.config;
-	if nargin<3; nPushPull = config.ifNpushPull; end
-	if nargin<4; amplitude = config.ifAmplitude; end
-
+    P = naomi.parseParameters(varargin, {'nPushPull', 'amplitude', 'dateOb', 'tplName'}, 'measure.IF');
+    nPushPull = naomi.getParameter(bench, P, 'nPushPull', 'ifNpushPull');
+	amplitude = naomi.getParameter(bench, P, 'amplitude', 'ifAmplitude');
+    
 	
     %naomi.action.resetDm(bench);
     %naomi.action.resetWfs(bench);
     
     nSubAperture = bench.nSubAperture;
-    tppush = ones(nSubAperture,nSubAperture) * 0.0;
-    tppull = ones(nSubAperture,nSubAperture) * 0.0;
+    tppush = zeros(nSubAperture,nSubAperture);
+    tppull = zeros(nSubAperture,nSubAperture);
     
     % Loop on N push-pull
     ref = bench.dm.cmdVector(act);
-    for pp=1:nPushPull
-        naomi.action.cmdZonal(bench, act, ref + amplitude);
-        %pause(0.1);
-        %naomi.measure.phase(bench,1); % get phase first without storing it  
+    if nPushPull
+        for pp=1:nPushPull
+            naomi.action.cmdZonal(bench, act, ref + amplitude);
+            tppush = tppush + naomi.measure.phase(bench,1);    
 
-        tppush = tppush + naomi.measure.phase(bench,1);        
-        naomi.action.cmdZonal(bench, act, ref - amplitude);
-        %pause(0.1);
-        %naomi.measure.phase(bench,1); % get phase first 
-        tppull = tppull + naomi.measure.phase(bench,1);
+            naomi.action.cmdZonal(bench, act, ref - amplitude);      
+            tppull = tppull + naomi.measure.phase(bench,1);
+        end
+
+        naomi.action.cmdZonal(bench, act, ref);
+        IFArray = (tppush - tppull) / (2*amplitude*nPushPull);
+    else
+        naomi.action.cmdZonal(bench, act, ref + amplitude);
+        IFArray = naomi.measure.phase(bench,1);
+        %naomi.action.cmdZonal(bench, act, ref);
     end
-    
-    naomi.action.cmdZonal(bench, act, ref);
-    IFArray = (tppush - tppull) / (2*amplitude*nPushPull);
    	 
     if nargout>1
         K = naomi.KEYS;
+        tplName = naomi.getParameter([], P, 'tplName', [], K.TPLNAMEd);
+        dateOb  = naomi.getParameter([], P, 'dateOb',  [], now);
+        
         h = {{K.MJDOBS,config.mjd, K.MJDOBSc},...
+             {K.DATEOB, dateOb, K.DATEOBc},...
+             {K.TPLNAME, tplName, K.TPLNAMEc},...
              {K.ACTNUM,act,  K.ACTNUMc      },...
              {K.IFAMP ,amplitude, K.IFAMPc},...
              {K.IFNPP,nPushPull,  K.IFNPPc}};
         
         IFData = naomi.data.IF(IFArray, h);
-				bench.populateHeader(IFData.header); 
+		bench.populateHeader(IFData.header); 
     end
 end
 

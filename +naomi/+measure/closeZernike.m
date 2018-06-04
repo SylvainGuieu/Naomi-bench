@@ -1,27 +1,26 @@
-function [phaseArray, phaseResidualArray, phaseData,phaseResidualData] = closeZernike(bench, zernike, amplitude, gain, nZernike, nStep)
+function [phaseArray, phaseResidualArray, phaseData,phaseResidualData] = closeZernike(bench, zernike, varargin)
     
 	config = bench.config;
-    if nargin<3; amplitude = config.zernikeAmplitude; end
-	if nargin<4; gain = config.zernikeCloseGain; end
-	if nargin<5; nZernike = config.zernikeCloseNzernike; end
-	if nargin<6; nStep = config.zernikeCloseNstep; end
     
-	nPhase = config.zernikeNphase;
+    P = naomi.parseParameters(varargin, {'amplitude', 'gain', 'nZernike', 'nStep', 'dateOb', 'tplNAme'}, 'measure.closeZernike');
+    P.gain        = naomi.getParameter(bench, P, 'gain', 'zernikeCloseGain');
+    P.highestMode = naomi.getParameter(bench, P, 'nZernike', 'zernikeCloseNzernike');
+    P.nStep       = naomi.getParameter(bench, P, 'nStep', 'zernikeCloseNstep');
+    P.amplitude   = naomi.getParameter(bench, P, 'amplitude' , 'zernikeAmplitude');
+    nPhase        = naomi.getParameter(bench, P, 'nPhase', 'zernikeNphase');
     
     
-    [~,PtZArray] = naomi.make.theoriticalZtP(bench);
-    
-    targetPhaseArray = naomi.make.theoriticalPhase(bench, zernike, amplitude);
+    targetPhaseArray = naomi.make.theoriticalPhase(bench, zernike, P);
     
 	naomi.action.resetDm(bench);
 	naomi.config.pupillMask(bench);		
 	naomi.action.resetWfs(bench);
 
 	
-	naomi.action.closeModal(bench,PtZArray, gain, nStep, 2, nZernike, targetPhaseArray);
+	naomi.action.closeModal(bench, targetPhaseArray, P);
 	
 	phaseArray = naomi.measure.phase(bench, config.flatNphase);
-  phaseResidualArray = phaseArray - targetPhaseArray;
+    phaseResidualArray = phaseArray - targetPhaseArray;
     
     % build the data objects 
     if nargout>2 

@@ -30,7 +30,7 @@ if bench.isDm
 
         [~,IFCData] = naomi.measure.IFC(bench);
         naomi.config.IFC(bench,IFCData);
-        naomi.saveData(IFCData, bench);
+        naomi.saveData(bench, IFCData);
         [xScale, yScale] = naomi.measure.pixelScale(bench);
         naomi.config.pixelScale(bench, xScale, yScale);
     end
@@ -40,7 +40,7 @@ else
     
     [~, phaseReferenceData] = naomi.measure.phaseReference(bench);
     naomi.config.phaseReference(bench,phaseReferenceData);
-    naomi.saveData(phaseReferenceData, bench);
+    naomi.saveData(bench, phaseReferenceData);
 end
 close all;
 end

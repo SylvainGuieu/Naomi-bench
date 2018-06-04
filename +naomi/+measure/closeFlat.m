@@ -1,24 +1,19 @@
-function [flatArray, flatData] = closeFlat(bench, gain, nZernike, nStep)
-
-	config = bench.config;
-	if nargin<2; gain = config.flatCloseGain; end
-	if nargin<3; nZernike = config.flatCloseNzernike; end
-	if nargin<4; nStep = config.flatCloseNstep; end
-
-	nPhase = config.flatNphase;
+function [flatArray, flatData] = closeFlat(bench, varargin)
     
+    P = naomi.parseParameters(varargin, {'gain', 'nZernike', 'nStep'}, 'measure.closeFlat');
+    P.gain =     naomi.getParameter(bench, P, 'gain', 'flatCloseGain');
+    P.highestMode = naomi.getParameter(bench, P, 'nZernike', 'flatCloseNzernike');
+    P.nStep =    naomi.getParameter(bench, P, 'nStep', 'flatCloseNstep');
+    nPhase =   naomi.getParameter(bench, P, 'nPhase', 'flatNphase');
     
-	[~,PtZArray] = naomi.make.theoriticalZtP(bench, [], [], nZernike);
-
-	
+    P.lowestMode = 2;
+     
 	naomi.action.resetDm(bench);
 	naomi.config.pupillMask(bench);		
 	naomi.action.resetWfs(bench);
     
-	naomi.action.closeModal(bench,PtZArray, gain, nStep, 2, nZernike);
+	naomi.action.closeModal(bench, 0.0 ,P);
 	
-	
-    
 	flatArray = naomi.measure.phase(bench, nPhase);
     
     % if to output argument encapsule the result in a 

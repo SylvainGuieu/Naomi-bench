@@ -1,9 +1,9 @@
-function [mask, maskName,  nEigenValue, nZernike, zeroMean, ztcOrientation] = ztcParametersFromData(data, maskUnit)
+function [mask, maskName,  nEigenValue, nZernike, zeroMean, ztcOrientation] = ztcParameters(data, maskUnit)
 %ZTCPARAMETERSFROMDATA Summary of this function goes here
 %   Detailed explanation goes here
 if nargin<2; maskUnit='pixel';end
 K = naomi.KEYS;
-[mask, maskName] = naomi.ztcMaskFromData(data, maskUnit);
+[mask, maskName] = naomi.getFromData.ztcMask(data, maskUnit);
 nEigenValue = data.getKey(K.ZTCNEIG);
 nZernike = data.getKey(K.ZTCNZERN);
 zeroMean = data.getKey(K.ZTCZMEAN);

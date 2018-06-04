@@ -22,6 +22,7 @@ function [phaseArray] = theoriticalPhase(nSub,x0,y0,diamPix, centralObscurationP
 if nargin<7
     orientation = 'xy';
 end
+
 if nargin<8; angle = 0.0; end
 
 mask = naomi.compute.pupillMask(nSub,diamPix, centralObscurationPix, x0, y0);

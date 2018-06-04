@@ -10,17 +10,17 @@ else
 end
 sTipData = naomi.measure.stroke(bench, 2);
 sTipData.setKey(naomi.KEYS.DATEOB,obdate , naomi.KEYS.DATEOBc);
-naomi.saveData(sTipData, bench);
+naomi.saveData(bench, sTipData);
 naomi.plot.figure('TIP QC');
 sTipData.plotQc;
-naomi.saveFigure(sTipData, 'QC', bench);
+naomi.saveFigure(bench, sTipData, 'QC');
 
 sTiltData = naomi.measure.stroke(bench, 3);
 sTiltData.setKey(naomi.KEYS.DATEOB,obdate , naomi.KEYS.DATEOBc)
-naomi.saveData(sTiltData, bench);
+naomi.saveData(bench, sTiltData);
 naomi.plot.figure('TILT QC');
 sTiltData.plotQc;
-naomi.saveFigure(sTiltData, 'QC', bench);
+naomi.saveFigure(bench, sTiltData, 'QC');
 
 end
 

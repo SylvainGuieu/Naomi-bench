@@ -6,15 +6,18 @@ classdef Simulator < naomi.objects.BaseObject
         sSerialName = 'simulator';
         IFM; % IFM matrix
         
-        biasVector % the bias vector name as aco 
+        simuBiasVector;  % the simulated bias vector 
+        biasVector; % the configured bias vector 
         turbuArray; % tubulances array must be ntubu x nSub x nSub array 
         turbuIndex =1;
+        simuTurbuStrength = 1;
         simuOrientation = '-xy';
-        zernike2Command; % the matrix name as aco 
+        
+        zernike2Command; % the zernike to command configured 
         ZtPtheoricArray;
-        PtZtheoricArray
+        PtZtheoricArray;
         cmdVector;% the command vector  name as aco 
-        staticZernike;
+        staticZernike = [0 0 0]; % at least 3
         phase2Command;
         
         ztcNzernike = 100;
@@ -42,38 +45,39 @@ classdef Simulator < naomi.objects.BaseObject
         rXzero = 14.5;
         rYzero = 15.7;
         
-        rXOrder = 2;  %tip
-        rYOrder = 3; % not used just for consistancy
+        rXOrder = 3;  %tilt
+        rYOrder = 2; % not used just for consistancy
         % Sign of rX movement regarding to zernic order 
-        rXSign = -1;
-        rYSign = -1;
+        rXSign = 1;
+        rYSign = 1;
         
         pause = 0.2;
+        
+        simuDmActuatorSeparation = 0.0025;
+
         
     end
     
     methods
-        function obj = Simulator(IFM, biasVector, turbuArray, zernike2Command)
+        function obj = Simulator(IFM, biasVector, turbuArray)
             %SIMULATOR Construct an instance of this class
             %   Detailed explanation goes here
             
-            if nargin>=4
-                obj.zernike2Command = zernike2Command; % if not set it will be computed by setIFM
-            end
+            
             
             obj.setIFM(IFM);
             
             if nargin>=2 && ~isempty(biasVector)                
-                obj.biasVector = biasVector;
+                obj.simuBiasVector = biasVector;
             else
-                obj.biasVector = zeros(obj.nActuator,1);               
+                obj.simuBiasVector = zeros(obj.nActuator,1);               
             end
             if nargin>=3 && ~isempty(turbuArray)
                 obj.turbuArray = turbuArray;
                 
                 
             end
-            
+            obj.biasVector = 0.0;
             
             [obj.ZtPtheoricArray, obj.PtZtheoricArray] = naomi.compute.theoriticalZtP(...
                         obj.nSubAperture,...
@@ -81,15 +85,15 @@ classdef Simulator < naomi.objects.BaseObject
                         obj.fullPupillDiameter/obj.pixelScale, ...
                         0.0, ...
                         obj.ztcNzernike, ...
-                        obj.orientation);
+                        obj.simuOrientation, 0.0);
                     
             obj.cmdVector = zeros(obj.nActuator, 1);            
         end
-        function Reset(obj);
+        function Reset(obj)
             obj.cmdVector = zeros(obj.nActuator, 1);
         end
         function img = getRawImage(obj)
-            img = ones(10,10)*0.8;
+            img = ones(10,10)*0.8+rand(1)*0.1;
             %img = zeros(10,10);
         end
         function haso = haso(obj)
@@ -102,7 +106,8 @@ classdef Simulator < naomi.objects.BaseObject
         function rawPhase = getRawPhase(obj)
             pause(obj.pause);
             
-            cmdVector = obj.cmdVector - obj.biasVector;
+            cmdVector = obj.cmdVector - obj.simuBiasVector + obj.biasVector;
+            %cmdVector = obj.cmdVector  + obj.biasVector;
             nActuator = obj.nActuator;
             nSubAperture = obj.nSubAperture;
             IFMArray = reshape( obj.IFM, nActuator, nSubAperture*nSubAperture);
@@ -110,54 +115,46 @@ classdef Simulator < naomi.objects.BaseObject
 %                 IFMArray = IFMArray + reshape(obj.turbuArray,nActuator,  nSubAperture*nSubAperture);
 %             end
             
-            if ~isempty(obj.staticZernike)
-                zernikeVector = obj.staticZernike;
-                nZer = length( zernikeVector);
-                
-            
-            
-                if nZer>obj.ztcNzernike
-                    error('zernike vector is too large');
-                end
-                allZernikeVector = zeros(obj.ztcNzernike, 1);
-                allZernikeVector(1:nZer) = zernikeVector;
-                
-                 
-                allZernikeVector(obj.rXOrder) = allZernikeVector(obj.rXOrder) -...
-                    (obj.rXMotorPosition - obj.rXzero)*obj.rXgain * ...
-                    obj.fullPupillDiameter*4.8e-6 /...
-                    (obj.rXSign*1e-6 * 4/2);
-                allZernikeVector(obj.rYOrder) = allZernikeVector(obj.rYOrder) - ...
-                    (obj.rYMotorPosition - obj.rYzero)*obj.rYgain * ...
-                    obj.fullPupillDiameter*4.8e-6 /...
-                    (obj.rYSign*1e-6 * 4/2);
-                
-                
-                cmdVector = cmdVector + (allZernikeVector'*obj.zernike2Command)';
-                
+            if isempty(obj.xCenter)
+                xCenter = nSubAperture/2.;
+                yCenter = nSubAperture/2.;
             else
-                allZernikeVector = zeros(obj.ztcNzernike, 1);
-                allZernikeVector(obj.rXOrder) = allZernikeVector(obj.rXOrder) +...
-                    (obj.rXMotorPosition - obj.rXzero)*obj.rXgain * ...
-                    obj.fullPupillDiameter*4.8e-6 /...
-                    (obj.rXSign*1e-6 * 4/2);
-                allZernikeVector(obj.rYOrder) = allZernikeVector(obj.rYOrder) + ...
-                    (obj.rYMotorPosition - obj.rYzero)*obj.rYgain * ...
-                    obj.fullPupillDiameter*4.8e-6 /...
-                    (obj.rYSign*1e-6 * 4/2);
-                
-                cmdVector = cmdVector + (allZernikeVector'*obj.zernike2Command)';
+                xCenter  = obj.xCenter;
+                yCenter  = obj.yCenter;
             end
             
+            staticZernike = obj.staticZernike;
+            
+            staticZernike(obj.rXOrder) = staticZernike(obj.rXOrder) +...
+                    (obj.rXMotorPosition - obj.rXzero)*obj.rXgain * ...
+                    obj.fullPupillDiameter*4.8e-6 /...
+                    (obj.rXSign*1e-6 * 4/2);
+            staticZernike(obj.rYOrder) = staticZernike(obj.rYOrder) + ...
+                    (obj.rYMotorPosition - obj.rYzero)*obj.rYgain * ...
+                    obj.fullPupillDiameter*4.8e-6 /...
+                    (obj.rYSign*1e-6 * 4/2);
+               
+                % add static aberation
+                nStatic = length(obj.staticZernike);
+                ZtP = naomi.compute.theoriticalZtP(nSubAperture, xCenter , yCenter, obj.fullPupillDiameter/obj.pixelScale, 0.0, nStatic , obj.simuOrientation, 0.0);
+                ZtP = (reshape(ZtP, nStatic, nSubAperture*nSubAperture)'.*staticZernike)';
+                rawPhase = sum(ZtP,1)';
+                
+             
+             %rawPhase = rawPhase + IFMArray'*-obj.simuBiasVector;
+                
+                
+                
             
             
             
-            rawPhase = IFMArray'*cmdVector;
+            
+            rawPhase = IFMArray'*cmdVector + rawPhase;
             rawPhase = reshape(rawPhase, nSubAperture, nSubAperture);
-            if ~isempty(obj.turbuArray)
+            if ~isempty(obj.turbuArray) && obj.simuTurbuStrength
                 [turbuLength, ~, ~] = size(obj.turbuArray);
                 if obj.turbuIndex>turbuLength; obj.turbuIndex = 1; end;
-                rawPhase = rawPhase + squeeze(obj.turbuArray(obj.turbuIndex,:,:));
+                rawPhase = rawPhase + squeeze(obj.turbuArray(obj.turbuIndex,:,:))*obj.simuTurbuStrength;
                 obj.turbuIndex = obj.turbuIndex+1;
             end
             
@@ -176,6 +173,10 @@ classdef Simulator < naomi.objects.BaseObject
         end
         
         function setZernike(obj, zernikeIndex, zernikeVector)
+            
+            if isempty(obj.zernike2Command)
+                error('No zernike2Command configured');
+            end
             if nargin<3
                 zernikeVector = zernikeIndex;
                 zernikeIndex = 1:length(zernikeVector);
@@ -202,29 +203,19 @@ classdef Simulator < naomi.objects.BaseObject
         end
         function setIFM(obj, IFM)
            obj.IFM = IFM;
-           if isempty(obj.xCenter)
-               IFC = squeeze(IFM(obj.dmCenterAct,:,:));
-               [xCenter,yCenter] = naomi.compute.IFCenter(IFC);
-               obj.xCenter = xCenter;
-               obj.yCenter = yCenter;
-           end
+           
+           IFC = squeeze(IFM(obj.dmCenterAct,:,:));
+           [xCenter,yCenter] = naomi.compute.IFCenter(IFC);
+           obj.xCenter = xCenter;
+           obj.yCenter = yCenter;
+
+           [xpixelScale, yPixelScale] = naomi.compute.IFMScale(IFM, obj.simuDmActuatorSeparation, obj.simuOrientation);
+           obj.pixelScale = 0.5* (xpixelScale + yPixelScale);
 %            if isempty(obj.pixelScale)
 %                [xS,yS] = naomi.compute.IFMScale(IFM);
 %                obj.pixelScale = 0.5 * (xS + yS);
 %            end
             
-           
-           if isempty(obj.zernike2Command)
-                
-               cleanIFMArray = naomi.compute.cleanIFM(IFM, obj.ifmNexclude, obj.ifmCleanPercentil); 
-               [~,ZtC,~] = naomi.compute.commandMatrix(cleanIFMArray, obj.xCenter, obj.yCenter, obj.fullPupillDiameter/obj.pixelScale, 0.0, obj.ztcNeigenValue, obj.ztcNzernike, 1, obj.simuOrientation);
-               if isempty(obj.zernike2Command)
-                obj.zernike2Command = ZtC;         
-               end
-               
-           else
-               [obj.ztcNzernike, ~] = size(obj.zernike2Command);
-           end
         end
         
         %%% Motor

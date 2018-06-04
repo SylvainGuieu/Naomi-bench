@@ -37,7 +37,12 @@ CtP(isnan(CtP)) = 0.0;
 % Compute Phase2Command matrix
 CtP = reshape(CtP,nActuator,nSubAperture*nSubAperture);
 CtP(:,nSubAperture*nSubAperture+1) = zeroMean * 1000;
-PtC = acecsPInv(CtP,nEigenValue);
+if exist('acecsPInv')
+    PtC = acecsPInv(CtP,nEigenValue);
+else
+    warning('The acecsPInv command is not found using pinv. Is ACE loaded ? ');
+    PtC = pinv(CtP);
+end
 PtC = PtC(1:nSubAperture*nSubAperture,:);
 PtC = reshape(PtC,nSubAperture,nSubAperture,nActuator);
 

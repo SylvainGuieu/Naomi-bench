@@ -5,11 +5,11 @@ function afterZtP(bench, ZtPData)
 
 naomi.config.ZtP(bench,ZtPData);
 
-naomi.saveData(ZtPData, bench);
+naomi.saveData(bench, ZtPData);
 naomi.plot.figure('ZtP QC', 1);
 ZtPData.plotQc;
-naomi.saveFigure(ZtPData,'QC',  bench);
+naomi.saveFigure(bench, ZtPData,'QC');
 naomi.plot.figure('ZtP QC Mode', 1);
 ZtPData.plotModes;
-naomi.saveFigure(ZtPData,'QC_Modes', bench);
+naomi.saveFigure(bench, ZtPData,'QC_Modes');
 end

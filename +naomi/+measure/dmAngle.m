@@ -1,16 +1,16 @@
-function [angleRad, xPos, yPos] = dmAngle(bench, actioners)
+function [angleRad, xPos, yPos] = dmAngle(bench, varargin)
 %DMANGLE Summary of this function goes here
 %   Detailed explanation goes here
-if nargin<2
-    actioners =  bench.config.dmAngleActioners; 
-end
+P         = naomi.parseParameters(varargin, {'actionerVector', 'amplitude', 'nPushPull'}, 'measure.dmAngle');
+actioners = naomi.getParameter(bench, P, 'actionerVector', 'dmAngleActionerVector');
+
 nActioners =  length(actioners);
 nSubAperture = bench.nSubAperture;
 %[i,j] = naomi.compute.actuatorPosition(bench.dmOrientation);
 data = zeros(nActioners,2);
 
 for iActioners=1:nActioners
-    [~,IFData] = naomi.measure.IF(bench, actioners(iActioners), 1, 0.3);
+    [~,IFData] = naomi.measure.IF(bench, actioners(iActioners), P);
     data(iActioners, 1) = ( IFData.profileFit.xCenter - nSubAperture/2) * bench.xPixelScale;
     data(iActioners, 2) = ( IFData.profileFit.yCenter - nSubAperture/2) * bench.yPixelScale;
 end

@@ -56,8 +56,7 @@ classdef PhaseCube < naomi.data.BaseData
             % return the diameter of the active pupill, the one used to
             % compute the Zernike to Command matrix
             % the returned diameter is in meter 
-            diam = obj.getKey(naomi.KEYS.ZTCDIAM,naomi.KEYS.ZTCDIAMd).*...
-                   obj.getKey(naomi.KEYS.DIAMRESC,1.0);
+            diam = obj.getKey(naomi.KEYS.ZTCDIAM,naomi.KEYS.ZTCDIAMd);
         
         end
         

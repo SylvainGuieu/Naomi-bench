@@ -252,6 +252,8 @@ classdef Environment < naomi.objects.BaseObject
         maintainFanVoltage = 24.0;
         calibFanVoltage = 0.0;
         
+        %%
+        vaporPressure = 1; % to be defined
         
         %%
         % The delta temperature for which the maintain state will start
@@ -607,6 +609,7 @@ classdef Environment < naomi.objects.BaseObject
                 return 
             end
             regulTemp = targetTemp - (refTemp-targetTemp) * gain;
+            regulTemp = max(obj.dewPointTemperature+1.0, regulTemp);
             
             obj.setRegister(obj.R_REGUL, regulTemp);
             obj.setRegister(obj.R_FAN_MODE(obj.F_IN), obj.ALLWAYSON); 
@@ -867,6 +870,18 @@ classdef Environment < naomi.objects.BaseObject
         function temp=tempQSM(obj)
             % temperature of the qsm (gimbal base)  
             temp = obj.getTemp(obj.S_QSM);
+        end
+        function tdp = dewPointTemperature(obj)
+            % 
+            % https://en.wikipedia.org/wiki/Dew_point
+            %a = 6.1121; b = 18.678; c = 257.14; %d = 234.5;
+            a = 6.112; b = 17.67; c = 243.5;
+            %a = 6.112; b = 17.62; c = 243.12;
+            
+            rh = obj.humidity; 
+            T = obj.tempEmbiant;
+            pa = a*exp((b*T)/(c+T)) * rh / 100;
+            tdp = c*log(pa/a) / (b - log(pa/a));
         end
     end
     

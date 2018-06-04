@@ -155,7 +155,7 @@ classdef IFM < naomi.data.PhaseCube
             ylim(ax, [0,1.2*max(fit.amplitude)]);
             grid(ax);  set(ax,'xminorgrid','on','yminorgrid','on');
             xlabel(ax, 'Actuator');
-            ylabel(ax, 'amp (um/1)');
+            ylabel(ax, 'amp (um/cmd)');
             title(ax, 'Influence Functions of all actuators');
             
             

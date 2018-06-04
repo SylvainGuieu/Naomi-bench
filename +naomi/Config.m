@@ -77,7 +77,8 @@ classdef Config < handle
         % (naomi.measure.dmAngle). 
         % angle in radiant 
         dmAngle = 0.0;
-        
+        % list of actioners activated  to compute the dmAngle
+        dmAngleActionerVector = [115,118,121,124,127];
         
         % define typical mask here in naomi, mask can be called by their name
         % or by a 3xCell array defining the {diameter, central-obscurtion-diameter, unit}
@@ -104,7 +105,7 @@ classdef Config < handle
         ztcDef = {
                   {'NAOMI_PUPILL', 'NAOMI_PUPILL', 140, 100, 1, '-xy'},...
                   {'DM_PUPILL',    'DM_PUPILL',    220, 100, 0, '-xy'},...
-                  {'NO_MASK',      'NO_MASK',     220, 100, 1,  '-xy'} % make a big mask = no mask 
+                  {'NO_MASK',      'NO_MASK',      220, 100, 1, '-xy'} % make a big mask = no mask 
                 };
                 
         % current ztcMode 
@@ -220,8 +221,8 @@ classdef Config < handle
 
         % define usable IF/IFM parameters 
         ifDef = {
-                       % |- ifNpushPull
-                       % |  |- ifAMplitude 
+                       % |- ifmNpushPull
+                       % |  |- ifmAMplitude 
                        % |  |     |- ifmNloop
                        % |  |     |  |- ifmPause 
             {'quick',    1, 0.3,  1, 0.0},
@@ -235,17 +236,34 @@ classdef Config < handle
         % The 4 following parameters will be modified 
         % when ifMode is changed
         % default nPushPull for IF and IFM computation 
-        ifNpushPull = 2;
+        ifmNpushPull = 2;
         % default Amplitude for IF and IFM computation 
-        ifAmplitude = 0.35;
+        ifmAmplitude = 0.35;
         % default number of llop for IFM computation 
         ifmNloop = 2;
         % default pause (in sec) between actuator for IFM 
         ifmPause = 1.0;
 
         %%
+        % default for measure.IF (outside of the IFM context)
+        ifNpushPull = 1;
+        % default Amplitude for IF and IFM computation 
+        ifAmplitude = 0.30;
+        
+        %%
         % IFM cleaning parameter 
         ifmCleanPercentil = 50;
+        
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %
+        % Close Modal Action 
+        %
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        closeModalGain = 0.5;
+        closeModalHighestZernike = 20;
+        closeModalLowestZernike = 2;  
+        closeModalNstep = 10;
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %
@@ -266,7 +284,7 @@ classdef Config < handle
         % flat prefered mode (for gui use) 'closed' or 'open'
         flatLoopMode = 'closed';
         % flat measurement, number of phase 
-        flatNphase = 5; 
+        flatNphase = 2; 
         
         % gain used to measure the flat in close loop 
         flatCloseGain = 0.5;
@@ -300,6 +318,8 @@ classdef Config < handle
         zernikeNphase = 1; 
         % amplitude used to play the zernike (for gui use)
         zernikeAmplitude = 1.0;
+        % number of push/pull when playing zernike 0 is only one push 
+        zernikeNpushPull = 1;
         % gain used to measure the zernike in close loop 
         zernikeCloseGain = 0.5;
         % number of Zernique to close the loop on zernike
@@ -488,8 +508,8 @@ classdef Config < handle
             for i=1:length(obj.ifDef)
                 def = obj.ifDef{i};
                 if strcmp(mode,def{1})
-                    obj.ifNpushPull = def{2};
-                    obj.ifAmplitude = def{3};
+                    obj.ifmNpushPull = def{2};
+                    obj.ifmAmplitude = def{3};
                     obj.ifmNloop = def{4};
                     obj.ifmPause = def{5};
                     found = true;
@@ -499,6 +519,27 @@ classdef Config < handle
 
             obj.ifMode = mode; 
         end 
+        function [nPushPull, amplitude, nLoop, ifmPause] =  ifmParameters(obj, mode)
+           if nargin<2
+               nPushPull =  obj.ifmNpushPull;
+               amplitude = obj.ifmAmplitude;
+               nLoop = obj.ifmNloop;
+               ifmPause = obj.ifmPause;
+           else
+               found = false;
+               for i=1:length(obj.ifDef)
+                def = obj.ifDef{i};
+                    if strcmp(mode,def{1})
+                        nPushPull = def{2};
+                        amplitude = def{3};
+                        nLoop = def{4};
+                        ifmPause = def{5};
+                        found = true;
+                    end
+                end
+            if ~found; error(sprintf('unknown mode %s',mode)); end 
+           end
+        end
         function ifModes = ifModeChoices(obj)
             ifModes = {};
             for i=1:length(obj.ifDef)
@@ -533,6 +574,7 @@ classdef Config < handle
                     obj.ztcNeigenValue = def{3};
                     obj.ztcNzernike = def{4};
                     obj.ztcZeroMean = def{5};
+                    obj.ztcOrientation = def{6};
                     found = true;
                 end
             end

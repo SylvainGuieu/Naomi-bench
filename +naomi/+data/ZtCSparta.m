@@ -8,8 +8,8 @@ classdef ZtCSparta < naomi.data.ZtC
             obj = obj@naomi.data.ZtC(varargin{:});
         end
         function sh = staticHeader(obj)
-        	sh = {{naomi.KEYS.DPRTYPE, 'ZTC',   naomi.KEYS.DPRTYPEc},...
-								{naomi.KEYS.DPRVER, 'SPARTA', naomi.KEYS.DPRVERc}};
+        	sh = {{naomi.KEYS.DPRTYPE, 'M2DM',   naomi.KEYS.DPRTYPEc},...
+				  {naomi.KEYS.DPRVER, 'SPARTA', naomi.KEYS.DPRVERc}};
         end   
         function idx = zernike2index(obj, zernike)
             % convert the given zernike number to the table index

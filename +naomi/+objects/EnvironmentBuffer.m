@@ -47,7 +47,7 @@ classdef EnvironmentBuffer < naomi.objects.Buffer
                case 'fanOut'
                    value = obj.buffer(1:i,obj.FANOUT);  
               case 'humidity'
-                   value = obj.buffer(1:i,obj.FANOUT);  
+                   value = obj.buffer(1:i,obj.HUMIDITY);  
                    
                otherwise
                    error('unknown field "%s"', key);

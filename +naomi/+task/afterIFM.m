@@ -8,9 +8,9 @@ function afterIFM(bench, IFMData)
 IFMCleanData = naomi.make.cleanIFM(bench, IFMData);
 naomi.config.IFM(bench,IFMCleanData);
 
-naomi.saveData(IFMData, bench);
-naomi.saveData(IFMCleanData, bench);
+naomi.saveData(bench, IFMData);
+naomi.saveData(bench, IFMCleanData);
 naomi.plot.figure('IFM QC', 1);
 IFMCleanData.plotQc;
-naomi.saveFigure(IFMCleanData,'QC',  bench);
+naomi.saveFigure(bench, IFMCleanData,'QC');
 end
