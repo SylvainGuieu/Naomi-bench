@@ -1,4 +1,4 @@
-function phaseArray = closeZonal(bench, PtC,gain,nStep,trgPhi)
+function phaseArray = closeZonal(bench, PtC,gain,nStep,trgPhi, filterTipTilt)
 % closeZonal Close a zonal loop
 %
 %   phi = closeZonal(dm,wfs,PtC,gain,nStep)
@@ -14,7 +14,9 @@ function phaseArray = closeZonal(bench, PtC,gain,nStep,trgPhi)
 
 dm = bench.dm;
 
-
+if nargin <6 
+    filterTipTilt = 0;
+end
 bench.log(sprintf('NOTICE: Close zonal loop in %i step:',nStep), 1);
 
 [~,~,nActuator] = size(PtC);
@@ -22,7 +24,7 @@ if nargin < 5; trgPhi = 0.0; end;
 
     for step=1:nStep
         % Read WFS
-        phi  = naomi.measure.phase(bench, 1);
+        phi  = naomi.measure.phase(bench, 1, filterTipTilt);
         phir = phi - trgPhi;
         
         % Control

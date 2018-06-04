@@ -20,6 +20,7 @@ function [phaseArray, phaseData] = openZernike(bench, zernike, varargin)
             phaseArray = phaseArray + (push-pull)/nPushPull;
         end
         phaseArray = phaseArray / (2*amplitude*nPushPull);
+        naomi.action.resetDm(bench);
     else
         naomi.action.cmdModal(bench, zernike, amplitude);
         % :TODO: Do not remove the tiptilt or leave it as it is ??? 

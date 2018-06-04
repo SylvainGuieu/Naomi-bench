@@ -77,8 +77,11 @@ function [dmBiasVector,dmBiasData,phaseFlatData] = dmBias(bench, varargin)
     naomi.config.pupillMask(bench, mask);
     
     naomi.action.resetDm(bench);
+    
+    % filter the tiptilt for flat dm
+    filterTipTilt = 1;
     try
-       phaseArray =  naomi.action.closeZonal(bench, PtCArray, gain, nStep);
+       phaseArray =  naomi.action.closeZonal(bench, PtCArray, gain, nStep, filterTipTilt);
     catch ME
         bench.dm.biasVector = savedBiasVector;
         naomi.action.resetDm(bench);

@@ -205,6 +205,16 @@ classdef Bench < naomi.objects.BaseObject
             obj.log(sprintf('NOTICE: dm chenged  to %s',obj.config.dmId));
             obj.log(sprintf('NOTICE: session name is now %s ',obj.config.sessionName));
         end
+        function lastSession(obj)
+            dmId = obj.config.dmId;
+            sessionNumber =1;
+            while (exist(fullfile(obj.config.todayDirectory, sprintf('%s.%d', dmId, sessionNumber)), 'file'))
+                    sessionNumber = sessionNumber +1;
+            end
+            if sessionNumber > 1; sessionNumber = sessionNumber - 1; end
+            obj.config.sessionName = sprintf('%s.%d', dmId, max( 1,sessionNumber));
+        end
+            
         function newSession(obj, name)
             % bench.newSession
             % create a new session. By default this will be the DMID.NUM

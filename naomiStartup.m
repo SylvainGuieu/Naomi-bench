@@ -26,7 +26,10 @@ naomiGlobalEnvironmentBuffer = naomi.newEnvironmentBuffer;
 
 % create a copy with the name bench
 bench = naomiGlobalBench;
-% make a new session after each startup ?
+% set the session to the last created 
+bench.lastSession; 
+
+% or make a new session after each startup ?
 % bench.newSession
 naomi.task.openStartupPanel;
 naomi.task.openCalibrationPanel;
