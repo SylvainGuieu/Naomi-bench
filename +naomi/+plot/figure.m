@@ -45,6 +45,10 @@ function fig = figure(name, bringFront)
                      set(fig, 'Position',[1228 121 560 843]);
                 case 'Alignment RTD' % alpao RtD
                     set(fig, 'Position',[1228 121 560 843]);
+                case 'ZtC Modes' 
+                    set(fig, 'Position',[881 45 560 760]);
+                case 'ZtC QC' 
+                    set(fig, 'Position',  [799 97 517 701]);
                     %grid2screen(screenGrid, [-1, -10, 25,90]));
 %                     case 'Influence Function'
 %                     %% figure related to measurement 

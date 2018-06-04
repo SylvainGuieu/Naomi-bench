@@ -427,9 +427,20 @@ classdef Environment < naomi.objects.BaseObject
         end
         
         function startMonitoring(obj)
+           % do nothing if the timer is already running
+           % this is important to avoid infinite loop with .updataControl
+          if ~isempty(obj.monitoringTimer)
+              if isvalid(obj.monitoringTimer)
+                  if strcmp(get(obj.monitoringTimer, 'Running'), 'on')
+                      return
+                  end
+              end
+          end
+            
           obj.stopMonitoring;
+           
           % make a timer for monitoring
-          obj.monitoringTimer = timer('StartDelay', 0, 'Period', 4, ...
+          obj.monitoringTimer = timer('Period', 4.0,'StartDelay', 0, ...
                                       'ExecutionMode', 'fixedRate');
           obj.monitoringTimer.TimerFcn = @obj.updateControl;
           start(obj.monitoringTimer);                    
@@ -543,7 +554,7 @@ classdef Environment < naomi.objects.BaseObject
             %  - switch from goToEmbiant to off if embiant temperature reached 
             % additional arguments are for timer callback but will be ignored
             state = obj.controlState;
-            
+            fprintf('tick');
             temp = obj.getTemp(obj.S_MIRROR); % temperature of the mirror
             regulTemp = obj.tempRegul;
             embiantTemp = obj.getTemp(obj.S_EMBIANT);

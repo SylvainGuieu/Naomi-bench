@@ -20,7 +20,11 @@ naomi.saveData(bench, ZtCData.toSparta);
 naomi.saveData(bench, ZtCDmData);
 
 naomi.plot.figure('ZtC QC');
-ZtCData.plotQc;
+ZtCData.plotQc(bench.IFMData, bench.dmBiasData);
 naomi.saveFigure(bench, ZtCData, 'QC');
+naomi.plot.figure('ZtC Modes');
+ZtCData.plotModes(bench.IFMData);
+naomi.saveFigure(bench, ZtCData, 'Modes');
+
 end
 
