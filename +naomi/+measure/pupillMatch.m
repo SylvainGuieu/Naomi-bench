@@ -18,10 +18,10 @@ if nargin<4; arcsecStep = 30; end
  for i=1:nStep
      arcsecVector(i) = movement;
      naomi.action.resetDm(bench);
-     [~,~,dTip,dTilt] = naomi.measure.missalignment(bench);
+     [~,~,dTip,dTilt] = naomi.measure.(bench);
      IFC = naomi.measure.IFC(bench);
      
-     f = naomi.compute.IFCenter(IFC);
+     f = naomi.compute.fittedIFprofile(IFC);
      xCenter = f.xCenter;
      yCenter = f.yCenter;
      
