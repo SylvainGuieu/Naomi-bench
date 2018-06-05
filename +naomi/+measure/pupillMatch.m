@@ -32,13 +32,24 @@ if nargin<4; arcsecStep = 30; end
  
  if bench.config.plotVerbose
      naomi.plot.figure('Pupill Match');
+     subplot(4,1,1);
      plot(arcsecVector,xCenterVector, 'b-o');
-     hold on
-     plot(arcsecVector,yCenterVector, 'r-o');
-     hold off
-     legend('x', 'y');
      xlabel(sprintf('%s => motor %s displacemet (arcsec)', order, axis));
-     ylabel('X/Y displacement (pixel)');
+     ylabel('X displacement (pixel)');
+     subplot(4,1,2);
+     plot(arcsecVector,yCenterVector, 'r-o');
+     xlabel(sprintf('%s => motor %s displacemet (arcsec)', order, axis));
+     ylabel('Y displacement (pixel)');
+     
+     
+     subplot(4,1,3);
+     plot(arcsecVector,tipVector, 'b-o');
+     xlabel('tip um rms');
+     ylabel('X displacement (pixel)');
+     subplot(4,1,4);
+     plot(arcsecVector,tiltVector, 'r-o');
+     xlabel('tilt um rms');
+     ylabel('Y displacement (pixel)');
  end
      
     
