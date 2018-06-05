@@ -9,7 +9,7 @@ if isempty(bench.IFMData)
 end
 startDate = now;
 ZtPData = naomi.measure.ZtP(bench);
-ZtPData.setKey(naomi.KEYS.DATEOB, bench.ZtCData.getKey(naomi.KEYS.DATEOB,startDate), naomi.KEYS.DATEOBc);
+ZtPData.setKey(naomi.KEYS.DATEOB, startDate, naomi.KEYS.DATEOBc);
 naomi.task.afterZtP(bench, ZtPData);
 end
 
