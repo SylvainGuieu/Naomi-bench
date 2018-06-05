@@ -77,11 +77,17 @@ function [dmBiasVector,dmBiasData,phaseFlatData] = dmBias(bench, varargin)
     naomi.config.pupillMask(bench, mask);
     
     naomi.action.resetDm(bench);
+    % put the current bias as a command so one can restart the bias
+    % computation from a previous state
+    if length(savedBiasVector)>1
+        naomi.action.cmdZonal(bench, squeeze(savedBiasVector));
+    end
+    
     
     % filter the tiptilt for flat dm
     filterTipTilt = 1;
     try
-       phaseArray =  naomi.action.closeZonal(bench, PtCArray, gain, nStep, filterTipTilt);
+       phaseArray =  naomi.action.closeZonal(bench, PtCArray, gain, nStep, 0.0, filterTipTilt);
     catch ME
         bench.dm.biasVector = savedBiasVector;
         naomi.action.resetDm(bench);
@@ -113,9 +119,10 @@ function [dmBiasVector,dmBiasData,phaseFlatData] = dmBias(bench, varargin)
              {K.NPHASE,    nStep,    K.NPHASEc  }, ...
              {K.LOOPGAIN,  gain,     K.LOOPGAINc}, ...
              {K.LOOPSTEP,  nStep,    K.LOOPSTEPc}, ...
-             {K.DPRVER, K.ZONAL, K.DPRVERc}};
+             {K.DPRVER, K.ZONAL, K.DPRVERc}, ...
+             {K.PHASETT, logical(filterTipTilt), K.PHASETTc}};
         
-        phaseFlatData  = naomi.data.PhaseFlat(phaseArray, h);
+      phaseFlatData  = naomi.data.PhaseFlat(phaseArray, h);
       bench.populateHeader(phaseFlatData.header);
    end
   end 

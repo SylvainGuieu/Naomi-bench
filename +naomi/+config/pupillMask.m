@@ -2,9 +2,9 @@ function success = pupillMask(bench, mask, maskCenter)
 	% Configure the Mask for the WFS
 	%
 	% configure.pupillMask(bench)
-	% configure.pupillMask(bench, 28e-3)
-	% configure.pupillMask(bench, 28e-3, 3.2, 5.6)
-	% configure.pupillMask(bench, 28e-3, 3.2, 5.6, 1.5e-3)
+    % configure.pupillMask(bench, mask)
+	% configure.pupillMask(bench, mask, maskCenter)
+	
 	% - bench : the bench object 
 	% all other parameters are optional they are taken from config if not given
 	% - mask : can be :

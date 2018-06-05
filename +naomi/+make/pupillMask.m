@@ -57,7 +57,7 @@ function [maskArray,maskData] = pupillMask(bench, mask, maskCenter)
         end
         xCenter = maskCenter(1);
         yCenter = maskCenter(2);
-    	end	
+      end	
       
       maskArray = naomi.compute.pupillMask(bench.nSubAperture, pupillDiameter,centralObscurtionDiameter, xCenter, yCenter);
       if nargout>1

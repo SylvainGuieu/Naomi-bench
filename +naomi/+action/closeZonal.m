@@ -13,14 +13,12 @@ function phaseArray = closeZonal(bench, PtC,gain,nStep,trgPhi, filterTipTilt)
 %
 
 dm = bench.dm;
+if nargin < 5; trgPhi = 0.0; end
+if nargin <6; filterTipTilt = 0; end
 
-if nargin <6 
-    filterTipTilt = 0;
-end
 bench.log(sprintf('NOTICE: Close zonal loop in %i step:',nStep), 1);
-
 [~,~,nActuator] = size(PtC);
-if nargin < 5; trgPhi = 0.0; end;
+
 
     for step=1:nStep
         % Read WFS
