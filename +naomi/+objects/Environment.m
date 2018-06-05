@@ -250,8 +250,8 @@ classdef Environment < naomi.objects.BaseObject
         goToCalibFanVoltage = 24.0;
         goToEmbiantFanVoltage = 24.0;
         maintainFanVoltage = 24.0;
-        calibFanVoltage = 0.0;
-        
+        calibInnerFanVoltage = 0.0;
+        calibOuterFanVoltage = 24.0;
         %%
         vaporPressure = 1; % to be defined
         
@@ -492,7 +492,7 @@ classdef Environment < naomi.objects.BaseObject
             end
             % otherwise check the fan voltage and then the temperature
             fanVoltage = obj.getFanVoltage(obj.F_IN);
-            if abs(fanVoltage-obj.calibFanVoltage)>1e-1
+            if abs(fanVoltage-obj.calibInnerFanVoltage)>1e-1
                 test = 0;
                 explanation = sprintf('The Fan inside the bench is still on : voltage = %.2f', fanVoltage);
                 return 
@@ -563,6 +563,7 @@ classdef Environment < naomi.objects.BaseObject
                 case obj.MAINTAIN % regulation to maintain the bench temperature
                     % We need to change the state when temperature is
                     % reaching a treshold
+                    
                     if embiantTemp>calibTemp % we are cooling down
                         if temp > (calibTemp+obj.startGoToCalibDeltaTemp)
                             obj.goToCalib();
@@ -574,12 +575,12 @@ classdef Environment < naomi.objects.BaseObject
                     end
                    
                 case obj.GOTOCALIB 
-                    if regulTemp < calibTemp % we are cooling down to calib temp
+                    if embiantTemp > calibTemp % we are cooling down to calib temp
                         if temp < (calibTemp - obj.startMaintainDeltaTemp)
                             obj.maintain();
                         end
                     else % we are warming up to calib temperature 
-                        if temp > (calibTemp + obj.startMaintainDeltaTemp)
+                        if temp > (calibTemp + obj.startMaintainDeltaTemp)                            
                             obj.maintain();
                         end
                     end
@@ -678,7 +679,7 @@ classdef Environment < naomi.objects.BaseObject
             % close to the mirror temperature to avoid temp leaks and to 
             % avoid temperature gradiant (turbulences) 
             obj.goTo('embiant', obj.calibTemperature, obj.calibCorrectiveFactor, ...
-                obj.calibFanVoltage,  obj.calibFanVoltage);
+                obj.calibInnerFanVoltage,  obj.calibOuterFanVoltage);
             obj.controlState = obj.CALIB;
             obj.stopMonitoring;
         end
