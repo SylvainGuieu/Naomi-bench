@@ -35,21 +35,27 @@ if nargin<4; arcsecStep = 30; end
      subplot(4,1,1);
      plot(arcsecVector,xCenterVector, 'b-o');
      xlabel(sprintf('%s => motor %s displacemet (arcsec)', order, axis));
-     ylabel('X displacement (pixel)');
+     ylabel('X (pixel)');
      subplot(4,1,2);
      plot(arcsecVector,yCenterVector, 'r-o');
      xlabel(sprintf('%s => motor %s displacemet (arcsec)', order, axis));
-     ylabel('Y displacement (pixel)');
+     ylabel('Y  (pixel)');
      
      
+     switch order
+         case 'tip'
+             v = tipVector;
+         case 'tilt'
+             v = tiltVector;
+     end
      subplot(4,1,3);
-     plot(arcsecVector,tipVector, 'b-o');
-     xlabel('tip um rms');
-     ylabel('X displacement (pixel)');
+     plot(v,xCenterVector,'b-o');
+     xlabel(sprintf('%s um rms',order));
+     ylabel('X (pixel)');
      subplot(4,1,4);
-     plot(arcsecVector,tiltVector, 'r-o');
-     xlabel('tilt um rms');
-     ylabel('Y displacement (pixel)');
+     plot(v, yCenterVector, 'r-o');
+     xlabel(sprintf('%s um rms', order));
+     ylabel('Y (pixel)');
  end
      
     
