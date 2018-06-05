@@ -20,7 +20,13 @@ if nargin<4; arcsecStep = 30; end
      naomi.action.resetDm(bench);
      [~,~,dTip,dTilt] = naomi.measure.missalignment(bench);
      IFC = naomi.measure.IFC(bench);
-     [xCenter,yCenter] = naomi.compute.IFCenter(IFC);
+     
+     f = naomi.compute.IFCenter(IFC);
+     xCenter = f.xCenter;
+     yCenter = f.yCenter;
+     
+     %[xCenter,yCenter] = naomi.compute.IFCenter(IFC);
+     
      naomi.action.resetDm(bench);
      xCenterVector(i) = xCenter;
      yCenterVector(i) = yCenter;
