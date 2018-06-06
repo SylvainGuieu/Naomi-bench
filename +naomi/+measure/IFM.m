@@ -70,7 +70,8 @@ function [IFMData, IFMcleanData] = IFM(bench, varargin) %callback, nPushPull, nL
                 return
             end
             if (iActuator*iLoop)>1
-                remainingTime = (now-start)*24*3600 / (iActuator*iLoop) * (nActuator*nLoop-iActuator*iLoop);
+                nStepMade = iActuator+(iLoop-1)*nActuator;
+                remainingTime = (now-start)*24*3600 / nStepMade * (nActuator*nLoop-nStepMade);
                 bench.log(sprintf('NOTICE: IFM Loop=%d/%d Actuator=%d/%d Time=%0.3fs remainingTime=%0.3fs', iLoop, nLoop, iActuator, nActuator, (now-start)*24*3600, remainingTime),2);
                 
             else
