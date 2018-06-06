@@ -11,7 +11,7 @@ function fig = figure(name, bringFront)
     %              |     |    |  |  |    |- v grid resolution
     screenGrid = [-1,   -1, 0, 0, 100, 100];
     if nargin<2
-        bringFront = 1;
+        bringFront = 0;
     end
     fig = findobj('type','figure','name',name);
 

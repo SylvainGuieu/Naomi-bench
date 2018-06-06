@@ -183,6 +183,7 @@ classdef Bench < naomi.objects.BaseObject
             % Change the current dm defined by its Id
             % this will stop the dm environment
             obj.log(sprintf('NOTICE: changing dm from %s to %s',obj.config.dmId, dmId));
+            newDm =  ~strcmp(obj.config.dmId, dmId);
             obj.config.dmId = dmId;
             if obj.isDm
                 obj.stopDm; % stop the dm environment 
@@ -204,6 +205,17 @@ classdef Bench < naomi.objects.BaseObject
             
             obj.log(sprintf('NOTICE: dm chenged  to %s',obj.config.dmId));
             obj.log(sprintf('NOTICE: session name is now %s ',obj.config.sessionName));
+            
+            if newDm
+               obj.measuredDmAngle = [];
+               obj.measuredXcenter = [];
+               obj.measuredXpixelScale = [];
+               obj.measuredYcenter = [];
+               obj.measuredYpixelScale = [];
+               obj.measuredXpupillCenter = [];
+               obj.measuredYpupillCenter = [];
+               obj.log('NOTICE: new dm centering and pixel scale measurement dropped');
+            end
         end
         function lastSession(obj)
             dmId = obj.config.dmId;
@@ -733,11 +745,11 @@ classdef Bench < naomi.objects.BaseObject
            try
             obj.gimbal.init;
            catch EM
-             obj.killProcess(naomi.KEYS.P_INITGIMBAL);
              obj.log('ERROR: gimbal motor init failed'); 
              rethrow(EM);
            end
-           obj.log('NOTICE: gimbal motor init finished'); 
+           obj.log('NOTICE: gimbal motor init finished');
+           obj.killProcess(naomi.KEYS.P_INITGIMBAL);
         end
         function stopGimbal(obj)
             obj.log('NOTICE: Stopping Gimbal ...', 1);

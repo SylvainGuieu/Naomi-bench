@@ -45,7 +45,7 @@ function [IFArray,IFData] = IF(bench,  act, varargin)
         %naomi.action.cmdZonal(bench, act, ref);
     end
    	if bench.config.plotVerbose
-       naomi.plot.figure('IF');
+       naomi.plot.figure('IF', 0);
        imagesc(IFArray);
        colorbar; 
        title(sprintf('IF %d rms=%.3f', act, naomi.compute.nanstd(IFArray(:))));
