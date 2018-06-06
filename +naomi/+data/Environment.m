@@ -37,8 +37,8 @@ classdef Environment < naomi.data.BaseData
         function c = TQSM(obj)
             c = obj.getKey(naomi.KEYS.TEMPQSM, 9);
         end
-        function c = TEMBIANT(obj)
-            c = obj.getKey(naomi.KEYS.TEMPEMBIANT, 10);
+        function c = TAMBIENT(obj)
+            c = obj.getKey(naomi.KEYS.TEMPAMBIENT, 10);
         end
 				function c = HUMIDITY(obj)
             c = obj.getKey(neomi.KEYS.HUMIDITY, 11);
@@ -58,8 +58,8 @@ classdef Environment < naomi.data.BaseData
                    value = obj.data(':',obj.TMIRROR);
                case 'tempQSM'
                    value = obj.data(':',obj.TQSM);
-               case 'tempEmbiant'
-                   value = obj.data(':',obj.TEMBIANT);
+               case 'tempAmbient'
+                   value = obj.data(':',obj.TAMBIENT);
                case 'time'
                    value = obj.data(':',obj.TIME);  
                case 'current'
@@ -105,7 +105,7 @@ classdef Environment < naomi.data.BaseData
             plot(axesList{3}, time, obj.get('tempIn'), 'b-', 'DisplayName','peltier in');
             plot(axesList{3}, time, obj.get('tempRegul'), 'b:', 'DisplayName','regul setpoint');
             
-            plot(axesList{3}, time, obj.get('tempEmbiant'), 'k:', 'DisplayName', 'embiant');
+            plot(axesList{3}, time, obj.get('tempAmbient'), 'k:', 'DisplayName', 'ambient');
             
             plot(axesList{3}, time, obj.get('tempMirror'), 'r-', 'DisplayName', 'mirror');
             plot(axesList{3}, time, obj.get('tempQSM'), 'r:', 'DisplayName', 'qsm');

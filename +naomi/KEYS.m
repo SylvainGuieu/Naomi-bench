@@ -318,8 +318,8 @@ classdef KEYS
        TEMPOUT= 'TEMPOUT';
        TEMPOUTc = '[C] Temperature of the Pletier outer face';
        
-       TEMPEMBIANT= 'TEMPEMBI';
-       TEMPEMBIANTc = '[C] Embiant temperature';
+       TEMPAMBIENT= 'TEMPAMBI';
+       TEMPAMBIENTc = '[C] Ambient temperature';
        
        TEMPREGUL= 'TEMPREGU';
        TEMPREGULc = '[C] Set Regulation temperature';
@@ -334,7 +334,7 @@ classdef KEYS
        PFANOUTc = '[V] Outer fan voltage';
        
        HUMIDITY = 'HUMIDITY';
-       HUMIDITYc = '[%] Embiant humidity';
+       HUMIDITYc = '[%] Ambient humidity';
        
        
        

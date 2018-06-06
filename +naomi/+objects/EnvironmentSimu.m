@@ -5,7 +5,7 @@ classdef EnvironmentSimu < naomi.objects.Environment
         simuRegul = 0;
         simuTime = 0;
         simuRegister;
-        simuUSBTemp = [20.0 20.0 20.0 20.0 20.0 50.0 50.0];
+        simuUSBTemp = [20.0 20.0 20.0 20.0 20.0 10.0 10.0];
         
         % simuTimeScale = 100 -> one 'real' computer second is 100 simulated seconde
         simuTimeScale = 1.0;
@@ -52,7 +52,7 @@ classdef EnvironmentSimu < naomi.objects.Environment
           regulTemp = str2double(obj.simuRegister(obj.R_REGUL));
           % peltier cold face
           t1 = str2double(obj.simuRegister(obj.R_TEMP(1)));
-          t4 = obj.simuUSBTemp(1); % embient
+          t4 = obj.simuUSBTemp(1); % ambient
           
           if obj.simuRegul
               current = (regulTemp-t1)*5.0;
@@ -86,7 +86,7 @@ classdef EnvironmentSimu < naomi.objects.Environment
           
           obj.simuUSBTemp(3) = max(8.0, obj.simuUSBTemp(3) + current*dTime/360 + (t4-obj.simuUSBTemp(3))*leak*dTime)+tErr*(rand-0.5);
           
-          obj.simuUSBTemp(1) = 20.0+tErr*(rand-0.5);  % embiant 
+          obj.simuUSBTemp(1) = 20.0+tErr*(rand-0.5);  % ambient 
            
           obj.simuTime = now;
         end

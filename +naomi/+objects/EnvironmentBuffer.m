@@ -10,7 +10,7 @@ classdef EnvironmentBuffer < naomi.objects.Buffer
         TOUT = 7;
         TMIRROR = 8;
         TQSM = 9;
-        TEMBIANT = 10;
+        TAMBIENT = 10;
         HUMIDITY = 11;
         
         environment; 
@@ -33,8 +33,8 @@ classdef EnvironmentBuffer < naomi.objects.Buffer
                    value = obj.buffer(1:i,obj.TMIRROR);
                case 'tempQSM'
                    value = obj.buffer(1:i,obj.TQSM);
-               case 'tempEmbiant'
-                   value = obj.buffer(1:i,obj.TEMBIANT);
+               case 'tempAmbient'
+                   value = obj.buffer(1:i,obj.TAMBIENT);
                case 'time'
                    value = obj.buffer(1:i,obj.TIME);
                
@@ -66,7 +66,7 @@ classdef EnvironmentBuffer < naomi.objects.Buffer
                  {K.TEMPOUT,     obj.TOUT, 'outer temp. table column number '},...
                  {K.TEMPMIRROR,  obj.TMIRROR, 'mirror temp. table column number '},...
                  {K.TEMPQSM,     obj.TQSM, 'base qsm temp. table column number '},...
-                 {K.TEMPEMBIANT, obj.TEMBIANT, 'embiant temp. table column number '},...
+                 {K.TEMPAMBIENT, obj.TAMBIENT, 'ambient temp. table column number '},...
                  {K.HUMIDITY,    obj.HUMIDITY, 'humidity table column number '},...
             };
             environmentData = naomi.data.Environment(obj.data, h);
@@ -99,9 +99,9 @@ classdef EnvironmentBuffer < naomi.objects.Buffer
             plot(axesList{3}, time, obj.get('tempIn'), 'b-', 'DisplayName','peltier in');
             plot(axesList{3}, time, obj.get('tempRegul'), 'b:', 'DisplayName','regul setpoint');
             
-            plot(axesList{3}, time, obj.get('tempEmbiant'), 'k:', 'DisplayName', 'embiant');
+            plot(axesList{3}, time, obj.get('tempAmbient'), 'k:', 'DisplayName', 'ambient');
             
-            plot(axesList{3}, time, obj.get('tempMirror'), 'r-', 'DisplayName', 'mirror');
+            plot(axesList{3}, time, obj.get('tempMirror'), 'r-', 'DisplayName', 'mirror', 'LineWidth',3);
             plot(axesList{3}, time, obj.get('tempQSM'), 'r:', 'DisplayName', 'qsm');
             
             
@@ -139,7 +139,7 @@ classdef EnvironmentBuffer < naomi.objects.Buffer
             obj.buffer(i, obj.TOUT) = e.tempOut;
             obj.buffer(i, obj.TMIRROR) = e.tempMirror;
             obj.buffer(i, obj.TQSM) = e.tempQSM;
-            obj.buffer(i, obj.TEMBIANT) = e.tempEmbiant;
+            obj.buffer(i, obj.TAMBIENT) = e.tempAmbient;
             obj.buffer(i, obj.FANIN) = e.fanIn;
             obj.buffer(i, obj.FANOUT) = e.fanOut;
             obj.buffer(i, obj.CURRENT) = e.current; 

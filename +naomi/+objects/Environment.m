@@ -192,10 +192,10 @@ classdef Environment < naomi.objects.BaseObject
         
         %% control constant definition
         % GOTOCALIB mode when starting the cooldown (or warmup depending of
-        % the embiant temperature). Shoud result to the MAINTAIN mode 
+        % the ambient temperature). Shoud result to the MAINTAIN mode 
         GOTOCALIB = 1; 
-        % GOTOEMBIANT to reach embiant temperature. Show result to OFF
-        GOTOEMBIANT = 2; 
+        % GOTOAMBIENT to reach ambient temperature. Show result to OFF
+        GOTOAMBIENT = 2; 
         
         % Maintain the bench temperature by adjusting the peltier cold face
         % temperature (at about the calib temperature) with the fan on 
@@ -217,7 +217,7 @@ classdef Environment < naomi.objects.BaseObject
         calibTemperature = 10.0 
         
         % acceptable difference of temperature between 
-        % mirror and embiant to allow door opening                   
+        % mirror and ambient to allow door opening                   
         safeDeltaTemp = 4.0 
         
         % temperature difference forwhich it is acceptable to start calibration
@@ -225,30 +225,30 @@ classdef Environment < naomi.objects.BaseObject
         calibDeltaTemp = 0.5 % +/- x 
         
         %% Temperature
-        % When cooling down (or warming up, depend of the embient temperature)
+        % When cooling down (or warming up, depend of the ambient temperature)
         % The laird regulation temperature is set as 
-        %   Tregul = Tcalib - (Tembiant - Tcalib) * correctiveFactor 
+        %   Tregul = Tcalib - (Tambient - Tcalib) * correctiveFactor 
         % Where Tbench0 is the bench (mirror) temperature when starting
         % cooldwond or warmup.
         goToCalibCorrectiveFactor = 1.0;
-        % For goToEmbient this is the same exccept that the reference
+        % For goToAmbient this is the same exccept that the reference
         % temperature is the bench temperature
         %   Tregul = Tcalib - (Tbench0 - Tcalib) * correctiveFactor 
-        goToEmbiantCorrectiveFactor = 1.0;
+        goToAmbientCorrectiveFactor = 1.0;
         
         % in the same way, To set the regulation temperature the formulae
-        % is Tregul = Tcalib - (Tembiant - Tcalib) * correctiveFactor
+        % is Tregul = Tcalib - (Tambient - Tcalib) * correctiveFactor
         maintainCorrectiveFactor = 0.2; 
         
         % also when doing a clibration (= fan off) the factor can be set 
-        % Tregul = Tcalib - (Tembiant - Tcalib) * correctiveFactor
+        % Tregul = Tcalib - (Tambient - Tcalib) * correctiveFactor
         % however it is recommanded to be 0.0 to avoid strong gradiant
         % temperature
         calibCorrectiveFactor = 0.0; 
         
         %% Fan 
         goToCalibFanVoltage = 24.0;
-        goToEmbiantFanVoltage = 24.0;
+        goToAmbientFanVoltage = 24.0;
         maintainFanVoltage = 24.0;
         calibInnerFanVoltage = 0.0;
         calibOuterFanVoltage = 24.0;
@@ -267,9 +267,9 @@ classdef Environment < naomi.objects.BaseObject
         % In the same way, if the maintain cannot maintain the temperature
         % the startGoToCalibDeltaTemp gives the temperature for witch we
         % may restart the goToCalib mode
-        % if Tembiant > Tcalib: (cool down)
+        % if Tambient > Tcalib: (cool down)
         %  T > (Tcalib + DeltaTemp)
-        % if Tembiant < Tcali 
+        % if Tambient < Tcali 
         %  T < (Tcalib - DeltaTemp)
         startGoToCalibDeltaTemp = 1.0
         
@@ -278,7 +278,7 @@ classdef Environment < naomi.objects.BaseObject
         % they are the matlab constant id to recognize temperature 
         S_IN = 1;
         S_OUT = 2;
-        S_EMBIANT = 4;
+        S_AMBIENT = 4;
         S_MIRROR = 5;
         S_QSM = 6;
         
@@ -311,7 +311,7 @@ classdef Environment < naomi.objects.BaseObject
         ALLWAYSOFF = 0;
         
         % usb temp channels  and humidity channel 
-        U_EMBIANT = 0;
+        U_AMBIENT = 0;
         U_MIRROR = 4;
         U_QSM = 2;
         U_HUMIDITY = 6;
@@ -351,8 +351,8 @@ classdef Environment < naomi.objects.BaseObject
         %     e.calib()
         %          (try to) Maintain the temperature with the inner fan off
         %          suitable to start calibration.
-        %     e.goToEmbiant()
-        %          Put the bench to the embiant temperature. Used after
+        %     e.goToAmbient()
+        %          Put the bench to the ambient temperature. Used after
         %          calibration is finished, before opening the door
         %     e.manual(setPoint, fan1Voltage, fan2Voltage)
         %          User can define the setpoint and fan voltages 
@@ -364,7 +364,7 @@ classdef Environment < naomi.objects.BaseObject
         % mode and eventaully switch from one mode to an other : 
         %         - from goToCalib to maintain  if calib temperature
         %         reached 
-        %         - from goToEmbiant to off if embiant temperature reached 
+        %         - from goToAmbient to off if ambient temperature reached 
         % 
         % Use e.isReadyToCalib to check if conditions are ok for
         % calibration 
@@ -463,7 +463,7 @@ classdef Environment < naomi.objects.BaseObject
           naomi.addToHeader(h, K.TEMPQSM,   obj.tempQSM,K.TEMPQSMc);
           naomi.addToHeader(h, K.TEMPIN,    obj.tempIn, K.TEMPINc);
           naomi.addToHeader(h, K.TEMPOUT,   obj.tempOut, K.TEMPOUTc);
-          naomi.addToHeader(h, K.TEMPEMBIANT, obj.tempEmbiant, K.TEMPEMBIANTc);
+          naomi.addToHeader(h, K.TEMPAMBIENT, obj.tempAmbient, K.TEMPAMBIENTc);
           naomi.addToHeader(h, K.TEMPREGUL, obj.tempRegul, K.TEMPREGULc);
           naomi.addToHeader(h, K.HUMIDITY, obj.humidity, K.HUMIDITYc);
         end
@@ -485,9 +485,9 @@ classdef Environment < naomi.objects.BaseObject
                     test = 0;
                     explanation = 'The bench is in regulation state -> fans are on';
                     return 
-                case obj.GOTOEMBIANT
+                case obj.GOTOAMBIENT
                     test = 0;
-                    explanation = 'The bench is getting to the embiant temperature';
+                    explanation = 'The bench is getting to the ambient temperature';
                     return 
             end
             % otherwise check the fan voltage and then the temperature
@@ -510,7 +510,7 @@ classdef Environment < naomi.objects.BaseObject
         
         function [test, explanation] = isSafeToOpen(obj)
            explanation = '';
-           dt = obj.getTemp(obj.S_EMBIANT) - obj.getTemp(obj.S_MIRROR);
+           dt = obj.getTemp(obj.S_AMBIENT) - obj.getTemp(obj.S_MIRROR);
            if abs(dt) < obj.safeDeltaTemp
                test = 1;
            else
@@ -528,8 +528,8 @@ classdef Environment < naomi.objects.BaseObject
             switch stateNum
                 case obj.GOTOCALIB
                     obj.goToCalib();
-                case obj.GOTOEMBIANT
-                    obj.goToEmbiant();
+                case obj.GOTOAMBIENT
+                    obj.goToAmbient();
                 case obj.CALIB
                     obj.calib();
                 case obj.MAINTAIN
@@ -546,25 +546,25 @@ classdef Environment < naomi.objects.BaseObject
             % e.updateControl()
             % 
             % check the current control mstate (goToCalib, maintain, calib,
-            % goToEmbiant, manual or off) and eventually change the control
+            % goToAmbient, manual or off) and eventually change the control
             % state in some conditions : 
             % 
             %  - switch from goToCalib to maintain  if calib temperature
             %     reached 
-            %  - switch from goToEmbiant to off if embiant temperature reached 
+            %  - switch from goToAmbient to off if ambient temperature reached 
             % additional arguments are for timer callback but will be ignored
             state = obj.controlState;
             
             temp = obj.getTemp(obj.S_MIRROR); % temperature of the mirror
             regulTemp = obj.tempRegul;
-            embiantTemp = obj.getTemp(obj.S_EMBIANT);
+            ambientTemp = obj.getTemp(obj.S_AMBIENT);
             calibTemp = obj.calibTemperature;
             switch state
                 case obj.MAINTAIN % regulation to maintain the bench temperature
                     % We need to change the state when temperature is
                     % reaching a treshold
                     
-                    if embiantTemp>calibTemp % we are cooling down
+                    if ambientTemp>calibTemp % we are cooling down
                         if temp > (calibTemp+obj.startGoToCalibDeltaTemp)
                             obj.goToCalib();
                         end
@@ -575,7 +575,7 @@ classdef Environment < naomi.objects.BaseObject
                     end
                    
                 case obj.GOTOCALIB 
-                    if embiantTemp > calibTemp % we are cooling down to calib temp
+                    if ambientTemp > calibTemp % we are cooling down to calib temp
                         if temp < (calibTemp - obj.startMaintainDeltaTemp)
                             obj.maintain();
                         end
@@ -585,10 +585,10 @@ classdef Environment < naomi.objects.BaseObject
                         end
                     end
                     
-                case obj.GOTOEMBIANT
-                    % turn everything off when the embiant temperature is
+                case obj.GOTOAMBIENT
+                    % turn everything off when the ambient temperature is
                     % reached.
-                    if temp>= embiantTemp
+                    if temp>= ambientTemp
                         obj.turnOff();
                     end
             end
@@ -606,10 +606,10 @@ classdef Environment < naomi.objects.BaseObject
             % and the fan voltages 
             % 
             % refTempName is the name used to extract the  refTemp 
-            % it can be 'embiant', 'mirror' or 'qsm'
+            % it can be 'ambient', 'mirror' or 'qsm'
             switch refTempName
-                case 'embiant'
-                    refTemp = obj.getTemp(obj.S_EMBIANT);
+                case 'ambient'
+                    refTemp = obj.getTemp(obj.S_AMBIENT);
                 case 'mirror'
                     refTemp = obj.getTemp(obj.S_MIRROR);
                 case 'qsm'
@@ -644,22 +644,22 @@ classdef Environment < naomi.objects.BaseObject
             % temprature. It is expected that user use e.maintain when the
             % calib temperature is reached or use e.controlUpdate() regulary to do
             % it manualy. 
-            obj.goTo('embiant', obj.calibTemperature, obj.goToCalibCorrectiveFactor, ...
+            obj.goTo('ambient', obj.calibTemperature, obj.goToCalibCorrectiveFactor, ...
                 obj.goToCalibFanVoltage, 24.0);
             
             obj.controlState = obj.GOTOCALIB;
             obj.startMonitoring;
         end
-        function goToEmbiant(obj)
-            % e.goToEmbiant()
-            % Go to the embiant temperature with higher set point 
+        function goToAmbient(obj)
+            % e.goToAmbient()
+            % Go to the ambient temperature with higher set point 
             % This mode can result in a higher temperature inside the
             % bench.
             % It is expected that user use e.turnOff() or that e.controlUpdate()
             % is ran regulary. 
-            obj.goTo('mirror', obj.getTemp(obj.S_EMBIANT), obj.goToEmbiantCorrectiveFactor, ...
-                obj.goToEmbiantFanVoltage, 24.0);
-            obj.controlState = obj.GOTOEMBIANT;
+            obj.goTo('mirror', obj.getTemp(obj.S_AMBIENT), obj.goToAmbientCorrectiveFactor, ...
+                obj.goToAmbientFanVoltage, 24.0);
+            obj.controlState = obj.GOTOAMBIENT;
             obj.startMonitoring;
         end
         
@@ -667,7 +667,7 @@ classdef Environment < naomi.objects.BaseObject
             % maintain the temperature inside the bench with the fan on 
             % used by e.controlUpdate() to wait the user to be ready to
             % change the mode to e.calib
-            obj.goTo('embiant', obj.calibTemperature, obj.maintainCorrectiveFactor, ...
+            obj.goTo('ambient', obj.calibTemperature, obj.maintainCorrectiveFactor, ...
                 obj.maintainFanVoltage, 24.0);
             obj.controlState = obj.MAINTAIN;
             obj.startMonitoring;
@@ -678,7 +678,7 @@ classdef Environment < naomi.objects.BaseObject
             % The temperature of the inside face of the peltier is set
             % close to the mirror temperature to avoid temp leaks and to 
             % avoid temperature gradiant (turbulences) 
-            obj.goTo('embiant', obj.calibTemperature, obj.calibCorrectiveFactor, ...
+            obj.goTo('ambient', obj.calibTemperature, obj.calibCorrectiveFactor, ...
                 obj.calibInnerFanVoltage,  obj.calibOuterFanVoltage);
             obj.controlState = obj.CALIB;
             obj.stopMonitoring;
@@ -768,7 +768,7 @@ classdef Environment < naomi.objects.BaseObject
         end
         
         function startRegulation(obj)
-            % start regulation use one of e.goToCalib , e.goToEmbiant,
+            % start regulation use one of e.goToCalib , e.goToAmbient,
             % e.maintain, e.calib, e.manual instead
             fprintf(obj.client, '$W');
             fscanf(obj.client); % $W
@@ -849,8 +849,8 @@ classdef Environment < naomi.objects.BaseObject
                     temp = str2double(obj.askRegister(obj.R_TEMP(obj.P_OUT)));
                 case 3
                     temp = str2double(obj.askRegister(obj.R_TEMP(3)));
-                case obj.S_EMBIANT
-                    temp = obj.getUSBTemp(obj.U_EMBIANT);
+                case obj.S_AMBIENT
+                    temp = obj.getUSBTemp(obj.U_AMBIENT);
                 case obj.S_MIRROR
                     temp = obj.getUSBTemp(obj.U_MIRROR);
                 case obj.S_QSM
@@ -875,9 +875,9 @@ classdef Environment < naomi.objects.BaseObject
             % temperature of the mirror 
             temp = obj.getTemp(obj.S_MIRROR);
         end
-        function temp=tempEmbiant(obj)
+        function temp=tempAmbient(obj)
             % temperature of the mirror 
-            temp = obj.getTemp(obj.S_EMBIANT);
+            temp = obj.getTemp(obj.S_AMBIENT);
         end
         function temp=tempQSM(obj)
             % temperature of the qsm (gimbal base)  
@@ -891,7 +891,7 @@ classdef Environment < naomi.objects.BaseObject
             %a = 6.112; b = 17.62; c = 243.12;
             
             rh = obj.humidity; 
-            T = obj.tempEmbiant;
+            T = obj.tempAmbient;
             pa = a*exp((b*T)/(c+T)) * rh / 100;
             tdp = c*log(pa/a) / (b - log(pa/a));
         end
